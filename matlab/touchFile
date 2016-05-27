@@ -1,0 +1,21 @@
+#! /bin/sh
+echo "creating resulting files..."
+#chmod 777 touchFile 
+# this file is used to generating Result files of HSI test
+for i in 11 12 13 14 15
+do name1=$(printf newKSC%02dNResult.mat $i);
+	touch "$name1";
+	chmod 777 "$name1";
+done
+
+for j in 11 12 13 14 15
+do name2=$(printf newKSC%02dN4Result.mat $j);
+	touch "$name2";
+	chmod 777 "$name2";
+done
+
+for k in 11 12 13 14 15
+do name3=$(printf newKSC%02dN8Result.mat $k);
+	touch "$name3";
+	chmod 777 "$name3";
+done
