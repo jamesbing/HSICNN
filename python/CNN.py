@@ -17,6 +17,23 @@ import numpy
 import theano
 import theano.tensor as T
 from theano.tensor.signal import downsample
+import tool
+
+"""
+构造卷积神经网络的函数
+"""
+def InitCNNModel(fileName):
+    rng = numpy.random.RandomState(23455)
+    datasets = tool.loadData(fileName)
+    train_set_x, train_set_y = datasets[0]
+    valid_set_x, valid_set_y = datasets[1]
+    test_set_x, test_set_y = datasets[2]
+
+"""
+用于表征CNN中的每个层次的特征，用于构造神经网络
+"""
+class layer(object):
+
 
 
 """
@@ -105,6 +122,7 @@ class ConvolutionalLayer(object):
 
 """
 定义Hidden Layer
+这一层一般都是用于承前启后，用全连接的方式对高维数据进行映射
 """
 class HiddenLayer(object):
     def __init__(self, rng, input, n_in, n_out, W = None, b = None,
@@ -141,32 +159,10 @@ class HiddenLayer(object):
 
 """
 定义logistic regression类
+这一层用于将特征向量映射到分类平面上，输出一个分类向量
 """
 class LogisticRegression(object):
-    """Multi-class Logistic Regression Class
-
-    The logistic regression is fully described by a weight matrix :math:`W`
-    and bias vector :math:`b`. Classification is done by projecting data
-    points onto a set of hyperplanes, the distance to which is used to
-    determine a class membership probability.
-    """
-
     def __init__(self, input, n_in, n_out):
-        """ Initialize the parameters of the logistic regression
-
-        :type input: theano.tensor.TensorType
-        :param input: symbolic variable that describes the input of the
-                      architecture (one minibatch)
-
-        :type n_in: int
-        :param n_in: number of input units, the dimension of the space in
-                     which the datapoints lie
-
-        :type n_out: int
-        :param n_out: number of output units, the dimension of the space in
-                      which the labels lie
-
-        """
         # start-snippet-1
         # initialize with 0 the weights W as a matrix of shape (n_in, n_out)
         self.W = theano.shared(
