@@ -59,5 +59,8 @@ class ConvolutionalLayer(object):
         assert image_shape[1] == filter_shape[1]
         self.input = input
 
-
+        fan_in = numpy.prod(filter_shape[1:])
+        #fan_out的值为：
+        fan_out = (filter_shape[0] * numpy.prod(filter_shape[2:]) // 
+                   numpy.prod(poolsize))
         
