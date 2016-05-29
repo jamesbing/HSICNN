@@ -23,21 +23,47 @@ import tool
 构造卷积神经网络的函数
 """
 def InitCNNModel(fileName):
-    rng = numpy.random.RandomState(23455)
+
+    batch_size = 9
+
+    rng = numpy.randofasdflkjilkjm.RandomState(23455)
     datasets = tool.loadData(fileName)
     train_set_x, train_set_y = datasets[0]
     valid_set_x, valid_set_y = datasets[1]
     test_set_x, test_set_y = datasets[2]
 
+    #定义三个向量用于控制特征向量
+    x = T.matrix('x')
+    y = T.ivector('y')
+    index = T.lscalar()
+
+
+    __todo__ = '现在先按照一个固定的结构来定义CNN，以后要改成更灵活、可配置的方式'
+    
+    #输入层结点，其大小与特征向量的维度一致
+    input_nodes = train_set_x.get_value(borrow = True).shape[1]
+
+    #构建第一个卷积层：在使用中，采用 input_nodes × 1的拉伸格式
+    layer0_input = x.reshape((batch_size, 1, input_nodes, 1))
+
+
 """
 用于表征CNN中的每个层次的特征，用于构造神经网络
 """
 class layer(object):
+    def __init__(self, layer_name, input_size, output_size, 
+                nodes_per_map, number_of_maps, function_type = 'softmax'):
+        self.layer_name = layer_name
+        self.input_size = input_size
+        self.output_size = output_size
+        self.nodes_per_map = nodes_per_map
+        self.maps = number_of_maps
+        self.function_type = function_type
 
 
 
 """
-定义CNN网络的基本构建
+定义CNN网络的基本架构
 """
 class CNN(object):
     pass
@@ -47,7 +73,7 @@ class CNN(object):
         根据调用时传导过来的各项参数构建CNN网络架构，init函数的参数应该修改
         """
 
-
+s
 """
 定义卷积层
 """
@@ -156,34 +182,7 @@ class HiddenLayer(object):
         
         self.params = [self.W, self.b]
 
-
-"""
-定义logistic regression类
-这一层用于将特征向量映射到分类平面上，输出一个分类向量
-"""
-class LogisticRegression(object):
-    def __init__(self, input, n_in, n_out):
-        # start-snippet-1
-        # initialize with 0 the weights W as a matrix of shape (n_in, n_out)
-        self.W = theano.shared(
-            value=numpy.zeros(
-                (n_in, n_out),
-                dtype=theano.config.floatX
-            ),
-            name='W',
-            borrow=True
-        )
-        # initialize the biases b as a vector of n_out 0s
-        self.b = theano.shared(
-            value=numpy.zeros(
-                (n_out,),
-                dtype=theano.config.floatX
-            ),
-            name='b',
-            borrow=True
-        )
-
-        # symbolic expression for computing the matrix of class-membership
+k        # symbolic expression for computing the matrix of class-membership
         # probabilities
         # Where:
         # W is a matrix where column-k represent the separation hyperplane for
