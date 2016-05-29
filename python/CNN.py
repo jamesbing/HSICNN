@@ -44,13 +44,20 @@ def InitCNNModel(fileName):
     input_nodes = train_set_x.get_value(borrow = True).shape[1]
 
     #构建第一个卷积层：在使用中，采用 input_nodes × 1的拉伸格式
+
     layer0_input = x.reshape((batch_size, 1, input_nodes, 1))
+    layer0 = ConvolutionalLayer(
+        rng,
+        input = layer0_input,
+        image_shape = (batch_size, 1, input_nodes, 1),
+        filter_shape = ()
+        )
 
 
 """
 用于表征CNN中的每个层次的特征，用于构造神经网络
 """
-class layer(object):
+class Layer(object):
     def __init__(self, layer_name, input_size, output_size, 
                 nodes_per_map, number_of_maps, function_type = 'softmax'):
         self.layer_name = layer_name
