@@ -53,10 +53,21 @@ def InitCNNModel(fileName):
         filter_shape = ()
         )
 
+    #这一层是连接Convolutional Layer MaxPooling之后的那一层
+    #与MaxPooling那一层和输出层连接的中间层次，其实是全连接层
+    layer1 = HiddenLayer(
+        
+        )
+
+    #这一层是连接前面的全连接层以及后面的输出层之间的那一层连接
+    #其操作实际上是一个logistics regression
+    layer2
+
 
 """
 用于表征CNN中的每个层次的特征，用于构造神经网络
 """
+
 class Layer(object):
     def __init__(self, layer_name, input_size, output_size, 
                 nodes_per_map, number_of_maps, function_type = 'softmax'):
@@ -189,7 +200,55 @@ class HiddenLayer(object):
         
         self.params = [self.W, self.b]
 
-k        # symbolic expression for computing the matrix of class-membership
+        # symbolic expression for computing the matrix of class-membership
         # probabilities
         # Where:
         # W is a matrix where column-k represent the separation hyperplane for
+
+class LogisticRegression(object):
+    def __init__(self, input, n_in, n_out):
+        # start-snippet-1
+        # initialize with 0 the weights W as a matrix of shape (n_in, n_out)
+        self.W = theano.shared(
+            value=numpy.zeros(
+                (n_in, n_out),
+                dtype=theano.config.floatX
+            ),
+            name='W',
+            borrow=True
+        )
+        # initialize the biases b as a vector of n_out 0s
+        self.b = theano.shared(
+            value=numpy.zeros(
+                (n_out,),
+                dtype=theano.config.floatX
+            ),
+            name='b',
+            borrow=True
+        )
+
+        self.p_y_given_x = T.nnet.softmax(T.dot(input,self.W) + self.b)
+
+        self.y_pred = T.argmax(self.p_y_given_x, axis = 1)
+
+        self.params = [self.W, self.b]
+
+        self.input = input
+
+    def negative_log_likelihood(self, y):
+
+        return -T.mean(T.log(self.p_y_given_x)[T.arange(y.shape[0]),y])
+
+    def errors(self, y):
+        if y.ndim != self.y_pred.ndim:
+            raise TypeError(
+                'y should have the same shape as self.y_pred',
+                ('y', y.type, 'y_pred', self.y_pred.type)
+                )
+
+        if y.dtype.startswith('int'):
+            return T.mean(T.neq(self.y_pred, y))
+        else:
+            raise NotImplementedError()
+
+
