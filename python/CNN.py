@@ -11,12 +11,13 @@ from __future__ import print_function
 import os
 import sys
 import timeit
-
+import math
 import numpy
 
 import theano
 import theano.tensor as T
 from theano.tensor.signal import downsample
+from theano.tensor.nnet import conv2d
 import tool
 
 """
@@ -37,8 +38,12 @@ def InitCNNModel(fileName):
     y = T.ivector('y')
     index = T.lscalar()
 
+    #定义学习效率，该值决定的是寻找最优解时每一步下降的幅度，
+    #也就是优化的步长，太大容易导致局部最优解困境，太小容易导致训练速度过慢
+    learning_rate = 0.01
 
-    __todo__ = '现在先按照一个固定的结构来定义CNN，以后要改成更灵活、可配置的方式'
+
+    #__todo__ = '现在先按照一个固定的结构来定义CNN，以后要改成更灵活、可配置的方式'
     
     #输入层结点，其大小与特征向量的维度一致
     input_nodes = train_set_x.get_value(borrow = True).shape[1]
@@ -46,22 +51,92 @@ def InitCNNModel(fileName):
     #构建第一个卷积层：在使用中，采用 input_nodes × 1的拉伸格式
     
     layer0_input = x.reshape((batch_size, 1, input_nodes, 1))
+    layer0_conv_kernel_number = 20
+    #该变量用于保存卷积跳步，其值等于采取的领域策略的数值+1
+    kernel_jump_step = 5
+    layer0_conv_kernel_size = math.ceil(
+        layer0_input/kernel_jump_step/9
+        ) * kernel_jump_step
+
+    n2_nodes_number = ((layer0_input - layer0_conv_kernel_size)/
+                       kernel_jump_step + 1)
+
+    n3_nodes_number = 40
+
+    layer1_max_pool_kernel_size = math.ceil(
+        n2_nodes_number / n3_nodes_number
+    )
+
+    max_pool_kernel_size = math.ceil()
+
     layer0 = ConvolutionalLayer(
-        rng,
+        rng ,
         input = layer0_input,
         image_shape = (batch_size, 1, input_nodes, 1),
-        filter_shape = ()
-        )
+        fi lter_shape = (layer0_conv_kernel_number, 1,
+                       layer0_conv_kernel_size, 1),
+        poolsize = (layer1_max_pool_kernel_size,1)
+        ) 
 
     #这一层是连接Convolutional Layer MaxPooling之后的那一层
     #与MaxPooling那一层和输出层连接的中间层次，其实是全连接层
+    layer1_input = layer0.output.flatten(2)
     layer1 = HiddenLayer(
-        
+        rng,
+        input = layer1_input,
+        n_in = layer0_conv_kernel_number * n3_nodes_number * 1,
+        n_out = 100,
+        activation = T.tanh
         )
 
     #这一层是连接前面的全连接层以及后面的输出层之间的那一层连接
     #其操作实际上是一个logistics regression
-    layer2
+    n_out_nodes = train_set_y.get_value(borrow = True).max() + 1
+    layer2 = LogisticRegressionLayer(
+        input=layer1.output, n_in = 100, n_out = n_out_nodes    
+        )
+
+    cost = layer2.negative_log_likehood(y)
+
+    test_model = theano.function(
+        [index],
+        layer2.errors(y),
+        givens = {
+            x:test_set_x[index * batch_size: (index + 1) * batch_size],
+            y:test_set_y[index * batch_size: (index + 1) * batch_size]
+        }
+        )
+
+    validate__model = theano.function(
+        [index],
+        layer2.errors(y),
+        givens = {
+            x:valid_set_x[index * batch_size: (index + 1) * batch_size],
+            y:valid_set_y[index * batch_size: (index + 1) * batch_size]
+        }
+        )
+    
+    params = layer2.params + layer1.params + layer0.params
+    
+    #为所有的权值参数创建一个梯度矩阵，以便用梯度下降算法进行训练
+    grads = T.grad(cost, params)
+
+    #权值更新法则
+    updates = [
+        (param_i, param_i - learning_rate * grad_i)
+        for param_i, grad_i in zip(params, grads)
+    ]
+
+    #根据更新法则以及相关参数，构造网络的基于反向传播梯度下降的训练函数
+    train_model = theano.function(
+        [index],
+        cost,
+        updates = updates,
+        givens = {
+            x:train_set_x[index * batch_size: (index + 1) * batch_size],
+            y:train_set_y[index * batch_size: (index + 1) * batch_size]
+        }
+        )
 
 
 """
@@ -205,7 +280,7 @@ class HiddenLayer(object):
         # Where:
         # W is a matrix where column-k represent the separation hyperplane for
 
-class LogisticRegression(object):
+class LogisticRegressionLayer(object):
     def __init__(self, input, n_in, n_out):
         # start-snippet-1
         # initialize with 0 the weights W as a matrix of shape (n_in, n_out)
