@@ -44,7 +44,7 @@ def InitCNNModel(fileName):
     input_nodes = train_set_x.get_value(borrow = True).shape[1]
 
     #构建第一个卷积层：在使用中，采用 input_nodes × 1的拉伸格式
-
+    
     layer0_input = x.reshape((batch_size, 1, input_nodes, 1))
     layer0 = ConvolutionalLayer(
         rng,
