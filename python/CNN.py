@@ -67,13 +67,13 @@ def InitCNNModel(fileName):
         n2_nodes_number / n3_nodes_number
     )
 
-    max_pool_kernel_size = math.ceil()
+   # max_pool_kernel_size = math.ceil()
 
     layer0 = ConvolutionalLayer(
         rng ,
         input = layer0_input,
         image_shape = (batch_size, 1, input_nodes, 1),
-        fi lter_shape = (layer0_conv_kernel_number, 1,
+        filter_shape = (layer0_conv_kernel_number, 1,
                        layer0_conv_kernel_size, 1),
         poolsize = (layer1_max_pool_kernel_size,1)
         ) 
@@ -137,6 +137,9 @@ def InitCNNModel(fileName):
             y:train_set_y[index * batch_size: (index + 1) * batch_size]
         }
         )
+
+
+
 
 
 """
