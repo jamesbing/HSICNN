@@ -4,9 +4,9 @@
 #本模块包含卷积神经网络中的必要组件#
 ####################################
 
-__author__ = 'Jiabing Leng @ james ::: tadakey@163.c0m'
-
 from __future__ import print_function
+
+__author__ = 'Jiabing Leng @ james ::: tadakey@163.c0m'
 
 import os
 import sys
@@ -23,11 +23,11 @@ import tool
 """
 构造卷积神经网络的函数
 """
-def InitCNNModel(fileName):
+def InitCNNModel(fileName, neighbor_strategy):
 
     batch_size = 9
 
-    rng = numpy.randofasdflkjilkjm.RandomState(23455)
+    rng = numpy.random.RandomState(23455)
     datasets = tool.loadData(fileName)
     train_set_x, train_set_y = datasets[0]
     valid_set_x, valid_set_y = datasets[1]
@@ -49,23 +49,23 @@ def InitCNNModel(fileName):
     input_nodes = train_set_x.get_value(borrow = True).shape[1]
 
     #构建第一个卷积层：在使用中，采用 input_nodes × 1的拉伸格式
-    
+ 
     layer0_input = x.reshape((batch_size, 1, input_nodes, 1))
     layer0_conv_kernel_number = 20
     #该变量用于保存卷积跳步，其值等于采取的领域策略的数值+1
-    kernel_jump_step = 5
-    layer0_conv_kernel_size = math.ceil(
-        layer0_input/kernel_jump_step/9
-        ) * kernel_jump_step
+    kernel_jump_step = neighbor_strategy + 1
+    layer0_conv_kernel_size = int(math.ceil(
+        (input_nodes/kernel_jump_step/9.
+        * kernel_jump_step)))
 
-    n2_nodes_number = ((layer0_input - layer0_conv_kernel_size)/
+    n2_nodes_number = ((input_nodes - layer0_conv_kernel_size)/
                        kernel_jump_step + 1)
 
     n3_nodes_number = 40
 
     layer1_max_pool_kernel_size = math.ceil(
-        n2_nodes_number / n3_nodes_number
-    )
+        float(n2_nodes_number / n3_nodes_number
+    ))
 
    # max_pool_kernel_size = math.ceil()
 
@@ -75,7 +75,7 @@ def InitCNNModel(fileName):
         image_shape = (batch_size, 1, input_nodes, 1),
         filter_shape = (layer0_conv_kernel_number, 1,
                        layer0_conv_kernel_size, 1),
-        poolsize = (layer1_max_pool_kernel_size,1)
+        poolsize = (int(layer1_max_pool_kernel_size),1)
         ) 
 
     #这一层是连接Convolutional Layer MaxPooling之后的那一层
@@ -96,7 +96,7 @@ def InitCNNModel(fileName):
         input=layer1.output, n_in = 100, n_out = n_out_nodes    
         )
 
-    cost = layer2.negative_log_likehood(y)
+    cost = layer2.negative_log_likelihood(y)
 
     test_model = theano.function(
         [index],
@@ -107,7 +107,7 @@ def InitCNNModel(fileName):
         }
         )
 
-    validate__model = theano.function(
+    validate_model = theano.function(
         [index],
         layer2.errors(y),
         givens = {
@@ -137,10 +137,19 @@ def InitCNNModel(fileName):
             y:train_set_y[index * batch_size: (index + 1) * batch_size]
         }
         )
-      ###############
+    ###############
     # TRAIN MODEL #
     ###############
+
     print('... training')
+    
+    n_train_batches = train_set_x.get_value(borrow = True).shape[0]
+    n_valid_batches = valid_set_x.get_value(borrow = True).shape[0]
+    n_test_batches = test_set_x.get_value(borrow = True).shape[0]
+    n_train_batches //= batch_size
+    n_valid_batches //= batch_size
+    n_test_batches //= batch_size
+
     # early-stopping parameters
     patience = 10000  # look as this many examples regardless
     patience_increase = 2  # wait this much longer when a new best is
@@ -159,6 +168,8 @@ def InitCNNModel(fileName):
     start_time = timeit.default_timer()
 
     epoch = 0
+    #n_epochs这个值表示的是，对于网络的最大的优化次数
+    n_epochs = 200
     done_looping = False
 
     while (epoch < n_epochs) and (not done_looping):
@@ -248,7 +259,7 @@ class CNN(object):
         根据调用时传导过来的各项参数构建CNN网络架构，init函数的参数应该修改
         """
 
-s
+
 """
 定义卷积层
 """
@@ -408,4 +419,5 @@ class LogisticRegressionLayer(object):
         else:
             raise NotImplementedError()
 
-
+if __name__ == '__main__':
+    InitCNNModel('newPU1N.mat',1)
