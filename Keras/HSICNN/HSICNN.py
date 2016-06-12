@@ -24,7 +24,13 @@ def build_CNN_model(layers, loss, optimizer):
     
     return model
 
-
+##########################################################
+#This function is used to train the constructed CNN model#
+##########################################################
+def train_model(model, x_train, y _train, x_val, y_val, batch_size,nb_epoch):
+    model.fit(x_train, y_train, batch_size = batch_size,
+             nb_epoch = nb_epoch, show_accuracy=True,verbose=1,
+             validation_data=(x_val, y_val))
 
 
 
