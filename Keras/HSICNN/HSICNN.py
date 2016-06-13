@@ -11,6 +11,8 @@ from keras.optimizers import SGD
 
 from keras.utils import np_utils
 
+import math
+
 ##################################################
 #This function is used to construct the CNN model#
 ##################################################
@@ -67,6 +69,35 @@ def loadData(dataFile, typeId = -1, bShowData = False):
     
     rval = [(train_data, train_label),(valid_data,valid_label),(test_data,test_label)]
     return rval
+
+#######################################################################################
+#currently, I wrote all the network constructing and training and testing in this file#
+#laterly, I will seperate them apart.                                                 #
+#######################################################################################
+def temp_network(filePath, number_of_con_filters = 20, con_step_length, max_pooling_feature_map_size):
+    #get the train data, train label, validate data, validate label, test data, test label
+    test_dataset, valid_dataset, test_dataset = loadData(filePath)
+    
+    #initialize parameters
+    layer1_input_length = len(test_dataset[0])
+    con_filter_length = (math.ceil( (layer1_input_length /  con_step_length) / 9)) * con_step_length
+
+    model = Sequential()
+    
+    #the first convolutional layer
+    print 'The size of the first convolutional layer is %d.' % layer1_input_length
+    layer1 = Convolution1D(number_of_con_filters, con_filter_length, activation = tanh, border_mode='same', bias=true, input_dim=layer1_input_length)
+    model.add(layer1)
+
+    #the max pooling layer after the first convolutional layer
+    first_feature_map_size = (layer1_input_length - con_filter_length) / con_step_length + 1
+    max_pooling_kernel_size = math.ceil(first_feature_map_size / max_pooling_feature_map_size)
+    layer2 = MaxPooling1D(max_pooling_kernel_size)
+    model.add(layer2)
+
+    #Flatten the variables outputed from maxpooling layer
+    model.add(Flatten())
+
 
 
 
