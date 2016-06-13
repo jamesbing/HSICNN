@@ -74,9 +74,9 @@ def loadData(dataFile, typeId = -1, bShowData = False):
 #currently, I wrote all the network constructing and training and testing in this file#
 #laterly, I will seperate them apart.                                                 #
 #######################################################################################
-def temp_network(filePath, number_of_con_filters = 20, con_step_length, max_pooling_feature_map_size):
+def temp_network(filePath, number_of_con_filters = 20, con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay):
     #get the train data, train label, validate data, validate label, test data, test label
-    test_dataset, valid_dataset, test_dataset = loadData(filePath)
+    train_dataset, valid_dataset, test_dataset = loadData(filePath)
     
     #initialize parameters
     layer1_input_length = len(test_dataset[0])
@@ -86,7 +86,7 @@ def temp_network(filePath, number_of_con_filters = 20, con_step_length, max_pool
     
     #the first convolutional layer
     print 'The size of the first convolutional layer is %d.' % layer1_input_length
-    layer1 = Convolution1D(number_of_con_filters, con_filter_length, activation = tanh, border_mode='same', bias=true, input_dim=layer1_input_length)
+    layer1 = Convolution1D(number_of_con_filters, con_filter_length, activation = tanh, border_mode='same', bias=True, input_dim=layer1_input_length)
     model.add(layer1)
 
     #the max pooling layer after the first convolutional layer
@@ -98,6 +98,27 @@ def temp_network(filePath, number_of_con_filters = 20, con_step_length, max_pool
     #Flatten the variables outputed from maxpooling layer
     model.add(Flatten())
 
+    #the fully connected layer
+    layer3 = Dense(number_of_full_layer_nodes, activation = tanh, bias = True)
+    model.add(layer3)
 
+    #the activation layer which will output the final classification result
+    classes = numpy.max(test_dataset[1])
+    print 'The number of classification classes is %d.' % classes
+    layer4 = Dense(classes,activation = softmax, bias=True)
+    model.add(layer4)
 
+    #the optimizer
+    sgd = SGD(lr = learning_ratio, decay = train_decay, momentum = 0.9, nesterov=True)
 
+    model.compile(optimizer=sgd, loss='categorical_crossentropy',metrics=['accuracy'])
+
+    #train the constructed model
+    history = model.fit(self, train_dataset[0], train_dataset[1], batch_size = 10, nb_epoch = 1000, verbose=1, valid_dataset, shuffle=True)
+    model.save_weights('model_weights.h5', overwrite=True)
+
+    #test the model
+    classes = model.predict_classes(test_dataset[0], verbose=1)
+    test_accuracy = numpy.mean(numpy.equal(test_dataset[1], classification))
+
+    print 'The correct ratio of the trained CNN model is %d' % test_accuracy
