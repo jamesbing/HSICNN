@@ -29,10 +29,10 @@ def build_CNN_model(layers, loss, optimizer):
 ##########################################################
 #This function is used to train the constructed CNN model#
 ##########################################################
-def train_model(model, x_train, y _train, x_val, y_val, batch_size,nb_epoch):
-    model.fit(x_train, y_train, batch_size = batch_size,
-             nb_epoch = nb_epoch, show_accuracy=True,verbose=1,
-             validation_data=(x_val, y_val))
+#def train_model(model, x_train, y _train, x_val, y_val, batch_size,nb_epoch):
+#    model.fit(x_train, y_train, batch_size = batch_size,
+#             nb_epoch = nb_epoch, show_accuracy=True,verbose=1,
+#             validation_data=(x_val, y_val))
 
 
 ################################
@@ -85,7 +85,7 @@ def temp_network(filePath, number_of_con_filters = 20, con_step_length, max_pool
     model = Sequential()
     
     #the first convolutional layer
-    print 'The size of the first convolutional layer is %d.' % layer1_input_length
+    print("The size of the first convolutional layer is ", layer1_input_length)
     layer1 = Convolution1D(number_of_con_filters, con_filter_length, activation = tanh, border_mode='same', bias=True, input_dim=layer1_input_length)
     model.add(layer1)
 
@@ -104,7 +104,7 @@ def temp_network(filePath, number_of_con_filters = 20, con_step_length, max_pool
 
     #the activation layer which will output the final classification result
     classes = numpy.max(test_dataset[1])
-    print 'The number of classification classes is %d.' % classes
+    print("The number of classification classes is ",classes)
     layer4 = Dense(classes,activation = softmax, bias=True)
     model.add(layer4)
 
@@ -121,4 +121,4 @@ def temp_network(filePath, number_of_con_filters = 20, con_step_length, max_pool
     classes = model.predict_classes(test_dataset[0], verbose=1)
     test_accuracy = numpy.mean(numpy.equal(test_dataset[1], classification))
 
-    print 'The correct ratio of the trained CNN model is %d' % test_accuracy
+    print("The correct ratio of the trained CNN model is ",  test_accuracy)
