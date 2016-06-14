@@ -8,7 +8,11 @@ from keras.models import Sequential
 from keras.layers.core import Dense,Dropout,Activation,Flatten
 from keras.layers.convolutional import Convolution2D, MaxPooling2D, Convolution1D, MaxPooling1D
 from keras.optimizers import SGD
+import imdb
 
+import theano
+
+#from keras.processing import sequence
 #from keras.layers.Activation import tanh, softmax
 
 from keras.utils import np_utils
@@ -65,14 +69,52 @@ def loadData(dataFile, typeId = -1, bShowData = False):
 #        shared_y = theano.shared(numpy.asarray(data_y,dtype='int32'))
 #        return shared_x, shared_y
 
-#    test_set_x, test_set_y = shared_dataset(test_set)
+#   test_set_x, test_set_y = shared_dataset(test_set)
 #    valid_set_x, valid_set_y = shared_dataset(valid_set)
 #    train_set_x, train_set_y = shared_dataset(train_set)
 
-#    rval = [(train_set_x, train_set_y), (valid_set_x, valid_set_y), (test_set_x, test_set_y)]
+#   rval = [(train_set_x, train_set_y), (valid_set_x, valid_set_y), (test_set_x, test_set_y)]
     
-    rval = [(train_data, train_label),(valid_data,valid_label),(test_data,test_label)]
-    return rval
+
+#    train_dataset_data = train_data.tolist()
+#    test_dataset_data = test_data.tolist()
+#    valid_dataset_data = valid_data.tolist()
+    
+    train_dataset_data = []
+    nX = []
+    for x in train_data:
+        nx = []
+        for w in x:
+            nx.append(w)
+        nX.append(nx)
+    train_dataset_data = nX
+    testTemp = numpy.array(nX[:len(nX)])
+
+    valid__dataset_data = []
+    nX = []
+    for x in valid_data:
+        nx = []
+        for w in x:
+            nx.append(w)
+        nX.append(nx)
+    valid_dataset_data = nX
+
+
+    test_dataset_data = []
+    nX = []
+    for x in test_data:
+        nx = []
+        for w in x:
+            nx.append(w)
+        nX.append(nx)
+    test_dataset_data = nX
+
+    train_dataset_data = numpy.array(train_dataset_data,dtype="object")
+    test_dataset_data = numpy.array(test_dataset_data)
+    valid_dataset_data = numpy.array(valid_dataset_data)
+
+    return [(train_dataset_data, train_label),(valid_dataset_data,valid_label),(test_dataset_data,test_label)]
+#    return rval
 
 #######################################################################################
 #currently, I wrote all the network constructing and training and testing in this file#
@@ -81,7 +123,10 @@ def loadData(dataFile, typeId = -1, bShowData = False):
 def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay):
     #get the train data, train label, validate data, validate label, test data, test label
     train_dataset, valid_dataset, test_dataset = loadData(filePath)
+
     
+
+#    train_dataset, test_dataset = imdb.load_data()   
     #initialize parameters
     layer1_input_length = len(test_dataset[0][0])
     con_filter_length = (math.ceil( (layer1_input_length /  con_step_length) / 9)) * con_step_length
@@ -90,14 +135,14 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     
     #the first convolutional layer
     print("The size of the first convolutional layer is ", layer1_input_length)
-    layer1 = Convolution1D(number_of_con_filters, con_filter_length, activation = 'tanh', border_mode='same', bias=True, input_dim=layer1_input_length)
+    layer1 = Convolution1D(number_of_con_filters, con_filter_length, activation = 'tanh', subsample_length=1,border_mode='valid', bias=True, input_dim = layer1_input_length,input_length = 1800)
     model.add(layer1)
 
     #the max pooling layer after the first convolutional layer
     first_feature_map_size = (layer1_input_length - con_filter_length) / con_step_length + 1
     max_pooling_kernel_size = int(math.ceil(first_feature_map_size / max_pooling_feature_map_size))
     print("the max pooling kernel size is ", max_pooling_kernel_size)
-    layer2 = MaxPooling1D(max_pooling_kernel_size)
+    layer2 = MaxPooling1D(max_pooling_kernel_size, stride=1, border_mode='valid')
     model.add(layer2)
 
     #Flatten the variables outputed from maxpooling layer
@@ -119,7 +164,36 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     model.compile(optimizer=sgd, loss='categorical_crossentropy',metrics=['accuracy'])
 
     #train the constructed model
-    history = model.fit(train_dataset[0], train_dataset[1], batch_size = 10, nb_epoch = 1000, verbose=1, validation_data = valid_dataset, shuffle=True)
+    #the input shape of the train_dataset should be a list.
+
+
+#    train_dataset_data = train_dataset[0].tolist()
+#    test_dataset_data = test_dataset[0].tolist()
+
+#    train_dataset_data = []
+#    for tempTrainMark in range(train_dataset[0].shape[0]):
+#        train_dataset_data.append(train_dataset[0][tempTrainMark])
+
+#   train_dataset_data = numpy.array(train_dataset_data)
+    
+#    print("The training dataset have ", len(train_dataset_data), "items, each item is a ", len(train_dataset_data[0]), "dimention vector.")
+#    print("There are ", len(train_dataset[1]),"labels in training dataset, the match between labels and item numbers is:", len(train_dataset[1]) == len(train_dataset_data), ".")
+#    test_dataset_data = []
+#    for tempTestMark in range(test_dataset[0].shape[0]):
+#        test_dataset_data.append(test_dataset[0][tempTestMark])
+
+
+#    test_dataset_data = numpy.array(test_dataset_data)
+#    train_dataset_data = numpy.array(train_dataset_data[:len(train_dataset_data)])
+#    test_dataset_data = numpy.array(test_dataset_data[:len(test_dataset_data)])
+
+#    train_dataset_data = sequence.pad_sequences(train_dataset_data, )
+
+#    train_dataset_data = train_dataset[0]
+    
+
+#    train_dataset_data = numpy.expand_dims(train_dataset[0], 1)
+    history = model.fit(train_dataset[0], train_dataset[1], batch_size = 10, nb_epoch = 1000, verbose=1, validation_split = 0.1, shuffle=True)
     model.save_weights('model_weights.h5', overwrite=True)
 
     #test the model
