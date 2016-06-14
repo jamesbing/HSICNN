@@ -9,6 +9,8 @@ from keras.layers.core import Dense,Dropout,Activation,Flatten
 from keras.layers.convolutional import Convolution2D, MaxPooling2D, Convolution1D, MaxPooling1D
 from keras.optimizers import SGD
 
+#from keras.layers.Activation import tanh, softmax
+
 from keras.utils import np_utils
 
 import scipy.io as sio
@@ -81,19 +83,20 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     train_dataset, valid_dataset, test_dataset = loadData(filePath)
     
     #initialize parameters
-    layer1_input_length = len(test_dataset[0])
+    layer1_input_length = len(test_dataset[0][0])
     con_filter_length = (math.ceil( (layer1_input_length /  con_step_length) / 9)) * con_step_length
 
     model = Sequential()
     
     #the first convolutional layer
     print("The size of the first convolutional layer is ", layer1_input_length)
-    layer1 = Convolution1D(number_of_con_filters, con_filter_length, activation = tanh, border_mode='same', bias=True, input_dim=layer1_input_length)
+    layer1 = Convolution1D(number_of_con_filters, con_filter_length, activation = 'tanh', border_mode='same', bias=True, input_dim=layer1_input_length)
     model.add(layer1)
 
     #the max pooling layer after the first convolutional layer
     first_feature_map_size = (layer1_input_length - con_filter_length) / con_step_length + 1
-    max_pooling_kernel_size = math.ceil(first_feature_map_size / max_pooling_feature_map_size)
+    max_pooling_kernel_size = int(math.ceil(first_feature_map_size / max_pooling_feature_map_size))
+    print("the max pooling kernel size is ", max_pooling_kernel_size)
     layer2 = MaxPooling1D(max_pooling_kernel_size)
     model.add(layer2)
 
@@ -101,13 +104,13 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     model.add(Flatten())
 
     #the fully connected layer
-    layer3 = Dense(number_of_full_layer_nodes, activation = tanh, bias = True)
+    layer3 = Dense(number_of_full_layer_nodes, activation = 'tanh', bias = True)
     model.add(layer3)
 
     #the activation layer which will output the final classification result
     classes = numpy.max(test_dataset[1])
     print("The number of classification classes is ",classes)
-    layer4 = Dense(classes,activation = softmax, bias=True)
+    layer4 = Dense(classes,activation = 'softmax', bias=True)
     model.add(layer4)
 
     #the optimizer
