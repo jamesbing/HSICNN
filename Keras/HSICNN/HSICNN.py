@@ -11,6 +11,8 @@ from keras.optimizers import SGD
 
 from keras.utils import np_utils
 
+import scipy.io as sio
+import random
 import math
 
 ##################################################
