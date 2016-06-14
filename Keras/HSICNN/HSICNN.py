@@ -74,7 +74,7 @@ def loadData(dataFile, typeId = -1, bShowData = False):
 #currently, I wrote all the network constructing and training and testing in this file#
 #laterly, I will seperate them apart.                                                 #
 #######################################################################################
-def temp_network(filePath, number_of_con_filters = 20, con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay):
+def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay):
     #get the train data, train label, validate data, validate label, test data, test label
     train_dataset, valid_dataset, test_dataset = loadData(filePath)
     
@@ -114,7 +114,7 @@ def temp_network(filePath, number_of_con_filters = 20, con_step_length, max_pool
     model.compile(optimizer=sgd, loss='categorical_crossentropy',metrics=['accuracy'])
 
     #train the constructed model
-    history = model.fit(self, train_dataset[0], train_dataset[1], batch_size = 10, nb_epoch = 1000, verbose=1, valid_dataset, shuffle=True)
+    history = model.fit(train_dataset[0], train_dataset[1], batch_size = 10, nb_epoch = 1000, verbose=1, validation_data = valid_dataset, shuffle=True)
     model.save_weights('model_weights.h5', overwrite=True)
 
     #test the model
@@ -122,3 +122,6 @@ def temp_network(filePath, number_of_con_filters = 20, con_step_length, max_pool
     test_accuracy = numpy.mean(numpy.equal(test_dataset[1], classification))
 
     print("The correct ratio of the trained CNN model is ",  test_accuracy)
+
+if __name__ == '__main__':
+    temp_network("newPU1NWith2RestN.mat", number_of_con_filters = 20, con_step_length = 1, max_pooling_feature_map_size = 40, number_of_full_layer_nodes = 100, learning_ratio = 0.01, train_decay = 0.001)
