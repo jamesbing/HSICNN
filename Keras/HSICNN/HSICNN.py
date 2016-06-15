@@ -8,7 +8,7 @@ from keras.models import Sequential
 from keras.layers.core import Dense,Dropout,Activation,Flatten
 from keras.layers.convolutional import Convolution2D, MaxPooling2D, Convolution1D, MaxPooling1D
 from keras.optimizers import SGD
-import imdb
+#import imdb
 
 import theano
 
@@ -86,9 +86,10 @@ def loadData(dataFile, typeId = -1, bShowData = False):
         nx = []
         for w in x:
             nx.append(w)
+        numpy.array(nx,dtype="object",copy=True)
         nX.append(nx)
     train_dataset_data = nX
-    testTemp = numpy.array(nX[:len(nX)])
+#    testTemp = numpy.array(nX[:len(nX)])
 
     valid__dataset_data = []
     nX = []
@@ -96,6 +97,7 @@ def loadData(dataFile, typeId = -1, bShowData = False):
         nx = []
         for w in x:
             nx.append(w)
+        numpy.array(nx,dtype="object",copy=True)
         nX.append(nx)
     valid_dataset_data = nX
 
@@ -106,6 +108,7 @@ def loadData(dataFile, typeId = -1, bShowData = False):
         nx = []
         for w in x:
             nx.append(w)
+        numpy.array(nx,dtype="object",copy=True)
         nX.append(nx)
     test_dataset_data = nX
 
@@ -135,7 +138,7 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     
     #the first convolutional layer
     print("The size of the first convolutional layer is ", layer1_input_length)
-    layer1 = Convolution1D(number_of_con_filters, con_filter_length, activation = 'tanh', subsample_length=1,border_mode='valid', bias=True, input_dim = layer1_input_length,input_length = 1800)
+    layer1 = Convolution1D(number_of_con_filters, con_filter_length, activation = 'tanh', subsample_length=1,border_mode='valid', bias=True, input_dim=103, input_length=1)
     model.add(layer1)
 
     #the max pooling layer after the first convolutional layer
@@ -193,7 +196,8 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     
 
 #    train_dataset_data = numpy.expand_dims(train_dataset[0], 1)
-    history = model.fit(train_dataset[0], train_dataset[1], batch_size = 10, nb_epoch = 1000, verbose=1, validation_split = 0.1, shuffle=True)
+    train_dataset_data = train_dataset[0].reshape(train_dataset[0].shape[0], 1, train_dataset[0].shape[1])
+    history = model.fit(train_dataset_data, train_dataset[1], batch_size = 10, nb_epoch = 1000, verbose=1, validation_split = 0.1, shuffle=True)
     model.save_weights('model_weights.h5', overwrite=True)
 
     #test the model
