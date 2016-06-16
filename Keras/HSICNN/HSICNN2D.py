@@ -252,6 +252,9 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     #test the model
     #prepare the testing dataset as the training dataset does
     
+    test_dataset[0] = test_dataset[0].reshape(test_dataset[0].shape[0],1,test_dataset[0].shape[1],1)
+    test_dataset[1] = np_utils.to_categorical(valid_dataset[1])
+
     classes = model.predict_classes(test_dataset[0], verbose=1)
     test_accuracy = numpy.mean(numpy.equal(test_dataset[1], classes))
 
