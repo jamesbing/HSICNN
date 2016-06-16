@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 # coding=utf-8
-
 from __future__ import print_function
 import numpy
+
+#import theano
+#theano.config.device = 'gpu'
+#theano.config.floatX = 'float32'
 
 from keras.models import Sequential
 from keras.layers.core import Dense,Dropout,Activation,Flatten
 from keras.layers.convolutional import Convolution2D, MaxPooling2D, Convolution1D, MaxPooling1D, Convolution3D, MaxPooling3D
 from keras.optimizers import SGD
 #import imdb
-
-import theano
-
 #from keras.processing import sequence
 #from keras.layers.Activation import tanh, softmax
 
@@ -98,7 +98,7 @@ def loadData(dataFile, typeId = -1, bShowData = False):
     train_dataset_data = nX
 #    testTemp = numpy.array(nX[:len(nX)])
 
-    valid__dataset_data = []
+    valid_dataset_data = []
     nX = []
     count = 0
     for x in valid_data:
@@ -240,12 +240,20 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     print("The dataset used to train the model shapes ",train_dataset_data.shape)
     print("The label corresponding to the train data shapes ",train_dataset_label.shape)
 #    print(train_dataset_data)
-    history = model.fit(train_dataset_data, train_dataset_label, batch_size = 10, nb_epoch = 1000, verbose=1, validation_split = 0.1, shuffle=True)
+
+    #prepare the validation dataset
+    validation_dataset_data = valid_dataset[0].reshape(valid_dataset[0].shape[0],1,valid_dataset[0].shape[1],1)
+    validation_dataset_label = np_utils.to_categorical(valid_dataset[1])
+    validation_data = (validation_dataset_data,validation_dataset_label)
+    history = model.fit(train_dataset_data, train_dataset_label, batch_size = 10, nb_epoch = 1000, verbose=1, validation_data=validation_data, shuffle=True)
     model.save_weights('model_weights.h5', overwrite=True)
+    
 
     #test the model
+    #prepare the testing dataset as the training dataset does
+    
     classes = model.predict_classes(test_dataset[0], verbose=1)
-    test_accuracy = numpy.mean(numpy.equal(test_dataset[1], classification))
+    test_accuracy = numpy.mean(numpy.equal(test_dataset[1], classes))
 
     print("The correct ratio of the trained CNN model is ",  test_accuracy)
 
