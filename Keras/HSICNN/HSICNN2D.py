@@ -93,7 +93,7 @@ def loadData(dataFile, typeId = -1, bShowData = False):
             nx.append(w)
         numpy.array(nx,dtype="object",copy=True)
         nX.append(nx)
-        train_label[count] = train_label_temp[count]
+        train_label[count] = int(train_label_temp[count])
         count = count + 1
     train_dataset_data = nX
 #    testTemp = numpy.array(nX[:len(nX)])
@@ -107,7 +107,7 @@ def loadData(dataFile, typeId = -1, bShowData = False):
             nx.append(w)
         numpy.array(nx,dtype="object",copy=True)
         nX.append(nx)
-        valid_label[count] = valid_label_temp[count]
+        valid_label[count] = int(valid_label_temp[count])
         count = count + 1
     valid_dataset_data = nX
 
@@ -121,7 +121,7 @@ def loadData(dataFile, typeId = -1, bShowData = False):
             nx.append(w)
         numpy.array(nx,dtype="object",copy=True)
         nX.append(nx)
-        test_label[count] = test_label_temp[count]
+        test_label[count] = int(test_label_temp[count])
         count = count + 1
     test_dataset_data = nX
 
@@ -245,20 +245,36 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     validation_dataset_data = valid_dataset[0].reshape(valid_dataset[0].shape[0],1,valid_dataset[0].shape[1],1)
     validation_dataset_label = np_utils.to_categorical(valid_dataset[1])
     validation_data = (validation_dataset_data,validation_dataset_label)
-    history = model.fit(train_dataset_data, train_dataset_label, batch_size = 10, nb_epoch = 1000, verbose=1, validation_data=validation_data, shuffle=True)
+    history = model.fit(train_dataset_data, train_dataset_label, batch_size = 20, nb_epoch = 100, verbose=1, validation_split=0.2, shuffle=True)
     model.save_weights('model_weights.h5', overwrite=True)
     
 
     #test the model
     #prepare the testing dataset as the training dataset does
     
-    test_dataset[0] = test_dataset[0].reshape(test_dataset[0].shape[0],1,test_dataset[0].shape[1],1)
-    test_dataset[1] = np_utils.to_categorical(valid_dataset[1])
+    test_dataset_data = test_dataset[0].reshape(test_dataset[0].shape[0],1,test_dataset[0].shape[1],1)
+    test_dataset_label = np_utils.to_categorical(test_dataset[1])
+    
+    classes = model.predict_classes(test_dataset_data, verbose=1)
+    test_dataset_label = test_dataset[1].astype(numpy.int) 
+    print("对测试数据集的预测结果为：",classes)
+    print("测试数据集中的真实结果为：",test_dataset_label)
+    print("一共得到测试结果",len(classes),"个，一共有",len(test_dataset_label),"个.")
+    count = 0
+    correctCount = 0
+#    comparasion = zip(classes, test_dataset_label)
+#    print(comparasion)
+#    for x,y in range(classes)
+#        if()
 
-    classes = model.predict_classes(test_dataset[0], verbose=1)
-    test_accuracy = numpy.mean(numpy.equal(test_dataset[1], classes))
+    test_accuracy = numpy.mean(numpy.equal(test_dataset_label, classes))
 
     print("The correct ratio of the trained CNN model is ",  test_accuracy)
+    
+    return classes,test_dataset_label    
+
+def network(path, con_step_length, max_pooling_feature_map_size):
+    return temp_network(path, number_of_con_filters = 20, con_step_length = con_step_length, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = 100, learning_ratio = 0.01, train_decay = 0.001)
 
 if __name__ == '__main__':
     temp_network("newPU1NWith2RestN.mat", number_of_con_filters = 20, con_step_length = 1, max_pooling_feature_map_size = 40, number_of_full_layer_nodes = 100, learning_ratio = 0.01, train_decay = 0.001)
