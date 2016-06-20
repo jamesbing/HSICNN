@@ -21,6 +21,8 @@ import scipy.io as sio
 import random
 import math
 
+import scipy.io as sio
+
 ##################################################
 #This function is used to construct the CNN model#
 ##################################################
@@ -138,7 +140,7 @@ def loadData(dataFile, typeId = -1, bShowData = False):
 #######################################################################################
 def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay):
     #get the train data, train label, validate data, validate label, test data, test label
-    train_dataset, valid_dataset, test_dataset = loadData(filePath)
+    train_dataset, valid_dataset, test_dataset = loadData(filePath + ".mat")
 
 
     #the dimension of the input signal's chanel
@@ -245,9 +247,10 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     validation_dataset_data = valid_dataset[0].reshape(valid_dataset[0].shape[0],1,valid_dataset[0].shape[1],1)
     validation_dataset_label = np_utils.to_categorical(valid_dataset[1])
     validation_data = (validation_dataset_data,validation_dataset_label)
-    history = model.fit(train_dataset_data, train_dataset_label, batch_size = 20, nb_epoch = 100, verbose=1, validation_split=0.2, shuffle=True)
-    model.save_weights('model_weights.h5', overwrite=True)
+    history = model.fit(train_dataset_data, train_dataset_label, batch_size = 10, nb_epoch = 100, verbose=1, validation_data = validation_data, shuffle=True)
+    model.save_weights(filePath + 'Model.h5', overwrite=True)
     
+    sio.savemat(filePath + "Result.mat",{'loss':history.history['loss'],'accuracy':history.history['acc']})
 
     #test the model
     #prepare the testing dataset as the training dataset does
