@@ -213,9 +213,9 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     model.load_weights(filePath + 'Model.h5')
     #拿到CNN全连接层提取到的特征
     train_data_for_svm = getMiddleOutPut(model,[train_dataset_data],5)
-    print("层号5，shape：",train_data_for_svm.shape)
+#    print("层号5，shape：",train_data_for_svm.shape)
     train_label_for_svm = train_dataset[1]
-    print("训练数据label的shape:",train_label_for_svm.shape)
+#    print("训练数据label的shape:",train_label_for_svm.shape)
     
     test_data_for_svm = getMiddleOutPut(model,[test_dataset_data],5)    
     test_dataset_label = test_dataset[1].astype(numpy.int) 
@@ -247,8 +247,7 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     start_time = time.time()
     clf1.fit(train_data_for_svm, train_label_for_svm)
     end_time = time.time()
-    print("训练时间为%f",(end_time-start_time))
-
+    print("训练用时:%f",(end_time-start_time))
 
     start_time = time.time()
     print("在测试集上的平均正确率为",clf1.score(test_data_for_svm, test_label_for_svm))
@@ -264,10 +263,13 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     print("数据集",filePath)
     print("kernel为")
     print(kernel_2)
-    print("在测试集上的平均正确率为:")
+    start_time= time.time()
     clf2.fit(train_dataset[0], train_dataset[1])
+    end_time = time.time()
+    print("训练用时:",end_time - start_time)
+
     start_time = time.time()
-    print(clf2.score(test_dataset[0],test_dataset[1]))
+    print("在测试集上的平均正确率为",clf2.score(test_dataset[0],test_dataset[1]))
     end_time = time.time()
     print("测试用时：%f" % (end_time - start_time))
     #result = clf.predict(X_train)
