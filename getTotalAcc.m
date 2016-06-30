@@ -11,16 +11,19 @@ function [totalAccVector, totalAccMatrix] = getTotalAcc(dataset, pixelStrategy, 
     totalAccVector = zeros(class_number);
     totalAccMatrix = zeros(class_number, class_number);
 
+    count = 0;
     for mark = [1:30]
-        path = strcat('new',dataset ,num2str(mark) ,'N',last);
-        temp_a = zeros(class_number);
-        temp_c = zeros(class_number, class_number);
-        [temp_a, temp_c] = calculateDetailed(path);
-        totalAccVector = totalAccVector + temp_a;
-        totalAccMatrix = totalAccMatrix + temp_c;
+        if (mark == 2 || mark == 3 || mark ==14 || mark == 15 || mark ==18 || mark ==19 || mark == 21 || mark == 22 || mark == 23 || mark == 25) == false
+            path = strcat('new',dataset ,num2str(mark) ,'N',last);
+            temp_a = zeros(class_number);
+            temp_c = zeros(class_number, class_number);
+            [temp_a, temp_c] = calculateDetailed(path);
+            totalAccVector = totalAccVector + temp_a;
+            totalAccMatrix = totalAccMatrix + temp_c;
+        end
     end
-    totalAccVector = (totalAccVector ./ 30);
-    totalAccMatrix = (totalAccMatrix ./ 30) * 100;
+    totalAccVector = (totalAccVector ./ 20);
+    totalAccMatrix = (totalAccMatrix ./ 20);
 end
 
 %为了画分类准确率柱状图
@@ -49,8 +52,8 @@ end
 classifyVector = classifyVector * 100;
 for mark = [1:class_number]
     for insideMark = [1:class_number]
-        predictLabel_matrix(mark,insideMark) = predictLabel_matrix(mark,insideMark) ./ actualVector(mark);
+        predictLabel_matrix(mark,insideMark) = roundn((predictLabel_matrix(mark,insideMark) ./ actualVector(mark)) * 100,-2);
     end
 end
-classifyMatrix = predictLabel_matrix * 100; 
+classifyMatrix = predictLabel_matrix'; 
 end
