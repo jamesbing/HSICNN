@@ -5,6 +5,7 @@ import numpy as np
 import lmdb
 import caffe
 import scipy.io as sio
+from random import shuffle
 
 #filepath表示高光谱图图像的存储位置
 filepath = 'newKSC1N8.mat'
@@ -50,13 +51,16 @@ env = lmdb.open(path, map_size=map_size)
 
 with env.begin(write=True) as txn:
     # txn is a Transaction object
-    for i in range(N):
+    mark = [[x] for x in range(N)]
+    shuffle(mark)
+    for temp in mark:
+        i = temp[0]
         datum = caffe.proto.caffe_pb2.Datum()
         datum.channels = X.shape[1]
         datum.height = X.shape[2]
         datum.width = X.shape[3]
         datum.data = X[i].tostring()  # or .tostring() if numpy < 1.9
-        datum.label = int(y[i])
+        datum.label = int(y[i]) - 1
         str_id = '{:08}'.format(i)
 
         # The encode is only essential in Python 3
