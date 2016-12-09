@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
+# author @ jiabing leng @ nankai university @ tadakey@163.com
+
 import scipy.io as sio
 import numpy as np
 from random import shuffle
@@ -17,8 +19,8 @@ sys.path.insert(0,context + '/python')
 
 def loadData(path):
     print 'please enter the neighbor pixels strategy, you can choose from 1,4 and 8.'
-    temp = raw_input(prompt)
-    print temp
+    neighbors = raw_input(prompt)
+    print neighbors
 #    while True:
 #        if temp not in (1,4,8):
 #            print 'you entered the wrong number, please re-enter.'
@@ -70,25 +72,102 @@ def loadData(path):
             if label != 0:
                 #for test purpose printing...
                 #print '[' + str(indexRow) + ',' + str(indexLine) + ']'
-                temp_data = DataSet[indexRow,indexLine]
-                if temp == 1:
-                    data = temp_data
-                elif temp > 1:
-                    center_data = temp_data
-                    if indexRow + 1 < rows and rindexRow > 0 and indexLine + 1 < lines and indexLine > 0 and Labels[indexRow + 1,indexLine] !=0 and Labels[indexRow - 1,indexLine] != 0 and Labels[indexRow, indexLine + 1] !=0 and Labels[indexRow, indexLine -1] != 0:
-                        data1 = DataSet[indexRow, indexLine - 1]
-                        data2 = DataSet[indexRow, indexLine + 1]
-                        data3 = DataSet[indexRow - 1, indexLine]
-                        data4 = DataSet[indexRow + 1, indexLine]
-                        data5 = DataSet[indexRow - 1, indexLine -1]
-                        data6 = DataSet[indexRow - 1, indexLine + 1]
-                        data7 = DataSet[indexRow + 1, indexLine - 1]
-                        data8 = DataSet[indexRow + 1, indexLine + 1]
+                data = DataSet[indexRow,indexLine]
+                if temp > 1:
+                    center_data = data
+                    #if indexRow + 1 < rows and rindexRow > 0 and indexLine + 1 < lines and indexLine > 0 and Labels[indexRow + 1,indexLine] !=0 and Labels[indexRow - 1,indexLine] != 0 and Labels[indexRow, indexLine + 1] !=0 and Labels[indexRow, indexLine -1] != 0:
+                    #    data1 = DataSet[indexRow, indexLine - 1]
+                    #    data2 = DataSet[indexRow, indexLine + 1]
+                    #    data3 = DataSet[indexRow - 1, indexLine]
+                    #    data4 = DataSet[indexRow + 1, indexLine]
+                    #    data5 = DataSet[indexRow - 1, indexLine -1]
+                    #    data6 = DataSet[indexRow - 1, indexLine + 1]
+                    #    data7 = DataSet[indexRow + 1, indexLine - 1]
+                    #    data8 = DataSet[indexRow + 1, indexLine + 1]
+                    ####################################################################################################################
+                    # fetching data around the target pixel according to following illustruction:
+                    # 
+                    #           data1      data2      data3
+                    #           data4     center      data5
+                    #           data6      data7      data8
+                    ####################################################################################################################
+                    data1 = []
+                    data2 = []
+                    data3 = []
+                    data4 = []
+                    data5 = []
+                    data6 = []
+                    data7 = []
+                    data8 = []
 
+                    # data1
+                    if indexRow - 1 >= 0 and indexLine - 1 >= 0 and Labels[indexRow - 1, indexLine - 1] > 0:
+                        data1 = DataSet[indexRow - 1, indexLine - 1]
+                    elif indexRow - 1 >= 0 and indexLine + 1 <= lines - 1 and Labels[indexRow - 1, indexLine + 1] > 0:
+                        data1 = DataSet[indexRow - 1, indexLine + 1]
+                    else:
+                        data1 = center_data
                     
-
-
-
+                    # data2
+                    if indexRow - 1 >= 0 and Labels[indexRow - 1, indexLine] > 0:
+                        data2 = DataSet[indexRow - 1, indexLine]
+                    elif indexRow + 1 <= rows - 1 and Labels[indexRow + 1, indexLine] > 0:
+                        data2 = DataSet[indexRow + 1, indexLine]
+                    else:
+                        data2 = center_data
+                        
+                    # data3
+                    if indexRow - 1 >= 0 and indexLine + 1 <= lines - 1 and Labels[indexRow - 1, indexLine + 1] > 0:
+                        data3 = DataSet[indexRow - 1, indexLine + 1]
+                    elif indexRow - 1 >= 0 and indexLine - 1 >= 0 and Labels[indexRow - 1, indexLine - 1] > 0:
+                        data3 = DataSet[indexRow - 1, indexLine - 1]
+                    else:
+                        data3 = center_data
+                        
+                    # data4
+                    if indexLine - 1 >= 0 and Labels[indexRow, indexLine - 1] > 0:
+                        data4 = DataSet[indexRow, indexLine - 1]
+                    elif indexLine + 1<= lines - 1 and Labels[indexRow, indexLine + 1] > 0:
+                        data4 = DataSet[indexRow, indexLine + 1]
+                    else:
+                        data4 = center_data
+                    
+                    # data5
+                    if indexLine + 1 <= lines - 1 and Labels[indexRow, indexLine + 1] > 0:
+                        data5 = DataSet[indexRow, indexLine + 1]
+                    elif indexLine - 1 >= 0 and Labels[indexRow, indexLine - 1] > 0:
+                        data5 = DataSet[indexRow, indexLine - 1]
+                    else:
+                        data5 = center_data
+                    
+                    # data6
+                    if indexRow + 1 <= rows - 1 and indexLine - 1 >= 0 and Labels[indexRow + 1, indexLine - 1] > 0:
+                        data6 = DataSet[indexRow + 1, indexLine - 1]
+                    elif indexRow + 1 <= rows - 1 and indexLine + 1 <= lines - 1 and Labels[indexRow + 1, indexLine + 1] > 0:
+                        data6 = DataSet[indexRow + 1, indexLine + 1]
+                    else:
+                        data6 = center_data
+                        
+                        
+                    # data7
+                    if indexRow + 1 <= rows - 1 and Labels[indexRow + 1, indexLine] > 0:
+                        data7 = DataSet[indexRow + 1, indexLine]
+                    elif indexRow - 1 >= 0 and Labels[indexRow - 1, indexLine] > 0:
+                        data7 = DataSet[indexRow - 1, indexLine]
+                    else:
+                        data7 = center_data
+                        
+                    # data8
+                    if indexRow + 1 <= rows - 1and indexLine + 1 <= lines - 1 and Labels[indexRow + 1, indexLine + 1] > 0:
+                        data8 = DataSet[indexRow + 1, indexLine + 1]
+                    elif indexRow + 1 <= rows - 1 and indexLine - 1 >= 0 and Labels[indexRow - 1, indexLine - 1] > 0:
+                        data8 = DataSet[indexRow + 1, indexLine - 1]
+                    else:
+                        data8 = center_data
+                    
+                    if neighbors == 4:
+                        data.append(data2).append
+                    
                 DataList[label - 1].append(data)
             indexLine = indexLine + 1
 
