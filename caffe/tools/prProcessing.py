@@ -57,8 +57,10 @@ def loadData(path):
 #    for element in Labels.flat:
 #        print element
     
-    lines = len(Labels)
-    rows = len(Labels[0])
+    rows = len(Labels)
+    lines = len(Labels[0])
+    print 'size of the dataset: ' + str(rows), str(lines)
+
     indexRow = 0
     for row in Labels:
         indexLine = 0
@@ -71,9 +73,20 @@ def loadData(path):
                 temp_data = DataSet[indexRow,indexLine]
                 if temp == 1:
                     data = temp_data
-                else if temp == 4:
+                elif temp > 1:
                     center_data = temp_data
-                    if rowLine + 1
+                    if indexRow + 1 < rows and rindexRow > 0 and indexLine + 1 < lines and indexLine > 0 and Labels[indexRow + 1,indexLine] !=0 and Labels[indexRow - 1,indexLine] != 0 and Labels[indexRow, indexLine + 1] !=0 and Labels[indexRow, indexLine -1] != 0:
+                        data1 = DataSet[indexRow, indexLine - 1]
+                        data2 = DataSet[indexRow, indexLine + 1]
+                        data3 = DataSet[indexRow - 1, indexLine]
+                        data4 = DataSet[indexRow + 1, indexLine]
+                        data5 = DataSet[indexRow - 1, indexLine -1]
+                        data6 = DataSet[indexRow - 1, indexLine + 1]
+                        data7 = DataSet[indexRow + 1, indexLine - 1]
+                        data8 = DataSet[indexRow + 1, indexLine + 1]
+
+                    
+
 
 
                 DataList[label - 1].append(data)
