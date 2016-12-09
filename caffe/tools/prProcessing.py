@@ -158,7 +158,7 @@ def loadData(path):
                         data7 = center_data
                         
                     # data8
-                    if indexRow + 1 <= rows - 1and indexLine + 1 <= lines - 1 and Labels[indexRow + 1, indexLine + 1] > 0:
+                    if indexRow + 1 <= rows - 1 and indexLine + 1 <= lines - 1 and Labels[indexRow + 1, indexLine + 1] > 0:
                         data8 = DataSet[indexRow + 1, indexLine + 1]
                     elif indexRow + 1 <= rows - 1 and indexLine - 1 >= 0 and Labels[indexRow - 1, indexLine - 1] > 0:
                         data8 = DataSet[indexRow + 1, indexLine - 1]
@@ -166,7 +166,9 @@ def loadData(path):
                         data8 = center_data
                     
                     if neighbors == 4:
-                        data.append(data2).append
+                        data = data + data2 + data4 + data5 + data7
+                    elif neighbors == 8:
+                        data = data + data1 + data2 + data3 + data4 + data5 + data6 + data7 + data8        
                     
                 DataList[label - 1].append(data)
             indexLine = indexLine + 1
@@ -176,6 +178,8 @@ def loadData(path):
     print 'data loaded.'
 
     return DataList
+
+
 def shuffling(dataList):
     print 'shuffling data...'
     for sub_list in dataList:
@@ -183,12 +187,9 @@ def shuffling(dataList):
     print 'shuffled.'
     
 
-
-
-
-
-#DataSet
-
+def splitDataSet(list):
+    print "please enter the ratio of training samples, eg. 80."
+    ratio = raw_input(prompt)
 
 
 
@@ -201,5 +202,5 @@ if os.path.exists(path_prefix + path) != True:
 else:
     dataList = loadData(path)
     shuffledDataList = shuffling(dataList)
-    print "please enter the ratio of training samples, eg. 80."
+    splitData(shuffledDataList)
 
