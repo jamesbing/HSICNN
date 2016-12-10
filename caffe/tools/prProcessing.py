@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
+# dawang jinwan hele pidan doufutang. @ zhoujing @
 # author @ jiabing leng @ nankai university @ tadakey@163.com
-# sponsor @ zhoujing
 
 import scipy.io as sio
 import numpy as np
