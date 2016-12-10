@@ -6,6 +6,7 @@ import scipy.io as sio
 import numpy as np
 from random import shuffle
 from sys import argv
+from math import ceil
 import lmdb
 import sys
 import os
@@ -14,8 +15,11 @@ import os
 
 prompt = '>'
 context = '/home/jiabing/caffe/'
+
 path_prefix = context + '/examples/HSI/datasets/'
 sys.path.insert(0,context + '/python')
+import caffe
+
 
 def loadData(path):
     print 'please enter the neighbor pixels strategy, you can choose from 1,4 and 8.'
@@ -186,11 +190,41 @@ def shuffling(dataList):
         shuffle(sub_list)
     print 'shuffled.'
     
+#def writeLMDB():
 
-def splitDataSet(list):
+
+def assembleData(list, datasetName):
+
     print "please enter the ratio of training samples, eg. 80."
-    ratio = raw_input(prompt)
+    ratio = raw_input(priompt)
 
+    # prepare the lmdb format dataset
+    # allocate the storage space for the dataset
+    # TODO: check how to allocate space according to the specific dataset instead of use the following map_size directly.
+    map_size = list.nbytes * 0
+    #create the lmdb data
+    envTrain = lmdb.open(datasetName + 'HSITrainlmdb', map_size = map_size)
+    envTest = lmdb.open(datasetName + 'HSITestlmdb', map_size = map_size)
+
+    
+    # split the dataset according to the ratio to caffe recognizable datasets
+    positionMark = 0
+    trainList = []
+    testList= []
+    trainingCount = 0
+    testingCount = 0
+    for dataList in list:
+        trainingNumer = int(ceil((float(len(dataList)) * ratio) / 100))
+        testingNumber = len(dataList) - trainingNumer
+        trainList[positionMark] = dataList[0:trainingNumer]
+        testList[positionMark] = dataList[trainingNumer:len(dataList)]
+        trainingCount = trainingCount + trainingNumer
+        testingCount = testingCount + testingNumber
+        positionMark = positionMark + 1
+    print 'data splited in to different datasets:'
+    print 'there are ' + trainingCount + ' training samples and '
+    print 'there are ' + testingCount + ' testing samples.'
+    print 'writing to lmdb format files for caffe...'
 
 
 #processing code segment
@@ -202,5 +236,5 @@ if os.path.exists(path_prefix + path) != True:
 else:
     dataList = loadData(path)
     shuffledDataList = shuffling(dataList)
-    splitData(shuffledDataList)
+    assembleData(shuffledDataList, path)
 
