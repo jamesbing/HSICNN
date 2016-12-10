@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 # author @ jiabing leng @ nankai university @ tadakey@163.com
+# sponsor @ zhoujing
 
 import scipy.io as sio
 import numpy as np
@@ -190,7 +191,14 @@ def shuffling(dataList):
         shuffle(sub_list)
     print 'shuffled.'
     
-#def writeLMDB():
+def writeLMDB(list, name, procedure):
+    map_size = list.nbytes * 10
+    # prepare the lmdb format file
+    print 'creating training lmdb ' + procedure + 'format dataset...'
+    env = lmdb.open('HSI' + procedure + 'lmdb', map_size = map_size)
+    count = 0
+    with env.begin(write = True) as txn:
+        for mark in range()
 
 
 def assembleData(list, datasetName):
@@ -226,6 +234,9 @@ def assembleData(list, datasetName):
     print 'there are ' + testingCount + ' testing samples.'
     print 'writing to lmdb format files for caffe...'
 
+    # write the splited data into lmdb format files
+    writeToLMDB(trainList, datasetName, 'training')
+    writeToLMDB(testList, datasetName, 'testing')
 
 #processing code segment
 print "enter the file folder path you want to transform..."
