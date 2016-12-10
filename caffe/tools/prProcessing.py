@@ -190,16 +190,45 @@ def shuffling(dataList):
     for sub_list in dataList:
         shuffle(sub_list)
     print 'shuffled.'
+    retur dataList
     
 def writeLMDB(list, name, procedure):
+
+    # prepare the data list
+    new_big_list = []
+    #add_count = 0
+    classCount = 1
+    for sub_list in list:
+        for sub_list_data in sub_list:
+            data_dict = {'label': classCount, 'data': sub_list_data}
+            new_big_list.append(data_dict)
+        classCount = classCount + 1
+    # now the data format have been transformed into this:
+    # new_big_list = [data_dicts....]
+    # in which data_dict is {'label': a label, 'data': data value}
+    print 'shuffling data again among different classes....'
+    shuffle(new_big_list)
+
     map_size = list.nbytes * 10
     # prepare the lmdb format file
     print 'creating training lmdb ' + procedure + 'format dataset...'
-    env = lmdb.open('HSI' + procedure + 'lmdb', map_size = map_size)
+    env = lmdb.open('HSI' + name + procedure + 'lmdb', map_size = map_size)
     count = 0
+    spectralBands = len(list[0])
+    print 'this data set '+ name +'had spectral bands of ' + spectralBands
+    temp_i = 0
     with env.begin(write = True) as txn:
-        for mark in range()
+        for sample in range(len(new_big_list)):
+            datum = caffe.proto.caffe_pb2.Datum()
+            datum.channels = 1
+            datum.height = 1
+            datum.width = spectralBands
+            datum.data = sample['data'].tostring()
+            datum.label = int(sample['label'])
+            str_id = '{:08}'.format(temp_i)
 
+            txn.put(str_id.encode('ascii'), datum.SerializeToString())
+    print 'Done.'
 
 def assembleData(list, datasetName):
 
