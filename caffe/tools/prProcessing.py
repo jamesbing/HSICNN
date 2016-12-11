@@ -78,7 +78,7 @@ def loadData(path):
                 #for test purpose printing...
                 #print '[' + str(indexRow) + ',' + str(indexLine) + ']'
                 data = DataSet[indexRow,indexLine]
-                if temp > 1:
+                if  neighbors> 1:
                     center_data = data
                     #if indexRow + 1 < rows and rindexRow > 0 and indexLine + 1 < lines and indexLine > 0 and Labels[indexRow + 1,indexLine] !=0 and Labels[indexRow - 1,indexLine] != 0 and Labels[indexRow, indexLine + 1] !=0 and Labels[indexRow, indexLine -1] != 0:
                     #    data1 = DataSet[indexRow, indexLine - 1]
@@ -174,7 +174,9 @@ def loadData(path):
                         data = data + data2 + data4 + data5 + data7
                     elif neighbors == 8:
                         data = data + data1 + data2 + data3 + data4 + data5 + data6 + data7 + data8        
-                    
+                #    elif neighbors == 1:
+                #        data = 
+
                 DataList[label - 1].append(data)
             indexLine = indexLine + 1
 
@@ -190,9 +192,9 @@ def shuffling(dataList):
     for sub_list in dataList:
         shuffle(sub_list)
     print 'shuffled.'
-    retur dataList
+    return dataList
     
-def writeLMDB(list, name, procedure):
+def writeToLMDB(list, name, procedure):
 
     # prepare the data list
     new_big_list = []
@@ -208,14 +210,15 @@ def writeLMDB(list, name, procedure):
     # in which data_dict is {'label': a label, 'data': data value}
     print 'shuffling data again among different classes....'
     shuffle(new_big_list)
+    print 'the size of the new big list, which is also the samples in this dataset is :' + str(len(new_big_list))
 
-    map_size = list.nbytes * 10
+    map_size = sys.getsizeof(list) * 10
     # prepare the lmdb format file
     print 'creating training lmdb ' + procedure + 'format dataset...'
     env = lmdb.open('HSI' + name + procedure + 'lmdb', map_size = map_size)
-    count = 0
+    #count = 0
     spectralBands = len(list[0])
-    print 'this data set '+ name +'had spectral bands of ' + spectralBands
+    print 'this data set '+ name +' had spectral bands of ' + str(spectralBands)
     temp_i = 0
     with env.begin(write = True) as txn:
         for sample in range(len(new_big_list)):
@@ -223,6 +226,7 @@ def writeLMDB(list, name, procedure):
             datum.channels = 1
             datum.height = 1
             datum.width = spectralBands
+            print sample
             datum.data = sample['data'].tostring()
             datum.label = int(sample['label'])
             str_id = '{:08}'.format(temp_i)
@@ -233,34 +237,49 @@ def writeLMDB(list, name, procedure):
 def assembleData(list, datasetName):
 
     print "please enter the ratio of training samples, eg. 80."
-    ratio = raw_input(priompt)
+    ratio = raw_input(prompt)
 
     # prepare the lmdb format dataset
     # allocate the storage space for the dataset
     # TODO: check how to allocate space according to the specific dataset instead of use the following map_size directly.
-    map_size = list.nbytes * 0
+    #map_size = list.nbytes * 0
     #create the lmdb data
-    envTrain = lmdb.open(datasetName + 'HSITrainlmdb', map_size = map_size)
-    envTest = lmdb.open(datasetName + 'HSITestlmdb', map_size = map_size)
+    #envTrain = lmdb.open(datasetName + 'HSITrainlmdb', map_size = map_size)
+    #envTest = lmdb.open(datasetName + 'HSITestlmdb', map_size = map_size)
 
     
     # split the dataset according to the ratio to caffe recognizable datasets
     positionMark = 0
     trainList = []
-    testList= []
+    testList = []
+    for mark in range(len(list)):
+        trainList.append([])
+        testList.append([])
+    print 'confirm the number of classes in this dataset is ' + str(len(list))
     trainingCount = 0
     testingCount = 0
+    #for sub_list in list:
+    print '#########################ratioing############################'
     for dataList in list:
-        trainingNumer = int(ceil((float(len(dataList)) * ratio) / 100))
-        testingNumber = len(dataList) - trainingNumer
-        trainList[positionMark] = dataList[0:trainingNumer]
-        testList[positionMark] = dataList[trainingNumer:len(dataList)]
-        trainingCount = trainingCount + trainingNumer
-        testingCount = testingCount + testingNumber
-        positionMark = positionMark + 1
+        #trainingNumer = ceil((len(dataList) * float(ratio) / 100.0)
+        # print 'the number of samples in this class is :' + str(len(dataList))
+         trainingNumber = int(ceil((len(dataList) * int(ratio)) / 100.0))
+         testingNumber = int(len(dataList) - trainingNumber)
+        # print 'the position of training list is from  0 to ' + str(trainingNumber)  + '.' 
+         trainList[positionMark].append(dataList[0:trainingNumber])
+         testList[positionMark].append(dataList[trainingNumber:len(dataList)])
+         trainingCount = trainingCount + trainingNumber
+         print '.............................................................'
+         print 'class ' + str(positionMark)
+         print 'train:' + str(trainingNumber)
+         testingCount = testingCount + testingNumber
+         print 'test:' + str(testingNumber)
+         print str(len(dataList)) + '.'
+         positionMark = positionMark + 1
+    print '---------------------------------------------------------------'
     print 'data splited in to different datasets:'
-    print 'there are ' + trainingCount + ' training samples and '
-    print 'there are ' + testingCount + ' testing samples.'
+    print 'there are ' + str(trainingCount) + ' training samples and '
+    print 'there are ' + str(testingCount) + ' testing samples.'
     print 'writing to lmdb format files for caffe...'
 
     # write the splited data into lmdb format files
