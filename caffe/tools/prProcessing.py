@@ -24,7 +24,7 @@ import caffe
 
 def loadData(path):
     print 'please enter the neighbor pixels strategy, you can choose from 1,4 and 8.'
-    neighbors = raw_input(prompt)
+    neighbors = int(raw_input(prompt))
     print neighbors
 #    while True:
 #        if temp not in (1,4,8):
@@ -53,6 +53,7 @@ def loadData(path):
     Labels = LabelsMat['ClsID']
     maxClass = np.max(Labels)
     print 'there are ' + str(maxClass) + ' classes in dataset ' + str(dataset)
+    print 'the spectral bands in this dataset is ' + str(len(DataSet[0][0]))
     
     #define many lists which number equals to maxClass,put it in a list
     DataList = []
@@ -171,9 +172,27 @@ def loadData(path):
                         data8 = center_data
                     
                     if neighbors == 4:
-                        data = data + data2 + data4 + data5 + data7
+                        data_1 = np.append(data2, data4)
+                        data_2 = np.append(data5, data7)
+                        data_3 = np.append(data_1, data_2)
+                        data  = np.append(data, data_3)
+                        #data = data + data2 + data4 + data5 + data7
                     elif neighbors == 8:
-                        data = data + data1 + data2 + data3 + data4 + data5 + data6 + data7 + data8        
+                        #print data
+                        #data = np.append(data, data1, data2, data3, data4, data5, data6, data7, data8)
+                        data_1 = np.append(data1, data2)
+                        data_2 = np.append(data3, data4)
+                        data_3 = np.append(data5, data6)
+                        data_4 = np.append(data7, data8)
+                        data_5 = np.append(data_1, data_2)
+                        data_6 = np.append(data_3, data_4)
+                        data_7 = np.append(data_5, data_6)
+                        data = np.append(data, data_7)
+
+                        #print data
+                        #print 'data1' + str(data1) + 'data2 ' + str(data2) + 'data3' + str(data3)
+                        #print 'data1 + data2:'
+                        #print np.append(data1, data2)
                 #    elif neighbors == 1:
                 #        data = 
 
@@ -183,7 +202,7 @@ def loadData(path):
         indexRow = indexRow + 1
     
     print 'data loaded.'
-
+    print 'spectral length now is: ' + str(len((DataList[0][0])))
     return DataList
 
 
@@ -197,47 +216,57 @@ def shuffling(dataList):
 def writeToLMDB(list, name, procedure):
 
     # prepare the data list
+    #print list[0]
     new_big_list = []
     #add_count = 0
     classCount = 1
     for sub_list in list:
+        #print 'samples number :' + str(len(sub_list))
         for sub_list_data in sub_list:
-            data_dict = {'label': classCount, 'data': sub_list_data}
-            new_big_list.append(data_dict)
-        classCount = classCount + 1
+            print 'number of samples in this class ' + str(len(sub_list_data))
+            for to_be_assemblied_data in sub_list_data:
+                data_dict = {'label': classCount, 'data': to_be_assemblied_data}
+                new_big_list.append(data_dict)
+            classCount = classCount + 1
     # now the data format have been transformed into this:
     # new_big_list = [data_dicts....]
     # in which data_dict is {'label': a label, 'data': data value}
+    # print new_big_list[0:20]
     print 'shuffling data again among different classes....'
     shuffle(new_big_list)
-    print 'the size of the new big list, which is also the samples in this dataset is :' + str(len(new_big_list))
+    #print new_big_list[0]['label']
+    #print new_big_list[0]['data']
+    print 'the number of spectral in this dataset is :' + str(len(new_big_list[0]['data']))
 
-    map_size = sys.getsizeof(list) * 10
+    map_size = sys.getsizeof(new_big_list) * 10
     # prepare the lmdb format file
     print 'creating training lmdb ' + procedure + 'format dataset...'
     env = lmdb.open('HSI' + name + procedure + 'lmdb', map_size = map_size)
     #count = 0
-    spectralBands = len(list[0])
+    spectralBands = len(new_big_list[0]['data'])
     print 'this data set '+ name +' had spectral bands of ' + str(spectralBands)
     temp_i = 0
+    countingMark = 0
     with env.begin(write = True) as txn:
-        for sample in range(len(new_big_list)):
+        for sample in new_big_list:
             datum = caffe.proto.caffe_pb2.Datum()
             datum.channels = 1
             datum.height = 1
             datum.width = spectralBands
-            print sample
+            # print sample
             datum.data = sample['data'].tostring()
             datum.label = int(sample['label'])
             str_id = '{:08}'.format(temp_i)
-
             txn.put(str_id.encode('ascii'), datum.SerializeToString())
+
+            countingMark = countingMark + 1
     print 'Done.'
+    print str(countingMark) + ' samples have successfully writed into lmdb format data file.'
 
 def assembleData(list, datasetName):
 
     print "please enter the ratio of training samples, eg. 80."
-    ratio = raw_input(prompt)
+    ratio = int(raw_input(prompt))
 
     # prepare the lmdb format dataset
     # allocate the storage space for the dataset
