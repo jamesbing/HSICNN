@@ -1,0 +1,10 @@
+[global]
+device=gpu
+floatX=float32
+root=/usr/local/cuda-7.0
+[nvcc]
+fastmath=True
+[blas]
+ldflags=-lopenblas
+[cuda]
+root=/usr/local/cuda-7.0
