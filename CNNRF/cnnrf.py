@@ -23,8 +23,14 @@ import math
 from keras import backend as K
 from sklearn.externals import joblib
 from sklearn import cross_validation,decomposition,svm
+from sklearn.model_selection import cross_val_score
+from sklearn.datasets import make_blobs
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import ExtraTreesClassifier
+from sklearn.tree import DesicionTreeClassifier
 
 import time
+
 def getMiddleOutPut(model,inputVector,kthlayer):
     getFunc = K.function([model.layers[0].input],[model.layers[kthlayer].output])
     layer_output = getFunc(inputVector)[0]
@@ -125,7 +131,7 @@ def loadData(dataFile, typeId = -1, bShowData = False):
 #######################################################################################
 def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay):
     #get the train data, train label, validate data, validate label, test data, test label
-    train_dataset, valid_dataset, test_dataset = loadData("/home/jiabing/HSICNNKSC/" + filePath + ".mat")
+    train_dataset, valid_dataset, test_dataset = loadData("/home/jiabing/HSICNNIndian/" + filePath + ".mat")
 
     file = open(filePath + "CNNSVMdescription.txt",'w')
 
@@ -220,14 +226,17 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     #根据已有的代码去构建训练好的网络
     model.load_weights(filePath + 'Model.h5')
     #拿到CNN全连接层提取到的特征
-    train_data_for_svm = getMiddleOutPut(model,[train_dataset_data],5)
+    train_data_for_rf = getMiddleOutPut(model,[train_dataset_data],5)
 #    print("层号5，shape：",train_data_for_svm.shape)
-    train_label_for_svm = train_dataset[1]
+    train_label_for_rf = train_dataset[1]
 #    print("训练数据label的shape:",train_label_for_svm.shape)
     
-    test_data_for_svm = getMiddleOutPut(model,[test_dataset_data],5)    
+    test_data_for_rf = getMiddleOutPut(model,[test_dataset_data],5)    
     test_dataset_label = test_dataset[1].astype(numpy.int) 
-    test_label_for_svm = test_dataset[1]
+    test_label_for_rf = test_dataset[1]
+#现在得到的数据集分别是：
+# train_data_for_rf, train_label_for_rf, test_data_for_rf, test_label_for_rf
+
 
     #下面这部分是把上面的CNN喂到SVM里面
 #    pca = decomposition.RandomizedPCA(n_components = 100,whiten=True)
@@ -237,27 +246,27 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
 #    X_test_pca = pca.transform(X_test)
 
     #原来gamma的值为0.0008
-    kernel_1 = 'linear'
-    kernel_2 = 'rbf'
+#    kernel_1 = 'linear'
+#    kernel_2 = 'rbf'
 
 #	用rbf核
-    clf1 = svm.SVC(C=1.0, kernel = kernel_2,  gamma='auto', probability=True,
-             tol = 0.00000000000001, max_iter = -1)
+#    clf1 = svm.SVC(C=1.0, kernel = kernel_2,  gamma='auto', probability=True,
+#             tol = 0.00000000000001, max_iter = -1)
     
-    clf2 = svm.SVC(C=1.0, kernel = kernel_2,  gamma='auto', probability=True,
-             tol = 0.00000000000001, max_iter = -1)
+#    clf2 = svm.SVC(C=1.0, kernel = kernel_2,  gamma='auto', probability=True,
+#             tol = 0.00000000000001, max_iter = -1)
     #用linear
-    clf3 = svm.SVC(C=0.8, kernel = kernel_2,  gamma='auto', probability=True,
-             tol = 0.00001, max_iter = -1)    
-    clf4 = svm.SVC(C=0.8, kernel = kernel_2,  gamma='auto', probability=True,
-             tol = 0.00001, max_iter = -1)
+#    clf3 = svm.SVC(C=0.8, kernel = kernel_2,  gamma='auto', probability=True,
+#             tol = 0.00001, max_iter = -1)    
+#    clf4 = svm.SVC(C=0.8, kernel = kernel_2,  gamma='auto', probability=True,
+#             tol = 0.00001, max_iter = -1)
 
-    print("#####################################################")
-    print("在CNN-SVM-RBF上的结果：")
-    print("数据集",filePath)
-    print("kernel为")
-    print(kernel_2)
-    print("开始训练")
+#    print("#####################################################")
+#    print("在CNN-SVM-RBF上的结果：")
+#    print("数据集",filePath)
+#    print("kernel为")
+#    print(kernel_2)
+#    print("开始训练")
     
     start_time = time.time()
     clf1.fit(train_data_for_svm, train_label_for_svm)
@@ -345,12 +354,13 @@ def network(path, con_step_length, max_pooling_feature_map_size):
     return result
 
 def run_batch(flag):
-    result1 = network("newKSC" + str(flag) + "N",1,40)
-    result2 = network("newKSC" + str(flag) + "N4",5,40)
-    result3 = network("newKSC" + str(flag) + "N8",9,40)
+    result1 = network("newIndian" + str(flag) + "N",1,40)
+    result2 = network("newIndian" + str(flag) + "N4",5,40)
+    result3 = network("newIndian" + str(flag) + "N8",9,40)
     return result1, result2, result3
 
-if __name__ == '__main__':
+#if __name__ == '__main__':
+def run():
     cnnsvmtraintime1 = 0.
     cnnsvmtesttime1 = 0.
     cnnsvmacc1 = 0.
@@ -378,11 +388,9 @@ if __name__ == '__main__':
     cnntesttime8 = 0.
     cnnacc8 = 0.
     
-    file_all_result = open("KSCEXPResultTOTAL.txt",'w')
+    file_all_result = open("IndianEXPResultTOTAL.txt",'w')
 
-    for flag in range(1,31):
-        if flag == 13:
-            continue
+    for flag in range(1,2):
         result = run_batch(flag)
         
         cnnsvmtraintime1 = cnnsvmtraintime1 + float(result[0]['cnnsvmtraintime'])
@@ -419,7 +427,7 @@ if __name__ == '__main__':
 #        file_all_result.write(str(flag) + "|" + str(cnnsvmtraintime1) + "|" + str(cnnsvmtesttime1) + "|" + str(cnnsvmacc1) + "|" + str(svmtraintime1) + "|" + str(svmtesttime1) + "|" + str(svmacc1) + "|" + str(cnntesttime1) + "|" + str(cnnacc1) + "|\n")
 #        file_all_result.write(str(flag) + "|" + str(cnnsvmtraintime4) + "|" + str(cnnsvmtesttime1) + "|" + str(cnnsvmacc1) + "|" + str(svmtraintime1) + "|" + str(svmtesttime1) + "|" + str(svmacc1) + "|" + str(cnntesttime1) + "|" + str(cnnacc1) + "|\n")
 #        file_all_result.write(str(flag) + "|" + str(cnnsvmtraintime1) + "|" + str(cnnsvmtesttime1) + "|" + str(cnnsvmacc1) + "|" + str(svmtraintime1) + "|" + str(svmtesttime1) + "|" + str(svmacc1) + "|" + str(cnntesttime1) + "|" + str(cnnacc1) + "|\n")
-    file = open("KSCEXPResultSUM.txt",'w')
+    file = open("IndianEXPResultSUM.txt",'w')
 
     file.write("---------------------单像素-----------------------\n")
 
