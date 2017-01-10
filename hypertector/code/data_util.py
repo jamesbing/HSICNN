@@ -21,12 +21,11 @@ import sys
 import os
 import time
 
-#sys.path.insert(0,'/home/jiabing/caffe/python')
-
 prompt = '>'
-context = '/home/jiabing/caffe/'
-
-path_prefix = context + '/examples/HSI/datasets/'
+#the caffe path in the specific ubuntu environment
+context = '/home/para/caffe/'
+#the folder path of the origional dataset 
+path_prefix = '../data/'
 sys.path.insert(0,context + '/python')
 import caffe
 
