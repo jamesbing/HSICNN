@@ -267,11 +267,41 @@ def writeToLMDB(list, name, procedure):
     print 'Done.'
     print str(countingMark) + ' samples have successfully writed into lmdb format data file.'
 
-# write to .mat data format
-def assembleMAT(list, datasetName):
+def prepareMatList(list):
+    Data = []
+    CId = []
+#    DataTe = []
+#    CIdTe = []
+    classCount = 1
+    for sub_list in list:
+        for sub_list_data in sub_list:
+            print 'number of samples in this class ' + str(len(sub_list_data))
+            for to_be_assemblied_data in sub_list_data:
+                Data.append(to_be_assemblied_data) 
+                CId.append(classCount)
+            classCount = classCount + 1
 
-# write data to lmdb format
-def assembleLMDB(list, datasetName):
+    # shuffle
+    liMark = range(len(Data))
+    shuffle(liMark)
+    flagCursor = 0
+    newData = []
+    newCId = []
+    for tempCount in liMark:
+        newData.append(Data[tempCount])
+        newCId.append(CId[tempCount])
+
+    return newData, newCId
+
+
+# write to .mat data format
+def writeToMAT(trainList, testList, datasetName):
+    DataTr, CIdTr = prepareMatList(trainList)
+    DataTe, CIdTe = prepareMatList(testList)
+    sio.savemat(datasetName + '.mat',{'DataTr':DataTr, 'CIdTr':CIdTr, 'DataTe':DataTe, 'CIdTe':CIdTe})
+
+
+def assembleData(list, datasetName):
 
     print "please enter the ratio of training samples, eg. 80."
     ratio = int(raw_input(prompt))
@@ -317,13 +347,16 @@ def assembleLMDB(list, datasetName):
     print 'data splited in to different datasets:'
     print 'there are ' + str(trainingCount) + ' training samples and '
     print 'there are ' + str(testingCount) + ' testing samples.'
-    print 'writing to lmdb format files for caffe...'
+    print 'writing dataset...'
 
-    # write the splited data into lmdb format files
-    writeToLMDB(trainList, datasetName, 'training')
-    writeToLMDB(testList, datasetName, 'testing')
-
-
+    print "choose the data format, enter 1 for lmdb or enter 2 for mat"
+    data_format = int(raw_input(prompt))
+    if data_format == 1:
+        # write the splited data into lmdb format files
+        writeToLMDB(trainList, datasetName, 'training')
+        writeToLMDB(testList, datasetName, 'testing')
+    elif data_format == 2:
+        writeToMAT(trainList, testList, datasetName)
 
 #def assembleData(list, datasetName):
 #    print "choose the data format, enter 1 for lmdb or enter 2 for mat"
