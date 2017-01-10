@@ -3,14 +3,6 @@
 # dawang jinwan hele pidan doufutang. @ zhoujing @
 # author @ jiabing leng @ nankai university @ tadakey@163.com
 
-# this code include following functions:
-# input the data folder and the dataset name
-# load data from  the inputed path
-# input the ratio of training and testing
-# input the strategy used in the deep CNN framework
-# input which data is used for , caffe or keras (aka, theano and tensorflow)
-# product the correct dataset format.
-
 import scipy.io as sio
 import numpy as np
 from random import shuffle
@@ -19,12 +11,12 @@ from math import ceil
 import lmdb
 import sys
 import os
-import time
+
+#sys.path.insert(0,'/home/jiabing/caffe/python')
 
 prompt = '>'
-#the caffe path in the specific ubuntu environment
 context = '/home/para/caffe/'
-#the folder path of the origional dataset 
+
 path_prefix = '../data/'
 sys.path.insert(0,context + '/python')
 import caffe
@@ -41,7 +33,7 @@ def loadData(path):
 #        else:
 #            break
 
-    start = time.clock()    
+    
     dataset = path
     path = path_prefix + path
     print path
@@ -77,25 +69,18 @@ def loadData(path):
     lines = len(Labels[0])
     print 'size of the dataset: ' + str(rows), str(lines)
 
-#    indexRow = 0
+    indexRow = 0
     for indexRow in range(rows):
-#        indexLine = 0
-        for indexLine in range(indexRow):
-            label = Labels[indexRow][indexLine]
+        indexLine = 0
+        for indexLine in range(lines):
+            label = Labels[indexRow,indexLine]
             #store non-zero data
             if label != 0:
                 #for test purpose printing...
                 #print '[' + str(indexRow) + ',' + str(indexLine) + ']'
-                temp_data = DataSet[indexRow,indexLine]
-                #print temp_data
-                #print 'row:' + str(indexRow)
-                #print 'line:' + str(indexLine)
-                #print 'label:' + str(label)
-                #break
-                spectralBands = len(temp_data)
-                data = []
+                data = DataSet[indexRow,indexLine]
                 if  neighbors> 1:
-                    center_data = temp_data
+                    center_data = data
                     #if indexRow + 1 < rows and rindexRow > 0 and indexLine + 1 < lines and indexLine > 0 and Labels[indexRow + 1,indexLine] !=0 and Labels[indexRow - 1,indexLine] != 0 and Labels[indexRow, indexLine + 1] !=0 and Labels[indexRow, indexLine -1] != 0:
                     #    data1 = DataSet[indexRow, indexLine - 1]
                     #    data2 = DataSet[indexRow, indexLine + 1]
@@ -187,25 +172,22 @@ def loadData(path):
                         data8 = center_data
                     
                     if neighbors == 4:
-                        #assembleMark = 0
-                        for assembleMark in range(spectralBands):
-                            data_1 = np.append(data2[assembleMark], data4[assembleMark])
-                            data_2 = np.append(data5[assembleMark], data7[assembleMark])
-                            data_3 = np.append(data_1, data_2)
-                            data  = np.append(center_data[assembleMark], data_3)
+                        data_1 = np.append(data2, data4)
+                        data_2 = np.append(data5, data7)
+                        data_3 = np.append(data_1, data_2)
+                        data  = np.append(data, data_3)
                         #data = data + data2 + data4 + data5 + data7
                     elif neighbors == 8:
                         #print data
                         #data = np.append(data, data1, data2, data3, data4, data5, data6, data7, data8)
-                        for assembleMark in range(spectralBands):
-                            data_1 = np.append(data1[assembleMark], data2[assembleMark])
-                            data_2 = np.append(data3[assembleMark], data4[assembleMark])
-                            data_3 = np.append(data5[assembleMark], data6[assembleMark])
-                            data_4 = np.append(data7[assembleMark], data8[assembleMark])
-                            data_5 = np.append(data_1, data_2)
-                            data_6 = np.append(data_3, data_4)
-                            data_7 = np.append(data_5, data_6)
-                            data = np.append(center_data[assembleMark], data_7)
+                        data_1 = np.append(data1, data2)
+                        data_2 = np.append(data3, data4)
+                        data_3 = np.append(data5, data6)
+                        data_4 = np.append(data7, data8)
+                        data_5 = np.append(data_1, data_2)
+                        data_6 = np.append(data_3, data_4)
+                        data_7 = np.append(data_5, data_6)
+                        data = np.append(data, data_7)
 
                         #print data
                         #print 'data1' + str(data1) + 'data2 ' + str(data2) + 'data3' + str(data3)
@@ -213,31 +195,23 @@ def loadData(path):
                         #print np.append(data1, data2)
                 #    elif neighbors == 1:
                 #        data = 
-                elif neighbors == 1:
-                    data = temp_data
-                
-                DataList[label - 1].append(data)
-                print label
-#            indexLine = indexLine + 1
 
-#        indexRow = indexRow + 1
+                DataList[label - 1].append(data)
+            indexLine = indexLine + 1
+
+        indexRow = indexRow + 1
     
-    end = time.clock()
-    tik_tok = end - start
     print 'data loaded.'
     print 'spectral length now is: ' + str(len((DataList[0][0])))
-    return DataList, tik_tok
+    return DataList
 
 
 def shuffling(dataList):
-    start = time.clock()
     print 'shuffling data...'
     for sub_list in dataList:
         shuffle(sub_list)
     print 'shuffled.'
-    end = time.clock()
-
-    return dataList, end - start
+    return dataList
     
 def writeToLMDB(list, name, procedure):
 
@@ -258,13 +232,13 @@ def writeToLMDB(list, name, procedure):
     # new_big_list = [data_dicts....]
     # in which data_dict is {'label': a label, 'data': data value}
     # print new_big_list[0:20]
-    print 'shuffling data again among different classes....'
-    shuffle(new_big_list)
+    #print 'shuffling data again among different classes....'
+    #shuffle(new_big_list)
     #print new_big_list[0]['label']
     #print new_big_list[0]['data']
     print 'the number of spectral in this dataset is :' + str(len(new_big_list[0]['data']))
 
-    map_size = sys.getsizeof(new_big_list) * 10
+    map_size = sys.getsizeof(new_big_list) * 100000
     # prepare the lmdb format file
     print 'creating training lmdb ' + procedure + 'format dataset...'
     env = lmdb.open('HSI' + name + procedure + 'lmdb', map_size = map_size)
@@ -273,31 +247,31 @@ def writeToLMDB(list, name, procedure):
     print 'this data set '+ name +' had spectral bands of ' + str(spectralBands)
     temp_i = 0
     countingMark = 0
+    sampleCounts = range(len(new_big_list))
+    shuffle(sampleCounts)
     with env.begin(write = True) as txn:
-        for sample in new_big_list:
+        for temp in sampleCounts:
+            sample = new_big_list[temp]
             datum = caffe.proto.caffe_pb2.Datum()
-            X = sample['data']
-            Y = sample['label']
-            #print X.shape[1]
-            #print X.shape[2]
-            #print X.shape[3]
             datum.channels = 1
             datum.height = 1
             datum.width = spectralBands
-
             # print sample
-            datum.data = X.tostring()
-            datum.label = int(Y)
-            #print datum.data
-            #print datum.label
+            datum.data = sample['data'].tostring()
+            datum.label = int(sample['label'])
             str_id = '{:08}'.format(temp_i)
             txn.put(str_id.encode('ascii'), datum.SerializeToString())
-
+	    temp_i = temp_i + 1
             countingMark = countingMark + 1
+	    #print '.'
     print 'Done.'
     print str(countingMark) + ' samples have successfully writed into lmdb format data file.'
 
-def assembleData(list, datasetName):
+# write to .mat data format
+def assembleMAT(list, datasetName):
+
+# write data to lmdb format
+def assembleLMDB(list, datasetName):
 
     print "please enter the ratio of training samples, eg. 80."
     ratio = int(raw_input(prompt))
@@ -311,9 +285,7 @@ def assembleData(list, datasetName):
     #envTest = lmdb.open(datasetName + 'HSITestlmdb', map_size = map_size)
 
     
-    start = time.clock()
     # split the dataset according to the ratio to caffe recognizable datasets
-    
     positionMark = 0
     trainList = []
     testList = []
@@ -350,8 +322,16 @@ def assembleData(list, datasetName):
     # write the splited data into lmdb format files
     writeToLMDB(trainList, datasetName, 'training')
     writeToLMDB(testList, datasetName, 'testing')
-    end = time.clock()
-    return end - start
+
+
+
+#def assembleData(list, datasetName):
+#    print "choose the data format, enter 1 for lmdb or enter 2 for mat"
+#    data_format = int(raw_input(prompt))
+#    if data_format == 1:
+#        assembleLMDB(list, datasetName)
+#    elif:
+#        assembleMAT(list, datasetName)
 
 #processing code segment
 print "enter the file folder path you want to transform..."
@@ -360,10 +340,6 @@ path = raw_input(prompt)
 if os.path.exists(path_prefix + path) != True:
     print "you entered the wrong file folder path, please re-enter."
 else:
-    dataList, time_loadData = loadData(path)
-    shuffledDataList, time_shuffling = shuffling(dataList)
-    time_assemble = assembleData(shuffledDataList, path)
-    print '%f s' % (time_loadData + time_shuffling + time_assemble)
-    
-#    print '%f s' % (end - start)
-
+    dataList = loadData(path)
+    shuffledDataList = shuffling(dataList)
+    assembleData(shuffledDataList, path)
