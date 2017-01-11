@@ -19,6 +19,7 @@ context = '/home/para/caffe/'
 datasetName = ''
 neighbor_strategy = 8
 train_ratio = 80
+neighbors = 4
 
 path_prefix = '../data/'
 sys.path.insert(0,context + '/python')
@@ -302,7 +303,7 @@ def prepareMatList(list):
 def writeToMAT(trainList, testList, datasetName):
     DataTr, CIdTr = prepareMatList(trainList)
     DataTe, CIdTe = prepareMatList(testList)
-    sio.savemat(datasetName + '_' + neighbor_strategy + '_' + train_ratio + '.mat',{'DataTr':DataTr, 'CIdTr':CIdTr, 'DataTe':DataTe, 'CIdTe':CIdTe})
+    sio.savemat(datasetName + '_' + str(neighbor_strategy) + '_' + str(train_ratio) + '.mat',{'DataTr':DataTr, 'CIdTr':CIdTr, 'DataTe':DataTe, 'CIdTe':CIdTe})
 
 
 def assembleData(list, datasetName):
@@ -382,4 +383,6 @@ def prepare():
         dataList = loadData(path)
         shuffledDataList = shuffling(dataList)
         assembleData(shuffledDataList, path)
-    return path
+    
+    realPath = path + '_' + str(neighbor_strategy) + '_' + str(train_ratio)
+    return realPath, neighbors

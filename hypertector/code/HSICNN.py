@@ -139,7 +139,7 @@ def loadData(dataFile, typeId = -1, bShowData = False):
 #currently, I wrote all the network constructing and training and testing in this file#
 #laterly, I will seperate them apart.                                                 #
 #######################################################################################
-def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay, batch_size):
+def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay, batch_size, epoches):
     #get the train data, train label, validate data, validate label, test data, test label
     train_dataset, valid_dataset, test_dataset = loadData(filePath + ".mat")
 
@@ -231,7 +231,7 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
 
     
 
-    history = model.fit(train_dataset_data, train_dataset_label, batch_size = batch_size, nb_epoch = 300, verbose=1, validation_split=0, shuffle=True)
+    history = model.fit(train_dataset_data, train_dataset_label, batch_size = batch_size, nb_epoch = epoches, verbose=1, validation_split=0, shuffle=True)
     model.save_weights(filePath + 'Model.h5', overwrite=True)
     
     sio.savemat(filePath + "Result.mat",{'loss':history.history['loss'],'accuracy':history.history['acc']})
@@ -256,8 +256,8 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     file.close()
     return classes,test_dataset_label    
 
-def network(path, con_step_length, max_pooling_feature_map_size, batch_size, learning_ratio, train_decay):
-    return temp_network(path, number_of_con_filters = 20, con_step_length = con_step_length, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = 100, learning_ratio = learning_ratio, train_decay = train_decay, batch_size = batch_size)
+def network(path, con_step_length, max_pooling_feature_map_size, fullLayerSize, batch_size, learning_ratio, train_decay, epoches):
+    return temp_network(path, number_of_con_filters = 20, con_step_length = con_step_length, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = fullLayerSize, learning_ratio = learning_ratio, train_decay = train_decay, batch_size = batch_size,epoches = epoches)
 
 def run_sub():
     for mark in range(15,31):
@@ -266,7 +266,7 @@ def run_sub():
 	network(file4pixel, 5, 40, 10)
 
 #if __name__ == '__main__':
-def run_network(datafile, convolutionalLayers, maxPoolingSize, fullLayerSize, learning_ratio, train_decay):
+def run_network(datafile, convolutionalLayers, maxPoolingSize, fullLayerSize, batch_size, learning_ratio, train_decay,epoches):
 
         file1pixel = datafile
 
@@ -276,7 +276,7 @@ def run_network(datafile, convolutionalLayers, maxPoolingSize, fullLayerSize, le
         f.write('start to train.......')
         startTime = time.clock()
         f.write('start time: ' + str(startTime) + '\n')
-        network(file1pixel, convolutionalLayers, maxPoolingSize, fullLayerSize, learning_ratio, train_decay)
+        network(file1pixel, convolutionalLayers, maxPoolingSize, batch_size, fullLayerSize, learning_ratio, train_decay,epoches)
         endTime = time.clock()
         f.write('end time: ' + str(endTime) + '\n')
         f.write('total time: ' + str(endTime - startTime))
