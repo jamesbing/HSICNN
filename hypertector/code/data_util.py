@@ -16,6 +16,9 @@ import os
 
 prompt = '>'
 context = '/home/para/caffe/'
+datasetName = ''
+neighbor_strategy = 8
+train_ratio = 80
 
 path_prefix = '../data/'
 sys.path.insert(0,context + '/python')
@@ -25,6 +28,7 @@ import caffe
 def loadData(path):
     print 'please enter the neighbor pixels strategy, you can choose from 1,4 and 8.'
     neighbors = int(raw_input(prompt))
+    neighbor_strategy = neighbors
     print neighbors
 #    while True:
 #        if temp not in (1,4,8):
@@ -298,13 +302,14 @@ def prepareMatList(list):
 def writeToMAT(trainList, testList, datasetName):
     DataTr, CIdTr = prepareMatList(trainList)
     DataTe, CIdTe = prepareMatList(testList)
-    sio.savemat(datasetName + '.mat',{'DataTr':DataTr, 'CIdTr':CIdTr, 'DataTe':DataTe, 'CIdTe':CIdTe})
+    sio.savemat(datasetName + '_' + neighbor_strategy + '_' + train_ratio + '.mat',{'DataTr':DataTr, 'CIdTr':CIdTr, 'DataTe':DataTe, 'CIdTe':CIdTe})
 
 
 def assembleData(list, datasetName):
 
     print "please enter the ratio of training samples, eg. 80."
     ratio = int(raw_input(prompt))
+    train_ratio = ratio
 
     # prepare the lmdb format dataset
     # allocate the storage space for the dataset
