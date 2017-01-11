@@ -377,3 +377,4 @@ def prepare():
         dataList = loadData(path)
         shuffledDataList = shuffling(dataList)
         assembleData(shuffledDataList, path)
+    return path
