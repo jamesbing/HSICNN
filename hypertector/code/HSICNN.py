@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding=utf-8
+# the cnn framework based on theano liberary
 from __future__ import print_function
 import numpy
 import time
@@ -218,42 +219,11 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
 
     model.compile(optimizer=sgd, loss='categorical_crossentropy',metrics=['accuracy'])
 
-    #train the constructed model
-    #the input shape of the train_dataset should be a list.
-
-
-#    train_dataset_data = train_dataset[0].tolist()
-#    test_dataset_data = test_dataset[0].tolist()
-
-#    train_dataset_data = []
-#    for tempTrainMark in range(train_dataset[0].shape[0]):
-#        train_dataset_data.append(train_dataset[0][tempTrainMark])
-
-#   train_dataset_data = numpy.array(train_dataset_data)
-    
-#    print("The training dataset have ", len(train_dataset_data), "items, each item is a ", len(train_dataset_data[0]), "dimention vector.")
-#    print("There are ", len(train_dataset[1]),"labels in training dataset, the match between labels and item numbers is:", len(train_dataset[1]) == len(train_dataset_data), ".")
-#    test_dataset_data = []
-#    for tempTestMark in range(test_dataset[0].shape[0]):
-#        test_dataset_data.append(test_dataset[0][tempTestMark])
-
-
-#    test_dataset_data = numpy.array(test_dataset_data)
-#    train_dataset_data = numpy.array(train_dataset_data[:len(train_dataset_data)])
-#    test_dataset_data = numpy.array(test_dataset_data[:len(test_dataset_data)])
-
-#    train_dataset_data = sequence.pad_sequences(train_dataset_data, )
-
-#    train_dataset_data = train_dataset[0]
-    
-
-#    train_dataset_data = numpy.expand_dims(train_dataset[0], 1)
     train_dataset_data = train_dataset[0].reshape(train_dataset[0].shape[0],1,train_dataset[0].shape[1],1)
     train_dataset_label = np_utils.to_categorical(train_dataset[1])
     print("The dataset used to train the model shapes ",train_dataset_data.shape)
     print("The label corresponding to the train data shapes ",train_dataset_label.shape)
-#    print(train_dataset_data)
-
+    
     #prepare the validation dataset
     validation_dataset_data = valid_dataset[0].reshape(valid_dataset[0].shape[0],1,valid_dataset[0].shape[1],1)
     validation_dataset_label = np_utils.to_categorical(valid_dataset[1])
@@ -277,12 +247,6 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     print("对测试数据集的预测结果为：",classes)
     print("测试数据集中的真实结果为：",test_dataset_label)
     print("一共得到测试结果",len(classes),"个，一共有",len(test_dataset_label),"个.")
-#    count = 0
-#    correctCount = 0
-#    comparasion = zip(classes, test_dataset_label)
-#    print(comparasion)
-#    for x,y in range(classes)
-#        if()
 
     test_accuracy = numpy.mean(numpy.equal(test_dataset_label, classes))
 
@@ -292,8 +256,8 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     file.close()
     return classes,test_dataset_label    
 
-def network(path, con_step_length, max_pooling_feature_map_size, batch_size):
-    return temp_network(path, number_of_con_filters = 20, con_step_length = con_step_length, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = 100, learning_ratio = 0.00075, train_decay = 0.0000005, batch_size = batch_size)
+def network(path, con_step_length, max_pooling_feature_map_size, batch_size, learning_ratio, train_decay):
+    return temp_network(path, number_of_con_filters = 20, con_step_length = con_step_length, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = 100, learning_ratio = learning_ratio, train_decay = train_decay, batch_size = batch_size)
 
 def run_sub():
     for mark in range(15,31):
@@ -301,32 +265,20 @@ def run_sub():
         file4pixel = "newKSC" + str(mark) + "N4"
 	network(file4pixel, 5, 40, 10)
 
-if __name__ == '__main__':
-#def run():
-#    for mark in range(1):
-#        print("现在执行的数据集是：newPU" + str(mark) + "N.mat")
-        file1pixel = "KSC"
-        f = open("/home/jiabing/HSICNNKSC/KSC8NTimeCounting_SGD.txt",'wb')
+#if __name__ == '__main__':
+def run_network(datafile, convolutionalLayers, maxPoolingSize, fullLayerSize, learning_ratio, train_decay):
+
+        file1pixel = datafile
+
+        f = open("/home/jiabing/HSICNNKSC/" + datafile +"TimeCounting.txt",'wb')
         print("现在执行的数据集是" +file1pixel +".mat, bling bling~~")
         f.write('------------------------------------------------------\n')
         f.write('start to train.......')
-        startTimeKSC8CPU = time.clock()
-        f.write('start time: ' + str(startTimeKSC8CPU) + '\n')
-        network(file1pixel, 9, 32, 100)
-        endTimeKSC8CPU = time.clock()
-        f.write('end time: ' + str(endTimeKSC8CPU) + '\n')
-        f.write('total time: ' + str(endTimeKSC8CPU - startTimeKSC8CPU))
+        startTime = time.clock()
+        f.write('start time: ' + str(startTime) + '\n')
+        network(file1pixel, convolutionalLayers, maxPoolingSize, fullLayerSize, learning_ratio, train_decay)
+        endTime = time.clock()
+        f.write('end time: ' + str(endTime) + '\n')
+        f.write('total time: ' + str(endTime - startTime))
         f.close()
-        print('total time ：' + str(endTimeKSC8CPU - startTimeKSC8CPU))
-#    network("newKSC8020N8first",9,40,)
-#    temp_network("newPU1NWith2RestN.mat", number_of_con_filters = 20, con_step_length = 1, max_pooling_feature_map_size = 40, number_of_full_layer_nodes = 100, learning_ratio = 0.01, train_decay = 0.001)
-#if __name__ == '__main__':
-#    for mark in range(5,6):
-#        print("现在执行的数据集是：newKSC" + str(mark) + "N.mat")
-#if __name__ == '__main__':
-#    for mark in range(1,2):
-#        print("现在的实验的数据集是：newKSC" + str(mark) + "N4.mat")
-#        file4pixel = "newKSC" + str(mark) + "N4"
-#	network(file4pixel, 5, 40, 100)
-#    network("newKSC8020N8first",9,40,)
-#    temp_network("newPU1NWith2RestN.mat", number_of_con_filters = 20, con_step_length = 1, max_pooling_feature_map_size = 40, number_of_full_layer_nodes = 100, learning_ratio = 0.01, train_decay = 0.001)
+        print('total time ：' + str(endTime - startTime))
