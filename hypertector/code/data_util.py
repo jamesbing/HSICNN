@@ -367,12 +367,13 @@ def assembleData(list, datasetName):
 #        assembleMAT(list, datasetName)
 
 #processing code segment
-print "enter the file folder path you want to transform..."
-path = raw_input(prompt)
+def prepare():
+    print "enter the file folder path you want to transform..."
+    path = raw_input(prompt)
 
-if os.path.exists(path_prefix + path) != True:
-    print "you entered the wrong file folder path, please re-enter."
-else:
-    dataList = loadData(path)
-    shuffledDataList = shuffling(dataList)
-    assembleData(shuffledDataList, path)
+    if os.path.exists(path_prefix + path) != True:
+        print "you entered the wrong file folder path, please re-enter."
+    else:
+        dataList = loadData(path)
+        shuffledDataList = shuffling(dataList)
+        assembleData(shuffledDataList, path)
