@@ -125,7 +125,7 @@ def loadData(dataFile, typeId = -1, bShowData = False):
 #######################################################################################
 def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay):
     #get the train data, train label, validate data, validate label, test data, test label
-    train_dataset, valid_dataset, test_dataset = loadData("/home/jiabing/HSICNNIndian/" + filePath + ".mat")
+    train_dataset, valid_dataset, test_dataset = loadData(filePath + ".mat")
 
     file = open(filePath + "CNNSVMdescription.txt",'w')
 
@@ -144,31 +144,7 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     #initialize parameters
     layer1_input_length = len(test_dataset[0][0])
     con_filter_length = int((math.ceil( (layer1_input_length /  con_step_length) / 9)) * con_step_length)
-
     destinations = numpy.max(test_dataset[1])
-    
-    #############################
-    #Network Information Display#
-    #############################
-    #file = open(filePath + "description.txt",'w')
-
- #   file.write("The network have " + str(channel_length) + "input nodes in the 1st layer.\n")
- #   file.write("The amount of samples in the dataset is " + str(sample_counts) +".\n")
- #   file.write("The number of classification classes is " + str(destinations) +".\n")
- #   file.write("The size of the first convolutional layer is " + str(layer1_input_length)+".\n")
- #   file.write('The number of convolutional filters is '+ str(number_of_con_filters)+ ",each kernel sizes "+ str(con_filter_length) + "X1.\n")
- #   file.write("There are "+str(number_of_full_layer_nodes)+" nodes in the fully connect layer.\n")
-
- #   print("The network have ", channel_length, "input nodes in the 1st layer.")
- #   print("The amount of samples in the dataset is ", sample_counts)
- #   print("The number of classification classes is ", destinations)
- #   print("The size of the first convolutional layer is ", layer1_input_length)
- #   print('The number of convolutional filters is ', number_of_con_filters, ",each kernel sizes ", con_filter_length,"X1.")
- #  print("There are ",number_of_full_layer_nodes," nodes in the fully connect layer.")
-    #########################
-    #Construct the CNN model# 
-    #########################
-    
     model = Sequential()
     
     #the first convolutional layer
@@ -230,13 +206,6 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     test_label_for_svm = test_dataset[1]
 
     #下面这部分是把上面的CNN喂到SVM里面
-#    pca = decomposition.RandomizedPCA(n_components = 100,whiten=True)
-#    pca.fit(X_train)
-
-#    X_train_pca = pca.transform(X_train)
-#    X_test_pca = pca.transform(X_test)
-
-    #原来gamma的值为0.0008
     kernel_1 = 'linear'
     kernel_2 = 'rbf'
 
@@ -340,17 +309,12 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     return {'cnnsvmtraintime':cnnsvmtraintime,'cnnsvmtesttime':cnnsvmtesttime,'cnnsvmacc':cnnsvmacc, 'svmtraintime':svmtraintime,'svmtesttime':svmtesttime,'svmacc':svmacc,'cnntesttime':cnntesttime,'cnnacc':cnnacc}
     file.close
 
-def network(path, con_step_length, max_pooling_feature_map_size):
-    result =  temp_network(path, number_of_con_filters = 20, con_step_length = con_step_length, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = 100, learning_ratio = 0.06, train_decay = 0.001)
+def network(file, convolutionalLayers, max_pooling_feature_map_size, full_layers_size, batch_size, ratio, decay):
+    result =  temp_network(file, number_of_con_filters = 20, con_step_length = convolutionalLayers, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = full_layers_size, learning_ratio = ratio, train_decay = decay)
     return result
 
-def run_batch(flag):
-    result1 = network("newIndian" + str(flag) + "N",1,40)
-    result2 = network("newIndian" + str(flag) + "N4",5,40)
-    result3 = network("newIndian" + str(flag) + "N8",9,40)
-    return result1, result2, result3
 
-if __name__ == '__main__':
+def run(filename,neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay):
     cnnsvmtraintime1 = 0.
     cnnsvmtesttime1 = 0.
     cnnsvmacc1 = 0.
@@ -359,67 +323,23 @@ if __name__ == '__main__':
     svmacc1 = 0.
     cnntesttime1 = 0.
     cnnacc1 = 0.
-
-    cnnsvmtraintime4 = 0.
-    cnnsvmtesttime4 = 0.
-    cnnsvmacc4 = 0.
-    svmtraintime4 = 0.
-    svmtesttime4 = 0.
-    svmacc4 = 0.
-    cnntesttime4 = 0.
-    cnnacc4 = 0.
-
-    cnnsvmtraintime8 = 0.
-    cnnsvmtesttime8 = 0.
-    cnnsvmacc8 = 0.
-    svmtraintime8 = 0.
-    svmtesttime8 = 0.
-    svmacc8 = 0.
-    cnntesttime8 = 0.
-    cnnacc8 = 0.
     
-    file_all_result = open("IndianEXPResultTOTAL.txt",'w')
+    file = open(filename + "_CNNRF_EXPResultTOTAL.txt",'w')
 
-    for flag in range(1,31):
-        result = run_batch(flag)
+    result = network(filename,neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay)
         
-        cnnsvmtraintime1 = cnnsvmtraintime1 + float(result[0]['cnnsvmtraintime'])
-        cnnsvmtesttime1 = cnnsvmtesttime1 + float(result[0]['cnnsvmtesttime'])
-        cnnsvmacc1 = cnnsvmacc1 + float(result[0]['cnnsvmacc'])
-        svmtraintime1 = svmtraintime1 + float(result[0]['svmtraintime'])
-        svmtesttime1 = svmtesttime1 + float(result[0]['svmtesttime'])
-        svmacc1 = svmacc1 + float(result[0]['svmacc'])
-        cnntesttime1 = cnntesttime1 + float(result[0]['cnntesttime'])
-        cnnacc1 = cnnacc1 + float(result[0]['cnnacc'])
+    cnnsvmtraintime1 = cnnsvmtraintime1 + float(result['cnnsvmtraintime'])
+    cnnsvmtesttime1 = cnnsvmtesttime1 + float(result['cnnsvmtesttime'])
+    cnnsvmacc1 = cnnsvmacc1 + float(result['cnnsvmacc'])
+    svmtraintime1 = svmtraintime1 + float(result['svmtraintime'])
+    svmtesttime1 = svmtesttime1 + float(result['svmtesttime'])
+    svmacc1 = svmacc1 + float(result['svmacc'])
+    cnntesttime1 = cnntesttime1 + float(result['cnntesttime'])
+    cnnacc1 = cnnacc1 + float(result['cnnacc'])
 
-        cnnsvmtraintime4 = cnnsvmtraintime4 + float(result[1]['cnnsvmtraintime'])
-        cnnsvmtesttime4 = cnnsvmtesttime4 + float(result[1]['cnnsvmtesttime'])
-        cnnsvmacc4 = cnnsvmacc4 + float(result[1]['cnnsvmacc'])
-        svmtraintime4 = svmtraintime4 + float(result[1]['svmtraintime'])
-        svmtesttime4 = svmtesttime4 + float(result[1]['svmtesttime'])
-        svmacc4 = svmacc4 + float(result[1]['svmacc'])
-        cnntesttime4 = cnntesttime4 + float(result[1]['cnntesttime'])
-        cnnacc4 = cnnacc4 + float(result[1]['cnnacc'])
-        
-        cnnsvmtraintime8 = cnnsvmtraintime8 + float(result[2]['cnnsvmtraintime'])
-        cnnsvmtesttime8 = cnnsvmtesttime8 + float(result[2]['cnnsvmtesttime'])
-        cnnsvmacc8 = cnnsvmacc8 + float(result[2]['cnnsvmacc'])
-        svmtraintime8 = svmtraintime8 + float(result[2]['svmtraintime'])
-        svmtesttime8 = svmtesttime8 + float(result[2]['svmtesttime'])
-        svmacc8 = svmacc8 + float(result[2]['svmacc'])
-        cnntesttime8 = cnntesttime8 + float(result[2]['cnntesttime'])
-        cnnacc8 = cnnacc8 + float(result[2]['cnnacc'])
-        file_all_result.write("|" +str(flag) + "|" + "1pixel" + "|" + result[0]['cnnsvmacc'] + "|" + result[0]['svmacc'] + "|" + result[0]['cnnacc'] + "|\n")
+    file.write("|" + filename + "results" + "|" + result['cnnsvmacc'] + "|" + result['svmacc'] + "|" + result['cnnacc'] + "|\n")
 
-        file_all_result.write("|" +str(flag) + "|" + "4pixles" + "|" + result[1]['cnnsvmacc'] + "|" + result[1]['svmacc'] + "|" + result[1]['cnnacc'] + "|\n")
-        
-        file_all_result.write("|" +str(flag) + "|" + "8pixels" + "|" +result[2]['cnnsvmacc'] + "|" + result[2]['svmacc'] + "|" + result[2]['cnnacc'] + "|\n")
-#        file_all_result.write(str(flag) + "|" + str(cnnsvmtraintime1) + "|" + str(cnnsvmtesttime1) + "|" + str(cnnsvmacc1) + "|" + str(svmtraintime1) + "|" + str(svmtesttime1) + "|" + str(svmacc1) + "|" + str(cnntesttime1) + "|" + str(cnnacc1) + "|\n")
-#        file_all_result.write(str(flag) + "|" + str(cnnsvmtraintime4) + "|" + str(cnnsvmtesttime1) + "|" + str(cnnsvmacc1) + "|" + str(svmtraintime1) + "|" + str(svmtesttime1) + "|" + str(svmacc1) + "|" + str(cnntesttime1) + "|" + str(cnnacc1) + "|\n")
-#        file_all_result.write(str(flag) + "|" + str(cnnsvmtraintime1) + "|" + str(cnnsvmtesttime1) + "|" + str(cnnsvmacc1) + "|" + str(svmtraintime1) + "|" + str(svmtesttime1) + "|" + str(svmacc1) + "|" + str(cnntesttime1) + "|" + str(cnnacc1) + "|\n")
-    file = open("IndianEXPResultSUM.txt",'w')
-
-    file.write("---------------------单像素-----------------------\n")
+    file.write("---------------------详细结果-----------------------\n")
 
     file.write(str(cnnsvmtraintime1) + "\n")
 
@@ -436,44 +356,6 @@ if __name__ == '__main__':
     file.write(str(cnntesttime1) + "\n")
 
     file.write(str(cnnacc1) + "\n")
-
-
-    file.write("---------------------4近邻像素-----------------------\n")
-    
-    file.write(str(cnnsvmtraintime4) + "\n")
-
-    file.write(str(cnnsvmtesttime4) + "\n")
-
-    file.write(str(cnnsvmacc4) + "\n")
-
-    file.write(str(svmtraintime4) + "\n")
-
-    file.write(str(svmtesttime4) + "\n")
-
-    file.write(str(svmacc4) + "\n")
-
-    file.write(str(cnntesttime4) + "\n")
-    
-    file.write(str(cnnacc4) + "\n")
-
-
-    file.write("---------------------8近邻像素-----------------------\n")
-
-    file.write(str(cnnsvmtraintime8) + "\n")
-
-    file.write(str(cnnsvmtesttime8) + "\n")
-
-    file.write(str(cnnsvmacc8) + "\n")
-
-    file.write(str(svmtraintime8) + "\n")
-
-    file.write(str(svmtesttime8) + "\n")
-
-    file.write(str(svmacc8) + "\n")
-
-    file.write(str(cnntesttime8) + "\n")
-    
-    file.write(str(cnnacc8) + "\n")
 
     file.close
 
