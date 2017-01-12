@@ -3,6 +3,7 @@
 # dawang jinwan hele pidan doufutang. @ zhoujing @
 # author @ jiabing leng @ nankai university @ tadakey@163.com
 
+import time
 import scipy.io as sio
 import numpy as np
 from random import shuffle
@@ -20,7 +21,6 @@ datasetName = ''
 neighbor_strategy = 8
 train_ratio = 80
 neighbors = 4
-
 path_prefix = '../data/'
 sys.path.insert(0,context + '/python')
 import caffe
@@ -303,7 +303,18 @@ def prepareMatList(list):
 def writeToMAT(trainList, testList, datasetName):
     DataTr, CIdTr = prepareMatList(trainList)
     DataTe, CIdTe = prepareMatList(testList)
-    sio.savemat(datasetName + '_' + str(neighbor_strategy) + '_' + str(train_ratio) + '.mat',{'DataTr':DataTr, 'CIdTr':CIdTr, 'DataTe':DataTe, 'CIdTe':CIdTe})
+  
+    ltime = time.localtime()
+    time_stamp = str(ltime[0]) + "_" + str(ltime[1]) + "_" + str(ltime[2]) + "_" + str(ltime[3]) + "_" + str(ltime[4])
+
+    folderPath = "../experiments/" + datasetName + '_' + str(neighbor_strategy) + '_' + str(train_ratio) + "_" + time_stamp + "/"
+    if not os.path.exists(folderPath):
+        os.makedirs(folderPath)
+
+    realPath = folderPath + datasetName + "_" + str(neighbor_strategy) + "_" + str(train_ratio)
+
+    sio.savemat(realPath + '.mat',{'DataTr':DataTr, 'CIdTr':CIdTr, 'DataTe':DataTe, 'CIdTe':CIdTe})
+    return realPath
 
 
 def assembleData(list, datasetName):
@@ -362,7 +373,7 @@ def assembleData(list, datasetName):
         writeToLMDB(trainList, datasetName, 'training')
         writeToLMDB(testList, datasetName, 'testing')
     elif data_format == 2:
-        writeToMAT(trainList, testList, datasetName)
+        return writeToMAT(trainList, testList, datasetName)
 
 #def assembleData(list, datasetName):
 #    print "choose the data format, enter 1 for lmdb or enter 2 for mat"
@@ -382,7 +393,11 @@ def prepare():
     else:
         dataList = loadData(path)
         shuffledDataList = shuffling(dataList)
-        assembleData(shuffledDataList, path)
-    
-    realPath = path + '_' + str(neighbor_strategy) + '_' + str(train_ratio)
-    return realPath, neighbors
+        realPath = assembleData(shuffledDataList, path)
+        #realPath = path + '_' + str(neighbor_strategy) + '_' + str(train_ratio)i
+        print "the dataset is stored in " + realPath + ".mat"
+        return realPath, neighbors
+
+
+if __name__ == '__main__':
+    prepare()

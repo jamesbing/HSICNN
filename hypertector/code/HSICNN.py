@@ -270,7 +270,7 @@ def run_network(datafile, convolutionalLayers, maxPoolingSize, fullLayerSize, ba
 
         file1pixel = datafile
 
-        f = open("/home/jiabing/HSICNNKSC/" + datafile +"TimeCounting.txt",'wb')
+        f = open(datafile +"CNNTimeCounting.txt",'wb')
         print("现在执行的数据集是" +file1pixel +".mat, bling bling~~")
         f.write('------------------------------------------------------\n')
         f.write('start to train.......')
