@@ -326,7 +326,7 @@ def run(filename,neighbors,max_pooling_feature_map_size,full_layers_size,batch_s
     
 
 
-    file = open(filename + "_CNNSVM_EXPResultTOTAL.txt",'w')
+    file = open(filename + "_CNNRF_EXPResultTOTAL.txt",'w')
 
     result = network(filename,neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay)
         
