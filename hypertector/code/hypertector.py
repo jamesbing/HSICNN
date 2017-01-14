@@ -11,7 +11,7 @@ from sys import argv
 prompt = '>'
 fullLayers = 100
 #mix_model_svm_ratio是为了以后采用组合混合模型的时候，保存一个svm在所有模型中的占比。以后根据需求进行扩充。。。TODO
-mix_model_svm_ratio = 
+mix_model_svm_ratio = 0
 file_name, neighbors = data_util.prepare()
 print "now constructing the network..."
 #print "enter the layers each convolutional kernel covers: "
