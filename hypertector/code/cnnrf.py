@@ -17,12 +17,16 @@ from keras.optimizers import SGD
 
 from keras.utils import np_utils
 
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.grid_search import GridSearchCV
+from sklearn import cross_validation, metrics
 import scipy.io as sio
 import random
 import math
 from keras import backend as K
-from sklearn.externals import joblib
-from sklearn import cross_validation,decomposition,svm
+
 
 import time
 def getMiddleOutPut(model,inputVector,kthlayer):
@@ -127,7 +131,7 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     #get the train data, train label, validate data, validate label, test data, test label
     train_dataset, valid_dataset, test_dataset = loadData(filePath + ".mat")
 
-    file = open(filePath + "CNNSVMdescription.txt",'w')
+    file = open(filePath + "CNNRFdescription.txt",'w')
 
 #    file.write("The network have " + str(channel_length) + "input nodes in the 1st layer.\n")
 #    file.write("The amount of samples in the dataset is " + str(sample_counts) +".\n")
@@ -196,14 +200,22 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     #根据已有的代码去构建训练好的网络
     model.load_weights(filePath + 'Model.h5')
     #拿到CNN全连接层提取到的特征
-    train_data_for_svm = getMiddleOutPut(model,[train_dataset_data],5)
-#    print("层号5，shape：",train_data_for_svm.shape)
-    train_label_for_svm = train_dataset[1]
-#    print("训练数据label的shape:",train_label_for_svm.shape)
+    train_data_for_rf = getMiddleOutPut(model,[train_dataset_data],5)
+#    print("层号5，shape：",train_data_for_rf.shape)
+    train_label_for_rf = train_dataset[1]
+#    print("训练数据label的shape:",train_label_for_rf.shape)
     
-    test_data_for_svm = getMiddleOutPut(model,[test_dataset_data],5)    
+    test_data_for_rf = getMiddleOutPut(model,[test_dataset_data],5)    
     test_dataset_label = test_dataset[1].astype(numpy.int) 
-    test_label_for_svm = test_dataset[1]
+    test_label_for_rf = test_dataset[1]
+    
+    #现在已经有了给rf的训练集和测试集：
+    #train_data_for_rf, train_label_for_rf
+    #test_data_for_rf, test_label_for_rf
+    
+    #构建RF进行测试
+
+
 
     #下面这部分是把上面的CNN喂到SVM里面
     kernel_1 = 'linear'
@@ -229,13 +241,13 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     print("开始训练")
     
     start_time = time.time()
-    clf1.fit(train_data_for_svm, train_label_for_svm)
+    clf1.fit(train_data_for_rf, train_label_for_rf)
     end_time = time.time()
     train_time = end_time - start_time
     print("训练用时:",train_time)
 
     start_time = time.time()
-    print("在测试集上的平均正确率为",clf1.score(test_data_for_svm, test_label_for_svm))
+    print("在测试集上的平均正确率为",clf1.score(test_data_for_rf, test_label_for_rf))
     end_time = time.time()
     test_time = end_time - start_time
     print("测试用时：%f" % test_time)
@@ -244,12 +256,12 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     file.write("The CNN-SVM joint use kernel " + kernel_2 + "\n")
     file.write("The SVM train time is " + str(train_time) +"\n")
     file.write("The testing time is " + str(test_time) + "\n")
-    file.write("The correct ratio of CNN-SVM is " + str(clf1.score(test_data_for_svm,test_label_for_svm)))
-    result = clf1.predict(test_data_for_svm)
+    file.write("The correct ratio of CNN-SVM is " + str(clf1.score(test_data_for_rf,test_label_for_rf)))
+    result = clf1.predict(test_data_for_rf)
     cnnsvmtraintime = str(train_time)
     cnnsvmtesttime = str(test_time)
-    cnnsvmacc = str((clf1.score(test_data_for_svm,test_label_for_svm)))
-    sio.savemat(filePath + "CNNSVMResult.mat",{'predict':result,'actual':test_label_for_svm})
+    cnnsvmacc = str((clf1.score(test_data_for_rf,test_label_for_rf)))
+    sio.savemat(filePath + "CNNSVMResult.mat",{'predict':result,'actual':test_label_for_rf})
     file.write("#########################################################################################################")
     joblib.dump(clf1,filePath + 'cnnsvmrbf.model')
 		
