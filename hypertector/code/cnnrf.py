@@ -2,6 +2,7 @@
 # coding=utf-8
 from __future__ import print_function
 import numpy
+import pandas as pd
 
 #import theano
 #theano.config.device = 'gpu'
@@ -14,7 +15,8 @@ from keras.optimizers import SGD
 #import imdb
 #from keras.processing import sequence
 #from keras.layers.Activation import tanh, softmax
-
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.grid_search import GridSearchCV
 from keras.utils import np_utils
 
 import scipy.io as sio
@@ -22,7 +24,8 @@ import random
 import math
 from keras import backend as K
 from sklearn.externals import joblib
-from sklearn import cross_validation,decomposition,svm
+from sklearn import cross_validation,decomposition,svm,metrics
+
 
 import time
 def getMiddleOutPut(model,inputVector,kthlayer):
@@ -326,7 +329,7 @@ def run(filename,neighbors,max_pooling_feature_map_size,full_layers_size,batch_s
     
 
 
-    file = open(filename + "_CNNSVM_EXPResultTOTAL.txt",'w')
+    file = open(filename + "_CNNRF_EXPResultTOTAL.txt",'w')
 
     result = network(filename,neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay)
         
