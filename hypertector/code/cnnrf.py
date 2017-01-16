@@ -232,7 +232,6 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     
     start_time = time.time()
     rf0.fit(train_data_for_rf, train_label_for_rf)
-    clf1.fit(train_data_for_rf, train_label_for_rf)
     end_time = time.time()
     train_time = end_time - start_time
     print("训练用时:",train_time)
@@ -248,7 +247,7 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     file.write("The RF train time is " + str(train_time) +"\n")
     file.write("The testing time is " + str(test_time) + "\n")
     file.write("The tree number in this RF is " + str(tree_counts) + "\n")
-    file.write("The correct ratio of CNN-RF is " + score)
+    file.write("The correct ratio of CNN-RF is " + str(score))
     result = rf0.predict(test_data_for_rf)
     cnnrftraintime = str(train_time)
     cnnrftesttime = str(test_time)
@@ -275,7 +274,7 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     print("训练用时:",train_time)
 
     start_time = time.time()
-    score_rf = rf1.score(test_data[0], test_data[1])
+    score_rf = rf1.score(test_dataset[0], test_dataset[1])
     print("在测试集上的平均正确率为",str(score_rf))
     end_time = time.time()
     test_time = end_time - start_time
