@@ -15,10 +15,11 @@ import os
 
 #sys.path.insert(0,'/home/jiabing/caffe/python')
 
+global neighbor_strategy, neighbors
 prompt = '>'
 context = '/home/para/caffe/'
 datasetName = ''
-neighbor_strategy = 8
+neighbor_strategy = 4
 train_ratio = 80
 neighbors = 4
 path_prefix = '../data/'
@@ -185,6 +186,7 @@ def loadData(path):
                     elif neighbors == 8:
                         #print data
                         #data = np.append(data, data1, data2, data3, data4, data5, data6, data7, data8)
+#                        print "neighbor startegy is 8"
                         data_1 = np.append(data1, data2)
                         data_2 = np.append(data3, data4)
                         data_3 = np.append(data5, data6)
@@ -208,7 +210,8 @@ def loadData(path):
     
     print 'data loaded.'
     print 'spectral length now is: ' + str(len((DataList[0][0])))
-    return DataList
+    print 'neighbor strategy ' + str(neighbors)
+    return DataList, neighbors
 
 
 def shuffling(dataList):
@@ -314,7 +317,7 @@ def writeToMAT(trainList, testList, datasetName):
     realPath = folderPath + datasetName + "_" + str(neighbor_strategy) + "_" + str(train_ratio)
 
     sio.savemat(realPath + '.mat',{'DataTr':DataTr, 'CIdTr':CIdTr, 'DataTe':DataTe, 'CIdTe':CIdTe})
-    return realPath
+    return realPath, neighbors
 
 
 def assembleData(list, datasetName):
@@ -391,11 +394,12 @@ def prepare():
     if os.path.exists(path_prefix + path) != True:
         print "you entered the wrong file folder path, please re-enter."
     else:
-        dataList = loadData(path)
+        dataList, neighbors = loadData(path)
         shuffledDataList = shuffling(dataList)
-        realPath = assembleData(shuffledDataList, path)
+        realPath, wrong_neighbor = assembleData(shuffledDataList, path)
         #realPath = path + '_' + str(neighbor_strategy) + '_' + str(train_ratio)i
         print "the dataset is stored in " + realPath + ".mat"
+        print neighbors
         return realPath, neighbors
 
 
