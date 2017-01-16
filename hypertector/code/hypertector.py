@@ -6,6 +6,7 @@ import HSICNN
 import data_util
 import cnnsvm
 import cnnrf
+
 from sys import argv
 
 prompt = '>'
@@ -13,6 +14,7 @@ fullLayers = 100
 #mix_model_svm_ratio是为了以后采用组合混合模型的时候，保存一个svm在所有模型中的占比。以后根据需求进行扩充。。。TODO
 mix_model_svm_ratio = 0
 file_name, neighbors = data_util.prepare()
+
 print "now constructing the network..."
 #print "enter the layers each convolutional kernel covers: "
 #neighbors = int(raw_input(prompt))
@@ -64,3 +66,16 @@ elif following_strategy == 3:
 
     print "now processing the cnn + rf joint framework..."
     cnnrf.run(file_name, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
+
+file = open(file_name + "_experiment_description.txt", 'w')
+file.write("-------------Experiment Description-------------")
+file.write("Data set:" + file_name + "#\n")
+file.write("neighbor strategy:" + str(neighbors) + "#\n")
+file.write("Max Polling Layer Neuron number:" + str(maxpoolings) + "#\n")
+file.write("Full Layer Neuron number:" + str(tempfullLayers) + "#\n")
+file.write("Batch size of SGD training:" + str(batch_size) + "#\n")
+file.write("Training epoches of deep CNN:" + str(epoches) + "#\n")
+file.write("Learning ratio:" + str(learning) + "#\n")
+file.write("Train decay:" + str(train_decay) +"#\n")
+
+
