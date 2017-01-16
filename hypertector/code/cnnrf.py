@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # coding=utf-8
+#@author jiabing leng
+#@dajingjing
+#@小冷今天去吃羊肉不带大静静
 from __future__ import print_function
 import numpy
 import pandas as pd
@@ -24,7 +27,7 @@ import random
 import math
 from keras import backend as K
 from sklearn.externals import joblib
-from sklearn import cross_validation,decomposition,svm,metrics
+from sklearn import cross_validation,decomposition,metrics
 
 
 import time
@@ -130,7 +133,7 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     #get the train data, train label, validate data, validate label, test data, test label
     train_dataset, valid_dataset, test_dataset = loadData(filePath + ".mat")
 
-    file = open(filePath + "CNNSVMdescription.txt",'w')
+    file = open(filePath + "CNNRFdescription.txt",'w')
 
 #    file.write("The network have " + str(channel_length) + "input nodes in the 1st layer.\n")
 #    file.write("The amount of samples in the dataset is " + str(sample_counts) +".\n")
@@ -199,98 +202,96 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     #根据已有的代码去构建训练好的网络
     model.load_weights(filePath + 'Model.h5')
     #拿到CNN全连接层提取到的特征
-    train_data_for_svm = getMiddleOutPut(model,[train_dataset_data],5)
-#    print("层号5，shape：",train_data_for_svm.shape)
-    train_label_for_svm = train_dataset[1]
-#    print("训练数据label的shape:",train_label_for_svm.shape)
+    train_data_for_rf = getMiddleOutPut(model,[train_dataset_data],5)
+#    print("层号5，shape：",train_data_for_rf.shape)
+    train_label_for_rf = train_dataset[1]
+#    print("训练数据label的shape:",train_label_for_rf.shape)
     
-    test_data_for_svm = getMiddleOutPut(model,[test_dataset_data],5)    
+    test_data_for_rf = getMiddleOutPut(model,[test_dataset_data],5)    
     test_dataset_label = test_dataset[1].astype(numpy.int) 
-    test_label_for_svm = test_dataset[1]
+    test_label_for_rf = test_dataset[1]
 
-    #下面这部分是把上面的CNN喂到SVM里面
-    kernel_1 = 'linear'
-    kernel_2 = 'rbf'
+    #进行CNN+RF的综合实验
+    #第一步：构造随机森林
+    #现在树的数目默认为100  
+    tree_counts = 100
+    rf0 = RandomForestClassifier(n_estimators = tree_counts, oob_score = True, random_state = 10)
+#
+#y_predprob = gbml.predict_proba(train_data_for_rf)[:,1]
+#    predict_ratio = metrics.roc_auc_score(train_label_for_rf, y_predprob)
+#    print("the correct ratio on training dataset after the first attempt round is:" + str(predict_ratio))
+    #第二步：确定森林中最佳的树的数量
 
-#	用rbf核
-    clf1 = svm.SVC(C=1.0, kernel = kernel_2,  gamma='auto', probability=True,
-             tol = 0.00000000000001, max_iter = -1)
-    
-    clf2 = svm.SVC(C=1.0, kernel = kernel_2,  gamma='auto', probability=True,
-             tol = 0.00000000000001, max_iter = -1)
-    #用linear
-    clf3 = svm.SVC(C=0.8, kernel = kernel_2,  gamma='auto', probability=True,
-             tol = 0.00001, max_iter = -1)    
-    clf4 = svm.SVC(C=0.8, kernel = kernel_2,  gamma='auto', probability=True,
-             tol = 0.00001, max_iter = -1)
+#    print("the out of bag score after the first attempt round is: " + str(rf0.oob_score_))
 
     print("#####################################################")
-    print("在CNN-SVM-RBF上的结果：")
+    print("在CNN-rf-RF上的结果：")
     print("数据集",filePath)
-    print("kernel为")
-    print(kernel_2)
+    print("树的数量：",tree_counts)
     print("开始训练")
     
     start_time = time.time()
-    clf1.fit(train_data_for_svm, train_label_for_svm)
+    rf0.fit(train_data_for_rf, train_label_for_rf)
+    clf1.fit(train_data_for_rf, train_label_for_rf)
     end_time = time.time()
     train_time = end_time - start_time
     print("训练用时:",train_time)
 
     start_time = time.time()
-    print("在测试集上的平均正确率为",clf1.score(test_data_for_svm, test_label_for_svm))
+    score = rf0.score(test_data_for_rf, test_label_for_rf)
+    print("在测试集上的平均正确率为", score)
     end_time = time.time()
     test_time = end_time - start_time
     print("测试用时：%f" % test_time)
     #result = clf.predict(X_train)
     file.write("#########################################################################################################")
-    file.write("The CNN-SVM joint use kernel " + kernel_2 + "\n")
-    file.write("The SVM train time is " + str(train_time) +"\n")
+    file.write("The RF train time is " + str(train_time) +"\n")
     file.write("The testing time is " + str(test_time) + "\n")
-    file.write("The correct ratio of CNN-SVM is " + str(clf1.score(test_data_for_svm,test_label_for_svm)))
-    result = clf1.predict(test_data_for_svm)
-    cnnsvmtraintime = str(train_time)
-    cnnsvmtesttime = str(test_time)
-    cnnsvmacc = str((clf1.score(test_data_for_svm,test_label_for_svm)))
-    sio.savemat(filePath + "CNNSVMResult.mat",{'predict':result,'actual':test_label_for_svm})
+    file.write("The tree number in this RF is " + str(tree_counts) + "\n")
+    file.write("The correct ratio of CNN-RF is " + score)
+    result = rf0.predict(test_data_for_rf)
+    cnnrftraintime = str(train_time)
+    cnnrftesttime = str(test_time)
+    cnnrfacc = str(score)
+    sio.savemat(filePath + "CNNRFResult.mat",{'predict':result,'actual':test_label_for_rf})
     file.write("#########################################################################################################")
-    joblib.dump(clf1,filePath + 'cnnsvmrbf.model')
+    joblib.dump(rf0,filePath + 'cnnrf.model')
 		
     #result = clf.predict(X_train)
     #correctRatio = np.mean(np.equal(result,Y_train))
-
+    
+    #只采用RF的情况
+    rf1 = RandomForestClassifier(n_estimators = tree_counts, oob_score = True, random_state = 10)
     print("#####################################################")
-    print("正在SVM上进行测试")
+    print("采用原来的数据构建随机森林RF")
     
     print("数据集",filePath)
-    print("kernel为")
-    print(kernel_2)
     print("开始训练")
-
+    
     start_time= time.time()
-    clf2.fit(train_dataset[0], train_dataset[1])
+    rf1.fit(train_dataset[0], train_dataset[1])
     end_time = time.time()
     train_time = end_time - start_time
     print("训练用时:",train_time)
 
     start_time = time.time()
-    print("在测试集上的平均正确率为",clf2.score(test_dataset[0],test_dataset[1]))
+    score_rf = rf1.score(test_data[0], test_data[1])
+    print("在测试集上的平均正确率为",str(score_rf))
     end_time = time.time()
     test_time = end_time - start_time
     print("测试用时：%f" % test_time)
     #result = clf.predict(X_train)
     file.write("#########################################################################################################")
-    file.write("The SVM only use kernel " + kernel_2 + "\n")
-    file.write("The SVM train time is " + str(train_time) +"\n")
+    file.write("The RF train time is " + str(train_time) +"\n")
     file.write("The testing time is " + str(test_time) + "\n")
-    file.write("The correct ratio of CNN-SVM is " + str(clf2.score(test_dataset[0],test_dataset[1])))
-    result = clf2.predict(test_dataset[0])
-    svmtraintime = str(train_time)
-    svmtesttime = str(test_time)
-    svmacc = str(clf2.score(test_dataset[0],test_dataset[1]))
-    sio.savemat(filePath + "SVMonlyResult.mat",{'predict':result,'actual':test_dataset[1]})
+    file.write("The correct ratio of CNN-RF is " + str(score_rf))
+    result = rf1.predict(test_dataset[0])
+    rftraintime = str(train_time)
+    rftesttime = str(test_time)
+    rfacc = str(score_rf)
+    sio.savemat(filePath + "RFonlyResult.mat",{'predict':result,'actual':test_dataset[1]})
     file.write("#########################################################################################################")
-    joblib.dump(clf2,filePath + 'svmrbf.model')
+    joblib.dump(rf1,filePath + 'rf.model')
 
     print("#####################################################")
     print("正在CNN上进行测试\n")
@@ -309,7 +310,7 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     file.write("#########################################################################################################")
     cnntesttime = str(end_time - start_time)
     cnnacc = str(test_accuracy)
-    return {'cnnsvmtraintime':cnnsvmtraintime,'cnnsvmtesttime':cnnsvmtesttime,'cnnsvmacc':cnnsvmacc, 'svmtraintime':svmtraintime,'svmtesttime':svmtesttime,'svmacc':svmacc,'cnntesttime':cnntesttime,'cnnacc':cnnacc}
+    return {'cnnrftraintime':cnnrftraintime,'cnnrftesttime':cnnrftesttime,'cnnrfacc':cnnrfacc, 'rftraintime':rftraintime,'rftesttime':rftesttime,'rfacc':rfacc,'cnntesttime':cnntesttime,'cnnacc':cnnacc}
     file.close
 
 def network(file, convolutionalLayers, max_pooling_feature_map_size, full_layers_size, batch_size, ratio, decay):
@@ -318,12 +319,12 @@ def network(file, convolutionalLayers, max_pooling_feature_map_size, full_layers
 
 
 def run(filename,neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay):
-    cnnsvmtraintime1 = 0.
-    cnnsvmtesttime1 = 0.
-    cnnsvmacc1 = 0.
-    svmtraintime1 = 0.
-    svmtesttime1 = 0.
-    svmacc1 = 0.
+    cnnrftraintime1 = 0.
+    cnnrftesttime1 = 0.
+    cnnrfacc1 = 0.
+    rftraintime1 = 0.
+    rftesttime1 = 0.
+    rfacc1 = 0.
     cnntesttime1 = 0.
     cnnacc1 = 0.
     
@@ -333,30 +334,30 @@ def run(filename,neighbors,max_pooling_feature_map_size,full_layers_size,batch_s
 
     result = network(filename,neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay)
         
-    cnnsvmtraintime1 = cnnsvmtraintime1 + float(result['cnnsvmtraintime'])
-    cnnsvmtesttime1 = cnnsvmtesttime1 + float(result['cnnsvmtesttime'])
-    cnnsvmacc1 = cnnsvmacc1 + float(result['cnnsvmacc'])
-    svmtraintime1 = svmtraintime1 + float(result['svmtraintime'])
-    svmtesttime1 = svmtesttime1 + float(result['svmtesttime'])
-    svmacc1 = svmacc1 + float(result['svmacc'])
+    cnnrftraintime1 = cnnrftraintime1 + float(result['cnnrftraintime'])
+    cnnrftesttime1 = cnnrftesttime1 + float(result['cnnrftesttime'])
+    cnnrfacc1 = cnnrfacc1 + float(result['cnnrfacc'])
+    rftraintime1 = rftraintime1 + float(result['rftraintime'])
+    rftesttime1 = rftesttime1 + float(result['rftesttime'])
+    rfacc1 = rfacc1 + float(result['rfacc'])
     cnntesttime1 = cnntesttime1 + float(result['cnntesttime'])
     cnnacc1 = cnnacc1 + float(result['cnnacc'])
 
-    file.write("|" + filename + "results" + "|" + result['cnnsvmacc'] + "|" + result['svmacc'] + "|" + result['cnnacc'] + "|\n")
+    file.write("|" + filename + "results" + "|" + result['cnnrfacc'] + "|" + result['rfacc'] + "|" + result['cnnacc'] + "|\n")
 
     file.write("---------------------详细结果-----------------------\n")
 
-    file.write(str(cnnsvmtraintime1) + "\n")
+    file.write(str(cnnrftraintime1) + "\n")
 
-    file.write(str(cnnsvmtesttime1) + "\n")
+    file.write(str(cnnrftesttime1) + "\n")
 
-    file.write(str(cnnsvmacc1) + "\n")
+    file.write(str(cnnrfacc1) + "\n")
 
-    file.write(str(svmtraintime1) + "\n")
+    file.write(str(rftraintime1) + "\n")
 
-    file.write(str(svmtesttime1) + "\n")
+    file.write(str(rftesttime1) + "\n")
 
-    file.write(str(svmacc1) + "\n")
+    file.write(str(rfacc1) + "\n")
 
     file.write(str(cnntesttime1) + "\n")
 

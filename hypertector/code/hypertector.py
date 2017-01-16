@@ -43,7 +43,6 @@ if following_strategy == 4:
     print "enter the ratio of svm classifier:"
     mix_model_svm_ratio = int(row_input(prompt))
 
-
 print "starting ..."
 HSICNN.run_network(file_name, neighbors, maxpoolings, fullLayers,batch_size, learning, train_decay, epoches)
 
