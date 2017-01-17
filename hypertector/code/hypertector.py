@@ -10,7 +10,6 @@ import cnnrf
 from sys import argv
 
 prompt = '>'
-fullLayers = 100
 #mix_model_svm_ratio是为了以后采用组合混合模型的时候，保存一个svm在所有模型中的占比。以后根据需求进行扩充。。。TODO
 mix_model_svm_ratio = 0
 file_name, neighbors = data_util.prepare()
@@ -23,9 +22,9 @@ print "the neighbors strategy is: " + str(neighbors)
 print "enter the number of neurons after the maxpooling layer:"
 maxpoolings = int(raw_input(prompt))
 print "enter the number of full layers\' neurons, default is 100:"
-tempfullLayers = int(raw_input(prompt))
-if tempfullLayers > 1:
-    fullLayers = tempfullLayers
+fullLayers = int(raw_input(prompt))
+#if tempfullLayers > 1:
+#    fullLayers = tempfullLayers
 print "enter the batch size for bsgd:"
 batch_size = int(raw_input(prompt))
 print "enter the learning ratio:"
