@@ -129,7 +129,7 @@ def loadData(dataFile, typeId = -1, bShowData = False):
 #currently, I wrote all the network constructing and training and testing in this file#
 #laterly, I will seperate them apart.                                                 #
 #######################################################################################
-def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay):
+def temp_network(filePath, trees, number_of_con_filters, con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay):
     #get the train data, train label, validate data, validate label, test data, test label
     train_dataset, valid_dataset, test_dataset = loadData(filePath + ".mat")
 
@@ -213,8 +213,7 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
 
     #进行CNN+RF的综合实验
     #第一步：构造随机森林
-    #现在树的数目默认为100  
-    tree_counts = 100
+    tree_counts = trees
     rf0 = RandomForestClassifier(n_estimators = tree_counts, oob_score = True, random_state = 10)
 #
 #y_predprob = gbml.predict_proba(train_data_for_rf)[:,1]
@@ -312,12 +311,12 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     return {'cnnrftraintime':cnnrftraintime,'cnnrftesttime':cnnrftesttime,'cnnrfacc':cnnrfacc, 'rftraintime':rftraintime,'rftesttime':rftesttime,'rfacc':rfacc,'cnntesttime':cnntesttime,'cnnacc':cnnacc}
     file.close
 
-def network(file, convolutionalLayers, max_pooling_feature_map_size, full_layers_size, batch_size, ratio, decay):
-    result =  temp_network(file, number_of_con_filters = 20, con_step_length = convolutionalLayers, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = full_layers_size, learning_ratio = ratio, train_decay = decay)
+def network(file, trees, neurons, convolutionalLayers, max_pooling_feature_map_size, full_layers_size, batch_size, ratio, decay):
+    result =  temp_network(file, trees, number_of_con_filters = neurons, con_step_length = convolutionalLayers, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = full_layers_size, learning_ratio = ratio, train_decay = decay)
     return result
 
 
-def run(filename,neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay):
+def run(filename, trees, neurons, neighbors, max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay):
     cnnrftraintime1 = 0.
     cnnrftesttime1 = 0.
     cnnrfacc1 = 0.
@@ -331,7 +330,7 @@ def run(filename,neighbors,max_pooling_feature_map_size,full_layers_size,batch_s
 
     file = open(filename + "_CNNRF_EXPResultTOTAL.txt",'w')
 
-    result = network(filename,neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay)
+    result = network(filename, trees, neurons, neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay)
         
     cnnrftraintime1 = cnnrftraintime1 + float(result['cnnrftraintime'])
     cnnrftesttime1 = cnnrftesttime1 + float(result['cnnrftesttime'])
