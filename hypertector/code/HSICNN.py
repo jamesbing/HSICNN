@@ -266,7 +266,7 @@ def run_sub():
 	network(file4pixel, 5, 40, 10)
 
 #if __name__ == '__main__':
-def run_network(datafile, neighbors, maxPoolingSize, fullLayerSize, batch_size, learning_ratio, train_decay,epoches):
+def run_network(datafile,neurons, neighbors, maxPoolingSize, fullLayerSize, batch_size, learning_ratio, train_decay,epoches):
 
 #    return temp_network(path, number_of_con_filters = 20, con_step_length = con_step_length, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = fullLayerSize, learning_ratio = learning_ratio, train_decay = train_decay, batch_size = batch_size,epoches = epoches)
 
@@ -277,7 +277,7 @@ def run_network(datafile, neighbors, maxPoolingSize, fullLayerSize, batch_size, 
         f.write('start to train.......')
         startTime = time.clock()
         f.write('start time: ' + str(startTime) + '\n')
-        temp_network(datafile, 20, neighbors, maxPoolingSize, fullLayerSize, learning_ratio, train_decay, batch_size, epoches)
+        temp_network(datafile, neurons, neighbors, maxPoolingSize, fullLayerSize, learning_ratio, train_decay, batch_size, epoches)
         endTime = time.clock()
         f.write('end time: ' + str(endTime) + '\n')
         f.write('total time: ' + str(endTime - startTime))
