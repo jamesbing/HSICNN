@@ -309,12 +309,12 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     return {'cnnsvmtraintime':cnnsvmtraintime,'cnnsvmtesttime':cnnsvmtesttime,'cnnsvmacc':cnnsvmacc, 'svmtraintime':svmtraintime,'svmtesttime':svmtesttime,'svmacc':svmacc,'cnntesttime':cnntesttime,'cnnacc':cnnacc}
     file.close
 
-def network(file, convolutionalLayers, max_pooling_feature_map_size, full_layers_size, batch_size, ratio, decay):
-    result =  temp_network(file, number_of_con_filters = 20, con_step_length = convolutionalLayers, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = full_layers_size, learning_ratio = ratio, train_decay = decay)
+def network(file, neurons, convolutionalLayers, max_pooling_feature_map_size, full_layers_size, batch_size, ratio, decay):
+    result =  temp_network(file, number_of_con_filters = neurons, con_step_length = convolutionalLayers, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = full_layers_size, learning_ratio = ratio, train_decay = decay)
     return result
 
 
-def run(filename,neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay):
+def run(filename,neurons, neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay):
     cnnsvmtraintime1 = 0.
     cnnsvmtesttime1 = 0.
     cnnsvmacc1 = 0.
@@ -327,8 +327,9 @@ def run(filename,neighbors,max_pooling_feature_map_size,full_layers_size,batch_s
 
 
     file = open(filename + "_CNNSVM_EXPResultTOTAL.txt",'w')
+    print("full_layers_size = " + str(full_layers_size))
 
-    result = network(filename,neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay)
+    result = network(filename, neurons, neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay)
         
     cnnsvmtraintime1 = cnnsvmtraintime1 + float(result['cnnsvmtraintime'])
     cnnsvmtesttime1 = cnnsvmtesttime1 + float(result['cnnsvmtesttime'])
