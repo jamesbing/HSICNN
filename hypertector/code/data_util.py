@@ -388,18 +388,27 @@ def assembleData(list, datasetName):
 
 #processing code segment
 def prepare():
-    print "enter the file folder path you want to transform..."
-    path = raw_input(prompt)
+    print "want to #1:construct a new dataset or #2:use existing dataset?"
+    if_new = int(raw_input(prompt))
+    if if_new == 1:
+        print "enter the file folder path you want to transform..."
+        path = raw_input(prompt)
 
-    if os.path.exists(path_prefix + path) != True:
-        print "you entered the wrong file folder path, please re-enter."
-    else:
-        dataList, neighbors = loadData(path)
-        shuffledDataList = shuffling(dataList)
-        realPath, wrong_neighbor = assembleData(shuffledDataList, path)
-        #realPath = path + '_' + str(neighbor_strategy) + '_' + str(train_ratio)i
-        print "the dataset is stored in " + realPath + ".mat"
-        print neighbors
+        if os.path.exists(path_prefix + path) != True:
+            print "you entered the wrong file folder path, please re-enter."
+        else:
+            dataList, neighbors = loadData(path)
+            shuffledDataList = shuffling(dataList)
+            realPath, wrong_neighbor = assembleData(shuffledDataList, path)
+            #realPath = path + '_' + str(neighbor_strategy) + '_' + str(train_ratio)i
+            print "the dataset is stored in " + realPath + ".mat"
+            print neighbors
+            return realPath, neighbors
+    elif if_new == 2:
+        print "enter the existing dataset path:"
+        realPath = raw_input(prompt)
+        #TODO后期要根据路径名去判断数据集的信息，并且赋给neighbors 变量，暂先用8固定
+        neighbors = 8
         return realPath, neighbors
 
 
