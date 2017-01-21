@@ -409,7 +409,7 @@ def prepare():
         realPath = raw_input(prompt)
         #TODO后期要根据路径名去判断数据集的信息，并且赋给neighbors 变量，暂先用8固定
         neighbors = 8
-        realPath = "../dataset/" + realPath
+        realPath = "../experiments/ + realPath
         return realPath, neighbors
 
 
