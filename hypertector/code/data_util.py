@@ -304,7 +304,7 @@ def prepareMatList(list):
 
 
 # write to .mat data format
-def writeToMAT(trainList, testList, datasetName, train_ratio):
+def writeToMAT(trainList, testList, datasetName, train_ratio, neighbors):
     DataTr, CIdTr = prepareMatList(trainList)
     DataTe, CIdTe = prepareMatList(testList)
   
@@ -321,7 +321,7 @@ def writeToMAT(trainList, testList, datasetName, train_ratio):
     return realPath, neighbors
 
 
-def assembleData(list, datasetName):
+def assembleData(list, datasetName, neighbors):
 
     print "please enter the ratio of training samples, eg. 80."
     ratio = int(raw_input(prompt))
@@ -377,7 +377,7 @@ def assembleData(list, datasetName):
         writeToLMDB(trainList, datasetName, 'training')
         writeToLMDB(testList, datasetName, 'testing')
     elif data_format == 2:
-        return writeToMAT(trainList, testList, datasetName, train_ratio)
+        return writeToMAT(trainList, testList, datasetName, train_ratio, neighbors)
 
 #def assembleData(list, datasetName):
 #    print "choose the data format, enter 1 for lmdb or enter 2 for mat"
@@ -398,9 +398,10 @@ def prepare():
         if os.path.exists(path_prefix + path) != True:
             print "you entered the wrong file folder path, please re-enter."
         else:
+            neighbors = 0
             dataList, neighbors = loadData(path)
             shuffledDataList = shuffling(dataList)
-            realPath, wrong_neighbor = assembleData(shuffledDataList, path)
+            realPath, wrong_neighbor = assembleData(shuffledDataList, path, neighbors)
             #realPath = path + '_' + str(neighbors) + '_' + str(train_ratio)i
             print "the dataset is stored in " + realPath + ".mat"
             print neighbors
