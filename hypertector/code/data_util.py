@@ -15,12 +15,13 @@ import os
 
 #sys.path.insert(0,'/home/jiabing/caffe/python')
 
-global neighbor_strategy, neighbors
+global neighbors 
+#neighbors
 prompt = '>'
 context = '/home/para/caffe/'
 datasetName = ''
-neighbor_strategy = 4
-train_ratio = 80
+#neighbors = 4
+global train_ratio
 neighbors = 4
 path_prefix = '../data/'
 sys.path.insert(0,context + '/python')
@@ -30,7 +31,7 @@ import caffe
 def loadData(path):
     print 'please enter the neighbor pixels strategy, you can choose from 1,4 and 8.'
     neighbors = int(raw_input(prompt))
-    neighbor_strategy = neighbors
+    neighbors = neighbors
     print neighbors
 #    while True:
 #        if temp not in (1,4,8):
@@ -303,18 +304,18 @@ def prepareMatList(list):
 
 
 # write to .mat data format
-def writeToMAT(trainList, testList, datasetName):
+def writeToMAT(trainList, testList, datasetName, train_ratio):
     DataTr, CIdTr = prepareMatList(trainList)
     DataTe, CIdTe = prepareMatList(testList)
   
     ltime = time.localtime()
     time_stamp = str(ltime[0]) + "_" + str(ltime[1]) + "_" + str(ltime[2]) + "_" + str(ltime[3]) + "_" + str(ltime[4])
 
-    folderPath = "../experiments/" + datasetName + '_' + str(neighbor_strategy) + '_' + str(train_ratio) + "_" + time_stamp + "/"
+    folderPath = "../experiments/" + datasetName + '_' + str(neighbors) + '_' + str(train_ratio) + "_" + time_stamp + "/"
     if not os.path.exists(folderPath):
         os.makedirs(folderPath)
 
-    realPath = folderPath + datasetName + "_" + str(neighbor_strategy) + "_" + str(train_ratio)
+    realPath = folderPath + datasetName + "_" + str(neighbors) + "_" + str(train_ratio)
 
     sio.savemat(realPath + '.mat',{'DataTr':DataTr, 'CIdTr':CIdTr, 'DataTe':DataTe, 'CIdTe':CIdTe})
     return realPath, neighbors
@@ -376,7 +377,7 @@ def assembleData(list, datasetName):
         writeToLMDB(trainList, datasetName, 'training')
         writeToLMDB(testList, datasetName, 'testing')
     elif data_format == 2:
-        return writeToMAT(trainList, testList, datasetName)
+        return writeToMAT(trainList, testList, datasetName, train_ratio)
 
 #def assembleData(list, datasetName):
 #    print "choose the data format, enter 1 for lmdb or enter 2 for mat"
@@ -400,7 +401,7 @@ def prepare():
             dataList, neighbors = loadData(path)
             shuffledDataList = shuffling(dataList)
             realPath, wrong_neighbor = assembleData(shuffledDataList, path)
-            #realPath = path + '_' + str(neighbor_strategy) + '_' + str(train_ratio)i
+            #realPath = path + '_' + str(neighbors) + '_' + str(train_ratio)i
             print "the dataset is stored in " + realPath + ".mat"
             print neighbors
             return realPath, neighbors
@@ -409,7 +410,7 @@ def prepare():
         realPath = raw_input(prompt)
         #TODO后期要根据路径名去判断数据集的信息，并且赋给neighbors 变量，暂先用8固定
         neighbors = 8
-        realPath = "../experiments/ + realPath
+        realPath = "../experiments/" + realPath + "/" +realPath
         return realPath, neighbors
 
 
