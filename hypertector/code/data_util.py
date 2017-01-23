@@ -64,8 +64,10 @@ def loadData(path):
     
     #define many lists which number equals to maxClass,put it in a list
     DataList = []
+    PositionList = []
     for mark in range(maxClass):
         DataList.append([])
+        PositionList.append([])
 
     #newDataset = np.array((Dataset.shape[0]))
 #    newLabels = np.array()
@@ -81,6 +83,7 @@ def loadData(path):
         indexLine = 0
         for indexLine in range(lines):
             label = Labels[indexRow,indexLine]
+            position = {'row':indexRow, 'line':indexLine}
             #store non-zero data
             if label != 0:
                 #for test purpose printing...
@@ -205,6 +208,7 @@ def loadData(path):
                 #        data = 
 
                 DataList[label - 1].append(data)
+                PositionList[label - 1].append(position)
             indexLine = indexLine + 1
 
         indexRow = indexRow + 1
@@ -212,7 +216,7 @@ def loadData(path):
     print 'data loaded.'
     print 'spectral length now is: ' + str(len((DataList[0][0])))
     print 'neighbor strategy ' + str(neighbors)
-    return DataList, neighbors
+    return DataList, neighbors, PositionList
 
 
 def shuffling(dataList):
