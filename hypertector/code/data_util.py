@@ -28,10 +28,13 @@ sys.path.insert(0,context + '/python')
 import caffe
 
 
-def loadData(path):
-    print 'please enter the neighbor pixels strategy, you can choose from 1,4 and 8.'
-    neighbors = int(raw_input(prompt))
-    neighbors = neighbors
+def loadData(path, strategy):
+    strategy = int(strategy)
+    neighbors = strategy
+    if strategy == 0:
+        print 'please enter the neighbor pixels strategy, you can choose from 1,4 and 8.'
+        neighbors = int(raw_input(prompt))
+    #neighbors = neighbors
     print neighbors
 #    while True:
 #        if temp not in (1,4,8):
@@ -325,12 +328,15 @@ def writeToMAT(trainList, testList, datasetName, train_ratio, neighbors):
     return realPath, neighbors
 
 
-def assembleData(list, datasetName, neighbors):
-
-    print "please enter the ratio of training samples, eg. 80."
-    ratio = int(raw_input(prompt))
-    train_ratio = ratio
-
+def assembleData(list, datasetName, neighbors, learning_ratio, dataset_format):
+    
+    ratio = 0
+    if learning_ratio == 0:
+        print "please enter the ratio of training samples, eg. 80."
+        ratio = int(raw_input(prompt))
+        #train_ratio = ratio
+    else:
+        ratio = learning_ratio
     # prepare the lmdb format dataset
     # allocate the storage space for the dataset
     # TODO: check how to allocate space according to the specific dataset instead of use the following map_size directly.
@@ -374,14 +380,20 @@ def assembleData(list, datasetName, neighbors):
     print 'there are ' + str(testingCount) + ' testing samples.'
     print 'writing dataset...'
 
-    print "choose the data format, enter 1 for lmdb or enter 2 for mat"
-    data_format = int(raw_input(prompt))
+    data_format = 0
+    #dataset_format = int(dataset_format)
+    print dataset_format
+    if dataset_format == "" and dataset_format != 1 and dataset_format != 2:
+        print "choose the data format, enter 1 for lmdb or enter 2 for mat"
+        data_format = int(raw_input(prompt))
+    elif dataset_format == 1 or dataset_format == 2:
+        data_format = dataset_format
     if data_format == 1:
         # write the splited data into lmdb format files
         writeToLMDB(trainList, datasetName, 'training')
         writeToLMDB(testList, datasetName, 'testing')
     elif data_format == 2:
-        return writeToMAT(trainList, testList, datasetName, train_ratio, neighbors)
+        return writeToMAT(trainList, testList, datasetName, ratio, neighbors)
 
 #def assembleData(list, datasetName):
 #    print "choose the data format, enter 1 for lmdb or enter 2 for mat"
@@ -392,24 +404,26 @@ def assembleData(list, datasetName, neighbors):
 #        assembleMAT(list, datasetName)
 
 #processing code segment
-def prepare():
-    print "want to #1:construct a new dataset or #2:use existing dataset?"
-    if_new = int(raw_input(prompt))
+def prepare(learning_ratio, data_set, neighbors, dataset_format):
+    #print "want to #1:construct a new dataset or #2:use existing dataset?"
+    #if_new = int(raw_input(prompt))
+    if_new = 1
     if if_new == 1:
-        print "enter the file folder path you want to transform..."
-        path = raw_input(prompt)
-
+        path = data_set
+        if data_set == "NONE":
+            print "enter the file folder path you want to transform..."    
+            path = raw_input(prompt)
+        
         if os.path.exists(path_prefix + path) != True:
             print "you entered the wrong file folder path, please re-enter."
         else:
-            neighbors = 0
-            dataList, neighbors = loadData(path)
+            dataList, inner_neighbors = loadData(path, neighbors)
             shuffledDataList = shuffling(dataList)
-            realPath, wrong_neighbor = assembleData(shuffledDataList, path, neighbors)
+            realPath, wrong_neighbor = assembleData(shuffledDataList, path, inner_neighbors, learning_ratio, dataset_format)
             #realPath = path + '_' + str(neighbors) + '_' + str(train_ratio)i
             print "the dataset is stored in " + realPath + ".mat"
-            print neighbors
-            return realPath, neighbors
+            print inner_neighbors
+            return realPath, inner_neighbors
     elif if_new == 2:
         print "enter the existing dataset path:"
         realPath = raw_input(prompt)
@@ -420,4 +434,4 @@ def prepare():
 
 
 if __name__ == '__main__':
-    prepare()
+    prepare(0)
