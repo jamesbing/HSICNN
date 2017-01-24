@@ -216,7 +216,7 @@ def loadData(path):
     print 'data loaded.'
     print 'spectral length now is: ' + str(len((DataList[0][0])))
     print 'neighbor strategy ' + str(neighbors)
-    return DataList, neighbors, PositionList
+    return DataList, neighbors
 
 
 def shuffling(dataList):
