@@ -6,89 +6,207 @@ import HSICNN
 import data_util
 import cnnsvm
 import cnnrf
+import time
 
 from sys import argv
 
-prompt = '>'
-#mix_model_svm_ratio是为了以后采用组合混合模型的时候，保存一个svm在所有模型中的占比。以后根据需求进行扩充。。。TODO
-mix_model_svm_ratio = 0
-file_name, neighbors = data_util.prepare()
+def run_single(learning_ratio):
 
-print "now constructing the network..."
-#print "enter the layers each convolutional kernel covers: "
-#neighbors = int(raw_input(prompt))
-neighbors = neighbors + 1
+    prompt = '>'
+    #mix_model_svm_ratio是为了以后采用组合混合模型的时候，保存一个svm在所有模型中的占比。以后根据需求进行扩充。。。TODO
+    mix_model_svm_ratio = 0
+    file_name, neighbors = data_util.prepare(learning_ratio,"NONE", 0, 2)
 
-print "the neighbors strategy is: " + str(neighbors)
-print "enter the number of convolutional neurons:"
-neurons = int(raw_input(prompt))
-print "enter the number of neurons after the maxpooling layer:"
-maxpoolings = int(raw_input(prompt))
-print "enter the number of full layers\' neurons, default is 100:"
-fullLayers = int(raw_input(prompt))
-#if tempfullLayers > 1:
-#    fullLayers = tempfullLayers
-print "enter the batch size for bsgd:"
-batch_size = int(raw_input(prompt))
-print "enter the learning ratio:"
-learning = float(raw_input(prompt))
-print "enter the train decay:"
-train_decay = float(raw_input(prompt))
-print "enter the epoches you want the network to be trained:"
-epoches = int(raw_input(prompt))
+    print "now constructing the network..."
+    #print "enter the layers each convolutional kernel covers: "
+    #neighbors = int(raw_input(prompt))
+    neighbors = neighbors + 1
 
-print "now choose the following strategy after the cnn network been trained:"
-print "#1:train a cnn-svm joint framework;"
-print "#2:train a cnn-rf joint framework;"
-print "#3:train both cnn-svm and cnn-rf joint frameworks;"
-print "#4:TODO: train a mix assemble cnn-classifier model."
-following_strategy = int(raw_input(prompt))
-if following_strategy == 4:
-    print "enter the ratio of svm classifier:"
-    mix_model_svm_ratio = int(row_input(prompt))
+    print "the neighbors strategy is: " + str(neighbors)
+    print "enter the number of convolutional neurons:"
+    neurons = int(raw_input(prompt))
+    print "enter the number of layers you want the CNN to operate convolutional operation:"
+    neuronLayersCount = int(raw_input(prompt))
+    print "enter the kernel size of the maxpooling layer:"
+    maxpoolings = int(raw_input(prompt))
+    print "enter the number of full layers\' neurons, default is 100:"
+    fullLayers = int(raw_input(prompt))
+    #if tempfullLayers > 1:
+    #    fullLayers = tempfullLayers
+    print "enter the batch size for bsgd:"
+    batch_size = int(raw_input(prompt))
+    print "enter the learning ratio:"
+    learning = float(raw_input(prompt))
+    print "enter the train decay:"
+    train_decay = float(raw_input(prompt))
+    print "enter the epoches you want the network to be trained:"
+    epoches = int(raw_input(prompt))
 
-tress = 0
-if following_strategy == 2 or following_strategy == 3:
-    print "enter the count of trees you want to set in Random Forest:"
-    trees = int(raw_input(prompt))
+    print "now choose the following strategy after the cnn network been trained:"
+    print "#1:train a cnn-svm joint framework;"
+    print "#2:train a cnn-rf joint framework;"
+    print "#3:train both cnn-svm and cnn-rf joint frameworks;"
+    print "#4:TODO: train a mix assemble cnn-classifier model."
+    following_strategy = int(raw_input(prompt))
+    if following_strategy == 4:
+        print "enter the ratio of svm classifier:"
+        mix_model_svm_ratio = int(row_input(prompt))
 
-print "starting ..."
-HSICNN.run_network(file_name, neurons, neighbors, maxpoolings, fullLayers,batch_size, learning, train_decay, epoches)
+    tress = 0
+    if following_strategy == 2 or following_strategy == 3:
+        print "enter the count of trees you want to set in Random Forest:"
+        trees = int(raw_input(prompt))
 
-print "the training of the network have done."
+    print "starting ..."
+    HSICNN.run_network(file_name, neurons,neuronLayersCount, neighbors, maxpoolings, fullLayers,batch_size, learning, train_decay, epoches)
 
-if following_strategy == 1:
-    #CNN + SVM
-    print "now processing the cnn + svm joint framework..."
-    cnnsvm.run(file_name, neurons, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
-elif following_strategy == 2:
-    #CNN + rfind
-    print "now processing the cnn + rf joint framework..."
-#    print "enter the count of trees you want to set in Random Forest:"
-#    trees = int(raw_input(prompt))
-    cnnrf.run(file_name,trees, neurons, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
-elif following_strategy == 3:
-    #CNN+svm and CNN+RF
-    
-    print "now processing the cnn + svm joint framework..."
-    cnnsvm.run(file_name, neurons, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
+    print "the training of the network have done."
 
-    print "now processing the cnn + rf joint framework..."
-    cnnrf.run(file_name, trees, neurons, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
+    if following_strategy == 1:
+        #CNN + SVM
+        print "now processing the cnn + svm joint framework..."
+        cnnsvm.run(file_name, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
+    elif following_strategy == 2:
+        #CNN + rfind
+        print "now processing the cnn + rf joint framework..."
+    #    print "enter the count of trees you want to set in Random Forest:"
+    #    trees = int(raw_input(prompt))
+        cnnrf.run(file_name,trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
+    elif following_strategy == 3:
+        #CNN+svm and CNN+RF
+        
+        print "now processing the cnn + svm joint framework..."
+        cnnsvm.run(file_name, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
 
-file = open(file_name + "_experiment_description.txt", 'w')
-file.write("-------------Experiment Description-------------\n")
-file.write("Data set:" + file_name + "#\n")
-file.write("neighbor strategy:" + str(neighbors) + "#\n")
-file.write("Convolutional Neurons:" + str(neurons) + "#\n")
-file.write("Max Polling Layer Neuron number:" + str(maxpoolings) + "#\n")
-file.write("Full Layer Neuron number:" + str(fullLayers) + "#\n")
-file.write("Batch size of SGD training:" + str(batch_size) + "#\n")
-file.write("Training epoches of deep CNN:" + str(epoches) + "#\n")
-file.write("Learning ratio:" + str(learning) + "#\n")
-file.write("Train decay:" + str(train_decay) +"#\n")
-if following_strategy == 2 or following_strategy == 3:
-    file.write("Number of trees in random forest: " + str(trees) + "#\n")
-file.write("===============================================")
+        print "now processing the cnn + rf joint framework..."
+        cnnrf.run(file_name, trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
 
+    file = open(file_name + "_experiment_description.txt", 'w')
+    file.write("-------------Experiment Description-------------\n")
+    file.write("Data set:" + file_name + "#\n")
+    file.write("neighbor strategy:" + str(neighbors) + "#\n")
+    file.write("Convolutional Neurons:" + str(neurons) + "#\n")
+    file.write("Max Polling Kernel Size:" + str(maxpoolings) + "#\n")
+    file.write("Full Layer Neuron number:" + str(fullLayers) + "#\n")
+    file.write("Batch size of SGD training:" + str(batch_size) + "#\n")
+    file.write("Training epoches of deep CNN:" + str(epoches) + "#\n")
+    file.write("Learning ratio:" + str(learning) + "#\n")
+    file.write("Train decay:" + str(train_decay) +"#\n")
+    if following_strategy == 2 or following_strategy == 3:
+        file.write("Number of trees in random forest: " + str(trees) + "#\n")
+    file.write("===============================================")
+    file.close()
+    return file_name
 
+def run_batch(datasetName,strategies, neurons, neuronLayersCount, maxpoolings, fullLayers, batch_size, learning, train_decay, epoches, following_strategy, trees, learning_sample_ratios, dataset_format):
+    mix_model_svm_ratio = 0
+    #print strategies
+    file_name, neighbors = data_util.prepare(learning_sample_ratios, datasetName, int(strategies), 2)
+    neighbors = neighbors + 1
+    print "the neighbors strategy is: " + str(neighbors)
+    print "starting ..."
+    HSICNN.run_network(file_name, neurons,neuronLayersCount, neighbors, maxpoolings, fullLayers,batch_size, learning, train_decay, epoches)
+    print "the training of the network have done."
+    if following_strategy == 1:
+        print "now processing the cnn + svm joint framework..."
+        cnnsvm.run(file_name, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
+    elif following_strategy == 2:
+        print "now processing the cnn + rf joint framework..."
+        cnnrf.run(file_name,trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
+    elif following_strategy == 3:
+        print "now processing the cnn + svm joint framework..."
+        cnnsvm.run(file_name, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
+        print "now processing the cnn + rf joint framework..."
+        cnnrf.run(file_name, trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
+    file = open(file_name + "_experiment_description.txt", 'w')
+    file.write("-------------Experiment Description-------------\n")
+    file.write("Data set:" + file_name + "#\n")
+    file.write("neighbor strategy:" + str(neighbors) + "#\n")
+    file.write("Convolutional Neurons:" + str(neurons) + "#\n")
+    file.write("Max Polling Kernel Size:" + str(maxpoolings) + "#\n")
+    file.write("Full Layer Neuron number:" + str(fullLayers) + "#\n")
+    file.write("Batch size of SGD training:" + str(batch_size) + "#\n")
+    file.write("Training epoches of deep CNN:" + str(epoches) + "#\n")
+    file.write("Learning ratio:" + str(learning) + "#\n")
+    file.write("Train decay:" + str(train_decay) +"#\n")
+    if following_strategy == 2 or following_strategy == 3:
+        file.write("Number of trees in random forest: " + str(trees) + "#\n")
+    file.write("===============================================")
+    file.close()
+    return file_name
+
+if __name__ == '__main__':
+    prompt = ">"
+    print "What kind of experiments you want to run?"
+    print "#1 Run a single experiment; #2 Run a batched experiment..."
+    if_batch = int(raw_input(prompt))
+    if if_batch == 1:
+        run_single(0)
+    elif if_batch == 2:
+        print "#1: fixed CNN, different ratio; #2:..."
+        run_type = int(raw_input(prompt))
+        if run_type == 1:
+            print "enter a sery of numbers of the ratio of training samples, end with an 'e':"
+            ratios = []
+            temp_ratio = raw_input(prompt)
+            while temp_ratio != 'e':
+                ratios.append(int(temp_ratio))
+                temp_ratio = raw_input(prompt)
+
+            #def run_batch(learning_ratio):
+#            mix_model_svm_ratio = 0
+#            file_name, neighbors = data_util.prepare(learning_ratio)
+            print "now gathering the parameters of the network..."
+#            neighbors = neighbors + 1
+#            print "the neighbors strategy is: " + str(neighbors)
+            print "enter the dataset name:"
+            dataset_fixed = raw_input(prompt)
+            print "enter the neighbor strategy, choose from 1, 4, or 8"
+            strategy_fixed = int(raw_input(prompt))
+            print "enter the number of convolutional neurons:"
+            neurons = int(raw_input(prompt))
+            print "enter the number of layers you want the CNN to operate convolutional operation:"
+            neuronLayersCount = int(raw_input(prompt))
+            print "enter the kernel size of the maxpooling layer:"
+            maxpoolings = int(raw_input(prompt))
+            print "enter the number of full layers\' neurons, default is 100:"
+            fullLayers = int(raw_input(prompt))
+            print "enter the batch size for bsgd:"
+            batch_size = int(raw_input(prompt))
+            print "enter the learning ratio:"
+            learning = float(raw_input(prompt))
+            print "enter the train decay:"
+            train_decay = float(raw_input(prompt))
+            print "enter the epoches you want the network to be trained:"
+            epoches = int(raw_input(prompt))
+            print "now choose the following strategy after the cnn network been trained:"
+            print "#1:train a cnn-svm joint framework;"
+            print "#2:train a cnn-rf joint framework;"
+            print "#3:train both cnn-svm and cnn-rf joint frameworks;"
+            print "#4:TODO: train a mix assemble cnn-classifier model."
+            following_strategy = int(raw_input(prompt))
+            if following_strategy == 4:
+                print "enter the ratio of svm classifier:"
+                mix_model_svm_ratio = int(row_input(prompt))
+            tress = 0
+            if following_strategy == 2 or following_strategy == 3:
+                print "enter the count of trees you want to set in Random Forest:"
+                trees = int(raw_input(prompt))
+
+            ltime = time.localtime()
+            time_stamp = str(ltime[0]) + "#" + str(ltime[1]) + "#" + str(ltime[2]) + "#" + str(ltime[3]) + "#" + str(ltime[4])
+
+            file = open("../experiments/BatchExpsFixedCNN_" + time_stamp + ".txt", 'w')
+            file.write("======== Experimental Folders ==========\n")
+            for temp_mark in range(len(ratios)):
+                learning_ratio = 0
+                train_decay_inner = 0
+                batch_size_inner = 0
+                if ratios[temp_mark] < 10:
+                    learning_ratio = learning / 10
+                    train_decay_inner = train_decay / 10
+                    batch_size_inner = batch_size / 10
+                file_name = run_batch(dataset_fixed, strategy_fixed, neurons, neuronLayersCount, maxpoolings, fullLayers, batch_size_inner, learning_ratio, train_decay_inner, epoches, following_strategy, trees, ratios[temp_mark], 2)
+                #file_name = run_single(ratios[temp_mark])
+                file.write(file_name + "\n")
+            file.close()
