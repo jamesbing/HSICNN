@@ -139,7 +139,7 @@ def loadData(dataFile, typeId = -1, bShowData = False):
 #currently, I wrote all the network constructing and training and testing in this file#
 #laterly, I will seperate them apart.                                                 #
 #######################################################################################
-def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay, batch_size, epoches):
+def temp_network(filePath, number_of_con_filters,neuronLayers, con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay, batch_size, epoches):
     #get the train data, train label, validate data, validate label, test data, test label
     train_dataset, valid_dataset, test_dataset = loadData(filePath + ".mat")
 
@@ -151,7 +151,7 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
 #    train_dataset, test_dataset = imdb.load_data()   
     #initialize parameters
     layer1_input_length = len(test_dataset[0][0])
-    con_filter_length = int((math.ceil( (layer1_input_length /  con_step_length) / 9)) * con_step_length)
+    con_filter_length = int((math.ceil( (layer1_input_length /  con_step_length) / neuronLayers)) * con_step_length)
 
     destinations = numpy.max(test_dataset[1])
     
@@ -192,7 +192,8 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
 
     #the max pooling layer after the first convolutional layer
     first_feature_map_size = (layer1_input_length - con_filter_length) / con_step_length + 1
-    max_pooling_kernel_size = int(math.ceil(first_feature_map_size / max_pooling_feature_map_size))
+#    max_pooling_kernel_size = int(math.ceil(first_feature_map_size / max_pooling_feature_map_size))
+    max_pooling_kernel_size = int(max_pooling_feature_map_size)
     print("The max pooling kernel size is ", max_pooling_kernel_size)
     file.write("The max pooling kernel size is " + str(max_pooling_kernel_size) +".\n")
     layer2 = MaxPooling2D(pool_size = (max_pooling_kernel_size,1), strides=(max_pooling_kernel_size,1), border_mode='valid',dim_ordering='th')
@@ -266,7 +267,7 @@ def run_sub():
 	network(file4pixel, 5, 40, 10)
 
 #if __name__ == '__main__':
-def run_network(datafile,neurons, neighbors, maxPoolingSize, fullLayerSize, batch_size, learning_ratio, train_decay,epoches):
+def run_network(datafile,neurons, neuronLayers, neighbors, maxPoolingSize, fullLayerSize, batch_size, learning_ratio, train_decay,epoches):
 
 #    return temp_network(path, number_of_con_filters = 20, con_step_length = con_step_length, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = fullLayerSize, learning_ratio = learning_ratio, train_decay = train_decay, batch_size = batch_size,epoches = epoches)
 
@@ -277,7 +278,7 @@ def run_network(datafile,neurons, neighbors, maxPoolingSize, fullLayerSize, batc
         f.write('start to train.......')
         startTime = time.clock()
         f.write('start time: ' + str(startTime) + '\n')
-        temp_network(datafile, neurons, neighbors, maxPoolingSize, fullLayerSize, learning_ratio, train_decay, batch_size, epoches)
+        temp_network(datafile, neurons, neuronLayers, neighbors, maxPoolingSize, fullLayerSize, learning_ratio, train_decay, batch_size, epoches)
         endTime = time.clock()
         f.write('end time: ' + str(endTime) + '\n')
         f.write('total time: ' + str(endTime - startTime))
