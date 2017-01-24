@@ -123,7 +123,7 @@ def loadData(dataFile, typeId = -1, bShowData = False):
 #currently, I wrote all the network constructing and training and testing in this file#
 #laterly, I will seperate them apart.                                                 #
 #######################################################################################
-def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay):
+def temp_network(filePath, number_of_con_filters,conLayers, con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay):
     #get the train data, train label, validate data, validate label, test data, test label
     train_dataset, valid_dataset, test_dataset = loadData(filePath + ".mat")
 
@@ -143,7 +143,7 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
 #    train_dataset, test_dataset = imdb.load_data()   
     #initialize parameters
     layer1_input_length = len(test_dataset[0][0])
-    con_filter_length = int((math.ceil( (layer1_input_length /  con_step_length) / 9)) * con_step_length)
+    con_filter_length = int((math.ceil( (layer1_input_length /  con_step_length) / conLayers)) * con_step_length)
     destinations = numpy.max(test_dataset[1])
     model = Sequential()
     
@@ -158,7 +158,8 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
 
     #the max pooling layer after the first convolutional layer
     first_feature_map_size = (layer1_input_length - con_filter_length) / con_step_length + 1
-    max_pooling_kernel_size = int(math.ceil(first_feature_map_size / max_pooling_feature_map_size))
+    #max_pooling_kernel_size = int(math.ceil(first_feature_map_size / max_pooling_feature_map_size))
+    max_pooling_kernel_size = int(max_pooling_feature_map_size)
     print("The max pooling kernel size is ", max_pooling_kernel_size)
     file.write("The max pooling kernel size is " + str(max_pooling_kernel_size) +".\n")
     layer2 = MaxPooling2D(pool_size = (max_pooling_kernel_size,1), strides=(max_pooling_kernel_size,1), border_mode='valid',dim_ordering='th')
@@ -309,12 +310,12 @@ def temp_network(filePath, number_of_con_filters, con_step_length, max_pooling_f
     return {'cnnsvmtraintime':cnnsvmtraintime,'cnnsvmtesttime':cnnsvmtesttime,'cnnsvmacc':cnnsvmacc, 'svmtraintime':svmtraintime,'svmtesttime':svmtesttime,'svmacc':svmacc,'cnntesttime':cnntesttime,'cnnacc':cnnacc}
     file.close
 
-def network(file, neurons, convolutionalLayers, max_pooling_feature_map_size, full_layers_size, batch_size, ratio, decay):
-    result =  temp_network(file, number_of_con_filters = neurons, con_step_length = convolutionalLayers, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = full_layers_size, learning_ratio = ratio, train_decay = decay)
+def network(file, neurons,conLayers, convolutionalLayers, max_pooling_feature_map_size, full_layers_size, batch_size, ratio, decay):
+    result =  temp_network(file, number_of_con_filters = neurons, conLayers = conLayers, con_step_length = convolutionalLayers, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = full_layers_size, learning_ratio = ratio, train_decay = decay)
     return result
 
 
-def run(filename,neurons, neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay):
+def run(filename,neurons,conLayers, neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay):
     cnnsvmtraintime1 = 0.
     cnnsvmtesttime1 = 0.
     cnnsvmacc1 = 0.
@@ -329,7 +330,7 @@ def run(filename,neurons, neighbors,max_pooling_feature_map_size,full_layers_siz
     file = open(filename + "_CNNSVM_EXPResultTOTAL.txt",'w')
     print("full_layers_size = " + str(full_layers_size))
 
-    result = network(filename, neurons, neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay)
+    result = network(filename, neurons,conLayers, neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay)
         
     cnnsvmtraintime1 = cnnsvmtraintime1 + float(result['cnnsvmtraintime'])
     cnnsvmtesttime1 = cnnsvmtesttime1 + float(result['cnnsvmtesttime'])
