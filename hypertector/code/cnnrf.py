@@ -225,7 +225,7 @@ def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_len
 #    print("the out of bag score after the first attempt round is: " + str(rf0.oob_score_))
 
     print("#####################################################")
-    print("在CNN-rf-RF上的结果：")
+    print("在CNN-RF上的结果：")
     print("数据集",filePath)
     print("树的数量：",tree_counts)
     print("开始训练")
@@ -283,7 +283,7 @@ def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_len
     file.write("#########################################################################################################\n")
     file.write("The RF train time is " + str(train_time) +"\n")
     file.write("The testing time is " + str(test_time) + "\n")
-    file.write("The correct ratio of CNN-RF is " + str(score_rf) + "\n")
+    file.write("The correct ratio of RF only is " + str(score_rf) + "\n")
     result = rf1.predict(test_dataset[0])
     rftraintime = str(train_time)
     rftesttime = str(test_time)
