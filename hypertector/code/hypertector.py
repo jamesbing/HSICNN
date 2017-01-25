@@ -206,6 +206,10 @@ if __name__ == '__main__':
                     learning_ratio = learning / 10
                     train_decay_inner = train_decay / 10
                     batch_size_inner = batch_size / 10
+                else:
+                    learning_ratio = learning
+                    train_decay_inner = train_decay
+                    batch_size_inner = batch_size
                 file_name = run_batch(dataset_fixed, strategy_fixed, neurons, neuronLayersCount, maxpoolings, fullLayers, batch_size_inner, learning_ratio, train_decay_inner, epoches, following_strategy, trees, ratios[temp_mark], 2)
                 #file_name = run_single(ratios[temp_mark])
                 file.write(file_name + "\n")
