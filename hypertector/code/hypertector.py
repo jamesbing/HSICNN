@@ -146,14 +146,17 @@ if __name__ == '__main__':
         print "#1: fixed CNN, different ratio; #2:..."
         run_type = int(raw_input(prompt))
         if run_type == 1:
-            print "enter a sery of numbers of the ratio of training samples, end with an 'e':"
+            print "enter a sery of numbers of the ratio of training samples, end with an 'e' or 'end', if you want to use the default sequence 1,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90, enter an 'a' or 'all':"
             ratios = []
             temp_ratio = raw_input(prompt)
-            while temp_ratio != 'e':
-                ratios.append(int(temp_ratio))
-                temp_ratio = raw_input(prompt)
-
-            #def run_batch(learning_ratio):
+            if temp_ratio == 'a' or temp_ratio == 'all':
+                temp_ratio = [1,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90]
+            else:
+                while temp_ratio != 'e' and temp_ratio != 'end':
+                    ratios.append(int(temp_ratio))
+                    temp_ratio = raw_input(prompt)
+            ratios = temp_ratio
+#def run_batch(learning_ratio):
 #            mix_model_svm_ratio = 0
 #            file_name, neighbors = data_util.prepare(learning_ratio)
             print "now gathering the parameters of the network..."
@@ -161,8 +164,8 @@ if __name__ == '__main__':
 #            print "the neighbors strategy is: " + str(neighbors)
             print "enter the dataset name:"
             dataset_fixed = raw_input(prompt)
-            print "enter the neighbor strategy, choose from 1, 4, or 8"
-            strategy_fixed = int(raw_input(prompt))
+            print "enter the neighbor strategy, choose from 1, 4, or 8, enter an 'a' or 'all' for all 1,4,8 strategies."
+            strategy_fixed = raw_input(prompt)
             print "enter the number of convolutional neurons:"
             neurons = int(raw_input(prompt))
             print "enter the number of layers you want the CNN to operate convolutional operation:"
@@ -200,38 +203,49 @@ if __name__ == '__main__':
             resultFile = open("../experiments/BatchResults_" + time_stamp + ".txt", 'w')
             file.write("======== Experimental Folders ==========\n")
             resultFile.write("=============== Batch Exprimental Results ===============\n")
-            for temp_mark in range(len(ratios)):
-                learning_ratio = 0
-                train_decay_inner = 0
-                batch_size_inner = 0
-                if ratios[temp_mark] < 10:
-                    learning_ratio = learning / 10
-                    train_decay_inner = train_decay / 10
-                    batch_size_inner = batch_size / 10
-                else:
-                    learning_ratio = learning
-                    train_decay_inner = train_decay
-                    batch_size_inner = batch_size
-                file_name = run_batch(dataset_fixed, strategy_fixed, neurons, neuronLayersCount, maxpoolings, fullLayers, batch_size_inner, learning_ratio, train_decay_inner, epoches, following_strategy, trees, ratios[temp_mark], 2)
-                #file_name = run_single(ratios[temp_mark])
-                file.write(file_name + "\n")
-                fileCNNRFResultsPath = file_name + "CNNRFdescription.txt"
-                fileCNNSVMResultsPath = file_name + "CNNSVMdescription.txt"
-                resultFile.write("##################################################\n")
-                resultFile.write(file_name + "\n")
-                inputFileRF = open(fileCNNRFResultsPath, "r")
-                inputFileSVM = open(fileCNNSVMResultsPath, "r")
-                allLinesRF = inputFileRF.readlines()
-                allLinesSVM = inputFileSVM.readlines()
-                resultFile.write("CNN-RF Results:\n")
-                for eachLine in allLinesRF:
-                    resultFile.write(eachLine)
-                resultFile.write("CNN-SVM Result:\n")
-                for eachLine in allLinesSVM:
-                    resultFile.write(eachLine)
-                inputFileRF.close()
-                inputFileSVM.close()
-                resultFile.write("##################################################\n")
+            resultFile.write("=========================================================\n")
+            strategiesList = []
+            if str(strategy_fixed) == 'a' or strategy_fixed == 'all':
+                strategiesList = [1,4,8]
+            else:
+                strategiesList = [int(strategy_fixed)]
+            for neighbor_strategy_mark in range(len(strategiesList)):
+                neighbor_strategy = strategiesList[neighbor_strategy_mark]
+                print "now is running on strategy " + str(neighbor_strategy)
+                file.write("~~~~~~~~~~~~~~~ Neighbors Strategies:" + str(neighbor_strategy) +" ~~~~~~~~~~~~~~~\n")
+                for temp_mark in range(len(ratios)):
+                    learning_ratio = 0
+                    train_decay_inner = 0
+                    batch_size_inner = 0
+                    if ratios[temp_mark] < 10:
+                        learning_ratio = learning / 10
+                        train_decay_inner = train_decay / 10
+                        batch_size_inner = batch_size / 10
+                    else:
+                        learning_ratio = learning
+                        train_decay_inner = train_decay
+                        batch_size_inner = batch_size
+                    file_name = run_batch(dataset_fixed,neighbor_strategy, neurons, neuronLayersCount, maxpoolings, fullLayers, batch_size_inner, learning_ratio, train_decay_inner, epoches, following_strategy, trees, ratios[temp_mark], 2)
+                    #file_name = run_single(ratios[temp_mark])
+                    file.write(file_name + "\n")
+                    fileCNNRFResultsPath = file_name + "CNNRFdescription.txt"
+                    fileCNNSVMResultsPath = file_name + "CNNSVMdescription.txt"
+                    resultFile.write("=========================================================\n")
+                    resultFile.write(file_name + "\n")
+                    inputFileRF = open(fileCNNRFResultsPath, "r")
+                    inputFileSVM = open(fileCNNSVMResultsPath, "r")
+                    allLinesRF = inputFileRF.readlines()
+                    allLinesSVM = inputFileSVM.readlines()
+                    resultFile.write("CNN-RF Results:\n")
+                    for eachLine in allLinesRF:
+                        resultFile.write(eachLine)
+                    resultFile.write("-----------------------------------------\n")
+                    resultFile.write("CNN-SVM Results:\n")
+                    for eachLine in allLinesSVM:
+                        resultFile.write(eachLine)
+                    inputFileRF.close()
+                    inputFileSVM.close()
+                    resultFile.write("##################################################\n")
             file.close()
             resultFile.close()
             print "The results are stored in the file " + "BatchResults_" + time_stamp + ".txt"
