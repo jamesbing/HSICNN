@@ -241,7 +241,7 @@ def temp_network(filePath, number_of_con_filters,conLayers, con_step_length, max
     test_time = end_time - start_time
     print("测试用时：%f" % test_time)
     #result = clf.predict(X_train)
-    file.write("#########################################################################################################\n")
+#    file.write("#########################################################################################################\n")
     file.write("The CNN-SVM joint use kernel " + kernel_2 + "\n")
     file.write("The SVM train time is " + str(train_time) +"\n")
     file.write("The testing time is " + str(test_time) + "\n")
@@ -251,7 +251,7 @@ def temp_network(filePath, number_of_con_filters,conLayers, con_step_length, max
     cnnsvmtesttime = str(test_time)
     cnnsvmacc = str((clf1.score(test_data_for_svm,test_label_for_svm)))
     sio.savemat(filePath + "CNNSVMResult.mat",{'predict':result,'actual':test_label_for_svm})
-    file.write("#########################################################################################################\n")
+#    file.write("#########################################################################################################\n")
     joblib.dump(clf1,filePath + 'cnnsvmrbf.model')
 		
     #result = clf.predict(X_train)
@@ -277,7 +277,7 @@ def temp_network(filePath, number_of_con_filters,conLayers, con_step_length, max
     test_time = end_time - start_time
     print("测试用时：%f" % test_time)
     #result = clf.predict(X_train)
-    file.write("#########################################################################################################\n")
+#    file.write("#########################################################################################################\n")
     file.write("The SVM only use kernel " + kernel_2 + "\n")
     file.write("The SVM train time is " + str(train_time) +"\n")
     file.write("The testing time is " + str(test_time) + "\n")
@@ -287,7 +287,7 @@ def temp_network(filePath, number_of_con_filters,conLayers, con_step_length, max
     svmtesttime = str(test_time)
     svmacc = str(clf2.score(test_dataset[0],test_dataset[1]))
     sio.savemat(filePath + "SVMonlyResult.mat",{'predict':result,'actual':test_dataset[1]})
-    file.write("#########################################################################################################\n")
+#    file.write("#########################################################################################################\n")
     joblib.dump(clf2,filePath + 'svmrbf.model')
 
     print("#####################################################")
@@ -299,12 +299,12 @@ def temp_network(filePath, number_of_con_filters,conLayers, con_step_length, max
     end_time = time.time()
     print("同一个测试集，在CNN上的正确率为：",test_accuracy)
     print("测试用时：%f" % (end_time - start_time))
-    file.write("#########################################################################################################\n")
+#    file.write("#########################################################################################################\n")
     file.write("The CNN only\n")
     file.write("The testing time is " + str(end_time - start_time) + "\n")
     file.write("The correct ratio of CNN only is " + str(test_accuracy) + "\n")
     sio.savemat(filePath + "CNNOnlyResult.mat",{'predict':classes,'actual':test_dataset_label})
-    file.write("#########################################################################################################\n")
+#    file.write("#########################################################################################################\n")
     cnntesttime = str(end_time - start_time)
     cnnacc = str(test_accuracy)
     return {'cnnsvmtraintime':cnnsvmtraintime,'cnnsvmtesttime':cnnsvmtesttime,'cnnsvmacc':cnnsvmacc, 'svmtraintime':svmtraintime,'svmtesttime':svmtesttime,'svmacc':svmacc,'cnntesttime':cnntesttime,'cnnacc':cnnacc}

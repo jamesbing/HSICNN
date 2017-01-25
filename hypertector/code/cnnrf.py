@@ -243,7 +243,7 @@ def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_len
     test_time = end_time - start_time
     print("测试用时：%f" % test_time)
     #result = clf.predict(X_train)
-    file.write("#########################################################################################################\n")
+#    file.write("#############################\n")
     file.write("The RF train time is " + str(train_time) +"\n")
     file.write("The testing time is " + str(test_time) + "\n")
     file.write("The tree number in this RF is " + str(tree_counts) + "\n")
@@ -253,7 +253,7 @@ def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_len
     cnnrftesttime = str(test_time)
     cnnrfacc = str(score)
     sio.savemat(filePath + "CNNRFResult.mat",{'predict':result,'actual':test_label_for_rf})
-    file.write("#########################################################################################################\n")
+#    file.write("#############################\n")
     joblib.dump(rf0,filePath + 'cnnrf.model')
 		
     #result = clf.predict(X_train)
@@ -280,7 +280,7 @@ def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_len
     test_time = end_time - start_time
     print("测试用时：%f" % test_time)
     #result = clf.predict(X_train)
-    file.write("#########################################################################################################\n")
+#    file.write("#############################\n")
     file.write("The RF train time is " + str(train_time) +"\n")
     file.write("The testing time is " + str(test_time) + "\n")
     file.write("The correct ratio of RF only is " + str(score_rf) + "\n")
@@ -289,7 +289,7 @@ def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_len
     rftesttime = str(test_time)
     rfacc = str(score_rf)
     sio.savemat(filePath + "RFonlyResult.mat",{'predict':result,'actual':test_dataset[1]})
-    file.write("#########################################################################################################\n")
+    file.write("#############################\n")
     joblib.dump(rf1,filePath + 'rf.model')
 
     print("#####################################################")
@@ -301,12 +301,12 @@ def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_len
     end_time = time.time()
     print("同一个测试集，在CNN上的正确率为：",test_accuracy)
     print("测试用时：%f" % (end_time - start_time))
-    file.write("#########################################################################################################\n")
+#    file.write("#############################\n")
     file.write("The CNN only\n")
     file.write("The testing time is " + str(end_time - start_time) + "\n")
     file.write("The correct ratio of CNN only is " + str(test_accuracy) + "\n")
     sio.savemat(filePath + "CNNOnlyResult.mat",{'predict':classes,'actual':test_dataset_label})
-    file.write("#########################################################################################################\n")
+#    file.write("############################\n")
     cnntesttime = str(end_time - start_time)
     cnnacc = str(test_accuracy)
     return {'cnnrftraintime':cnnrftraintime,'cnnrftesttime':cnnrftesttime,'cnnrfacc':cnnrfacc, 'rftraintime':rftraintime,'rftesttime':rftesttime,'rfacc':rfacc,'cnntesttime':cnntesttime,'cnnacc':cnnacc}
