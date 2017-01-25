@@ -197,7 +197,9 @@ if __name__ == '__main__':
             time_stamp = str(ltime[0]) + "#" + str(ltime[1]) + "#" + str(ltime[2]) + "#" + str(ltime[3]) + "#" + str(ltime[4])
 
             file = open("../experiments/BatchExpsFixedCNN_" + time_stamp + ".txt", 'w')
+            resultFile = open("../experiments/BatchResults_" + time_stamp + ".txt", 'w')
             file.write("======== Experimental Folders ==========\n")
+            resultFile.write("=============== Batch Exprimental Results ===============\n")
             for temp_mark in range(len(ratios)):
                 learning_ratio = 0
                 train_decay_inner = 0
@@ -213,4 +215,24 @@ if __name__ == '__main__':
                 file_name = run_batch(dataset_fixed, strategy_fixed, neurons, neuronLayersCount, maxpoolings, fullLayers, batch_size_inner, learning_ratio, train_decay_inner, epoches, following_strategy, trees, ratios[temp_mark], 2)
                 #file_name = run_single(ratios[temp_mark])
                 file.write(file_name + "\n")
+                fileCNNRFResultsPath = file_name + "CNNRFdescription.txt"
+                fileCNNSVMResultsPath = file_name + "CNNSVMdescription.txt"
+                resultFile.write("##################################################\n")
+                resultFile.write(file_name + "\n")
+                inputFileRF = open(fileCNNRFResultsPath, "r")
+                inputFileSVM = open(fileCNNSVMResultsPath, "r")
+                allLinesRF = inputFileRF.readlines()
+                allLinesSVM = inputFileSVM.readlines()
+                resultFile.write("CNN-RF Results:\n")
+                for eachLine in allLinesRF:
+                    resultFile.write(eachLine)
+                resultFile.write("CNN-SVM Result:\n")
+                for eachLine in allLinesSVM:
+                    resultFile.write(eachLine)
+                inputFileRF.close()
+                inputFileSVM.close()
+                resultFile.write("##################################################\n")
             file.close()
+            resultFile.close()
+            print "The results are stored in the file " + "BatchResults_" + time_stamp + ".txt"
+            print "All folders contains the experiments are stored in the file " + "BatchExpsFixedCNN_" + time_stamp + ".txt"
