@@ -214,8 +214,9 @@ def temp_network(filePath, number_of_con_filters,conLayers, con_step_length, max
     clf1 = svm.SVC(C=1.0, kernel = kernel_2,  gamma='auto', probability=True,
              tol = 0.00000000000001, max_iter = -1)
     
-    clf2 = svm.SVC(C=1.0, kernel = kernel_2,  gamma='auto', probability=True,
-             tol = 0.00000000000001, max_iter = -1)
+#    clf2 = svm.SVC(C=1.0, kernel = kernel_2,  gamma='auto', probability=True,
+#             tol = 0.00000000000001, max_iter = -1)\
+    clf2 = svm.SVC(decision_function_shape='ovo')
     #用linear
     clf3 = svm.SVC(C=0.8, kernel = kernel_2,  gamma='auto', probability=True,
              tol = 0.00001, max_iter = -1)    
