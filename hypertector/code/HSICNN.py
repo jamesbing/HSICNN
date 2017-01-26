@@ -151,8 +151,9 @@ def temp_network(filePath, number_of_con_filters,neuronLayers, con_step_length, 
 #    train_dataset, test_dataset = imdb.load_data()   
     #initialize parameters
     layer1_input_length = len(test_dataset[0][0])
-    con_filter_length = int((math.ceil( (layer1_input_length /  con_step_length) / neuronLayers)) * con_step_length)
+    #con_filter_length = int((math.ceil( (layer1_input_length /  con_step_length) / neuronLayers)) * con_step_length)
 
+    con_filter_length = int(math.ceil(neuronLayers * con_step_length))
     destinations = numpy.max(test_dataset[1])
     
     #############################
@@ -192,6 +193,7 @@ def temp_network(filePath, number_of_con_filters,neuronLayers, con_step_length, 
 
     #the max pooling layer after the first convolutional layer
     first_feature_map_size = (layer1_input_length - con_filter_length) / con_step_length + 1
+    print ("After the convolutional operation, the length of the feature map size is: " + str(first_feature_map_size))
 #    max_pooling_kernel_size = int(math.ceil(first_feature_map_size / max_pooling_feature_map_size))
     max_pooling_kernel_size = int(max_pooling_feature_map_size)
     print("The max pooling kernel size is ", max_pooling_kernel_size)
