@@ -47,6 +47,7 @@ def run_single(learning_ratio):
     print "#2:train a cnn-rf joint framework;"
     print "#3:train both cnn-svm and cnn-rf joint frameworks;"
     print "#4:TODO: train a mix assemble cnn-classifier model."
+    print "#5: train a CNN model only."
     following_strategy = int(raw_input(prompt))
     if following_strategy == 4:
         print "enter the ratio of svm classifier:"
@@ -62,17 +63,17 @@ def run_single(learning_ratio):
 
     print "the training of the network have done."
 
-    if following_strategy == 1:
+    if following_strategy == 1 and following_strategy != 5:
         #CNN + SVM
         print "now processing the cnn + svm joint framework..."
         cnnsvm.run(file_name, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
-    elif following_strategy == 2:
+    elif following_strategy == 2 and following_strategy != 5:
         #CNN + rfind
         print "now processing the cnn + rf joint framework..."
     #    print "enter the count of trees you want to set in Random Forest:"
     #    trees = int(raw_input(prompt))
         cnnrf.run(file_name,trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
-    elif following_strategy == 3:
+    elif following_strategy == 3 != following_strategy != 5:
         #CNN+svm and CNN+RF
         
         print "now processing the cnn + svm joint framework..."
