@@ -224,6 +224,10 @@ if __name__ == '__main__':
                         learning_ratio = learning / 10
                         train_decay_inner = train_decay / 10
                         batch_size_inner = batch_size / 10
+                    elif ratios[temp_mark] < 5:
+                        learning_ratio = learning / 100
+                        train_decay_inner = train_decay / 100
+                        batch_size_inner = batch_size / 100
                     else:
                         learning_ratio = learning
                         train_decay_inner = train_decay
