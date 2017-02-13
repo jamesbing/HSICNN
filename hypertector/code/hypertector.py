@@ -224,10 +224,10 @@ if __name__ == '__main__':
                         learning_ratio = learning / 10
                         train_decay_inner = train_decay / 10
                         batch_size_inner = batch_size / 10
-                    elif ratios[temp_mark] < 5:
-                        learning_ratio = learning / 100
-                        train_decay_inner = train_decay / 100
-                        batch_size_inner = batch_size / 100
+                    #elif ratios[temp_mark] < 5:
+                    #    learning_ratio = learning / 100
+                    #    train_decay_inner = train_decay / 100
+                    #    batch_size_inner = batch_size / 100
                     else:
                         learning_ratio = learning
                         train_decay_inner = train_decay
@@ -236,22 +236,26 @@ if __name__ == '__main__':
                     #file_name = run_single(ratios[temp_mark])
                     file.write(file_name + "\n")
                     fileCNNRFResultsPath = file_name + "CNNRFdescription.txt"
-                    fileCNNSVMResultsPath = file_name + "CNNSVMdescription.txt"
+                    if following_strategy == 3:
+                        fileCNNSVMResultsPath = file_name + "CNNSVMdescription.txt"
                     resultFile.write("=========================================================\n")
                     resultFile.write(file_name + "\n")
                     inputFileRF = open(fileCNNRFResultsPath, "r")
-                    inputFileSVM = open(fileCNNSVMResultsPath, "r")
+                    if following_strategy == 3:
+                        inputFileSVM = open(fileCNNSVMResultsPath, "r")
                     allLinesRF = inputFileRF.readlines()
-                    allLinesSVM = inputFileSVM.readlines()
+                    if following_strategy == 3:
+                        allLinesSVM = inputFileSVM.readlines()
                     resultFile.write("CNN-RF Results:\n")
                     for eachLine in allLinesRF:
                         resultFile.write(eachLine)
                     resultFile.write("-----------------------------------------\n")
-                    resultFile.write("CNN-SVM Results:\n")
-                    for eachLine in allLinesSVM:
-                        resultFile.write(eachLine)
-                    inputFileRF.close()
-                    inputFileSVM.close()
+                    if following_strategy == 3:
+                        resultFile.write("CNN-SVM Results:\n")
+                        for eachLine in allLinesSVM:
+                            resultFile.write(eachLine)
+                        inputFileRF.close()
+                        inputFileSVM.close()
                     resultFile.write("##################################################\n")
             file.close()
             resultFile.close()
