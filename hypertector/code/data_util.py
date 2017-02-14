@@ -405,9 +405,10 @@ def assembleData(list, datasetName, neighbors, learning_ratio, dataset_format):
 
 #processing code segment
 def prepare(learning_ratio, data_set, neighbors, dataset_format):
-    #print "want to #1:construct a new dataset or #2:use existing dataset?"
-    #if_new = int(raw_input(prompt))
-    if_new = 1
+    print "want to #1:construct a new dataset or #2:use existing dataset?"
+    if_new = int(raw_input(prompt))
+    # if_new = 1
+    # judge if the dataset is exists. to determain if the code will use the existing dataset and the exsiting experiment results.
     if if_new == 1:
         path = data_set
         if data_set == "NONE":
