@@ -96,7 +96,7 @@ def run_single(learning_ratio):
     file.write("Train decay:" + str(train_decay) +"#\n")
     if following_strategy == 2 or following_strategy == 3:
         file.write("Number of trees in random forest: " + str(trees) + "#\n")
-    file.write("===============================================")
+    file.write("===============================================\n")
     file.close()
     return file_name
 
@@ -134,7 +134,7 @@ def run_batch(datasetName,strategies, neurons, neuronLayersCount, maxpoolings, f
     file.write("Train decay:" + str(train_decay) +"#\n")
     if following_strategy == 2 or following_strategy == 3:
         file.write("Number of trees in random forest: " + str(trees) + "#\n")
-    file.write("===============================================")
+    file.write("===============================================\n")
     file.close()
     return file_name
 
