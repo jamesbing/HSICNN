@@ -167,8 +167,17 @@ if __name__ == '__main__':
 #            print "the neighbors strategy is: " + str(neighbors)
             print "enter the dataset name:"
             dataset_fixed = raw_input(prompt)
-            print "enter the neighbor strategy, choose from 1, 4, or 8, enter an 'a' or 'all' for all 1,4,8 strategies."
-            strategy_fixed = raw_input(prompt)
+            print "enter the neighbor strategy, choose from 1, 4, or 8, end with an 'e' or 'end'. if you want to run on all the strategies, enter an 'a' or 'all' for all 1,4,8 strategies."
+            temp_strategies_list = []
+            temp_strategy_input = raw_input(prompt)
+            if temp_strategy_input == 'a' or temp_strategy_input == 'all':
+                temp_strategies_list = [1,4,8]
+            else:
+                while temp_strategy_input != 'e' and temp_strategy_input != 'end':
+                    temp_strategies_list.append(int(temp_strategy_input))
+                    temp_strategy_input = raw_input(prompt)
+            #strategy_fixed = raw_input(prompt)
+
             print "enter the number of convolutional neurons:"
             neurons = int(raw_input(prompt))
             print "enter the number of layers you want the CNN to operate convolutional operation:"
@@ -207,11 +216,14 @@ if __name__ == '__main__':
             file.write("======== Experimental Folders ==========\n")
             resultFile.write("=============== Batch Exprimental Results ===============\n")
             resultFile.write("=========================================================\n")
-            strategiesList = []
-            if str(strategy_fixed) == 'a' or strategy_fixed == 'all':
-                strategiesList = [1,4,8]
-            else:
-                strategiesList = [int(strategy_fixed)]
+            
+            #strategiesList = []
+            #if str(strategy_fixed) == 'a' or strategy_fixed == 'all':
+            #    strategiesList = [1,4,8]
+            #else:
+            #    strategiesList = [int(strategy_fixed)]
+            # 
+            strategiesList = temp_strategies_list
             for neighbor_strategy_mark in range(len(strategiesList)):
                 neighbor_strategy = strategiesList[neighbor_strategy_mark]
                 print "now is running on strategy " + str(neighbor_strategy)
@@ -232,7 +244,16 @@ if __name__ == '__main__':
                         learning_ratio = learning
                         train_decay_inner = train_decay
                         batch_size_inner = batch_size
-                    file_name = run_batch(dataset_fixed,neighbor_strategy, neurons, neuronLayersCount, maxpoolings, fullLayers, batch_size_inner, learning_ratio, train_decay_inner, epoches, following_strategy, trees, ratios[temp_mark], 2)
+    
+                    #set the full layers nodes to satisfy the change of neighbors strategies.
+                    #TODO: need to check if this makes sense
+                    #actual_full_layers = 0
+                    #if neighbor_strategy == 4:
+                    #    actual_full_layers = fullLayers / 2
+                    #elif neighbor_strategy == 1:
+                    #    actual_full_layers = fullLayers / 4
+
+                    file_name = run_batch(dataset_fixed,neighbor_strategy, neurons, neuronLayersCount, maxpoolings,fullLayers, batch_size_inner, learning_ratio, train_decay_inner, epoches, following_strategy, trees, ratios[temp_mark], 2)
                     #file_name = run_single(ratios[temp_mark])
                     file.write(file_name + "\n")
                     fileCNNRFResultsPath = file_name + "CNNRFdescription.txt"
