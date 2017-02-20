@@ -87,6 +87,8 @@ def loadData(path, strategy):
         for indexLine in range(lines):
             label = Labels[indexRow,indexLine]
             position = {'row':indexRow, 'line':indexLine}
+            # testing purpose:print position
+
             #store non-zero data
             if label != 0:
                 #for test purpose printing...
@@ -219,7 +221,7 @@ def loadData(path, strategy):
     print 'data loaded.'
     print 'spectral length now is: ' + str(len((DataList[0][0])))
     print 'neighbor strategy ' + str(neighbors)
-    return DataList, neighbors
+    return DataList, neighbors, PositionList
 
 
 def shuffling(dataList):
@@ -418,7 +420,8 @@ def prepare(learning_ratio, data_set, neighbors, dataset_format):
         if os.path.exists(path_prefix + path) != True:
             print "you entered the wrong file folder path, please re-enter."
         else:
-            dataList, inner_neighbors = loadData(path, neighbors)
+            dataList, inner_neighbors, positionList = loadData(path, neighbors)
+            print positionList
             shuffledDataList = shuffling(dataList)
             realPath, wrong_neighbor = assembleData(shuffledDataList, path, inner_neighbors, learning_ratio, dataset_format)
             #realPath = path + '_' + str(neighbors) + '_' + str(train_ratio)i
@@ -435,4 +438,4 @@ def prepare(learning_ratio, data_set, neighbors, dataset_format):
 
 
 if __name__ == '__main__':
-    prepare(0)
+    prepare(0,'PU', 8, 1)
