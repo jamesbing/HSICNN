@@ -224,23 +224,27 @@ def loadData(path, strategy):
     return DataList, neighbors, PositionList
 
 
-def shuffling(dataList, positionList):
+def shuffling(dataList,ids, positionList):
     print 'shuffling data...'
-    if len(dataList) != len(positionList):
+    if (len(dataList) == len(positionList) and len(dataList) == len(ids)) != True:
         print 'The length of data list and position list does not match.'
         return 0
     shuffleMark = range(len(dataList))
+    
     shuffledData = []
+    shuffledIds = []
     shuffledPosition = []
+    
     shuffle(shuffleMark)
     for tempCount in shuffleMark:
         shuffledData.append(dataList[tempCount])
         shuffledPosition.append(positionList[tempCount])
+        shuffledIds.append(ids[tempCount])
 #
 #    for sub_list in dataList:
 #        shuffle(sub_list)
     print 'shuffled.'
-    return shuffledData, shuffledPosition
+    return shuffledData, shuffledIds, shuffledPosition
     
 def writeToLMDB(list, name, procedure):
 
@@ -296,37 +300,63 @@ def writeToLMDB(list, name, procedure):
     print 'Done.'
     print str(countingMark) + ' samples have successfully writed into lmdb format data file.'
 
-def prepareMatList(list):
+def prepareMatList(list, positions):
     Data = []
     CId = []
+    Positions = []
 #    DataTe = []
 #    CIdTe = []
     classCount = 1
+    #positionMark_A = 0
+    #PositionMark_B = 0
+    #PositionMark_C = 0
+    #print positions.shape
+    #TODO: put these following two fors into one for.
     for sub_list in list:
+
         for sub_list_data in sub_list:
-            print 'number of samples in this class ' + str(len(sub_list_data))
+
+            print 'number of samples in number ' + str(classCount) + ' class ' + str(len(sub_list_data))
             for to_be_assemblied_data in sub_list_data:
+
                 Data.append(to_be_assemblied_data) 
                 CId.append(classCount)
+                #Positions.append(positions[positionMark])
+                #positionMark = positionMark + 1
+                #PositionMark_C = PositionMark_C
+                #Positions.append(positions[positionMark_A][PositionMark_B][PositionMark_C])
             classCount = classCount + 1
+            #PositionMark_B = PositionMark_B + 1
+        #positionMark_A = positionMark_A + 1
+    for sub_positions in positions:
+        #print str(len(sub_positions)) + '  '
+        for sub_sub_positions in sub_positions:
+            #print len(sub_sub_positions)
+            #print str(len(sub_sub_positions))
+            for actual_Position in sub_sub_positions:
+            #    print str(len(actual_Positions))
+                Positions.append(actual_Position)
+
 
     # shuffle
-    liMark = range(len(Data))
-    shuffle(liMark)
-    flagCursor = 0
-    newData = []
-    newCId = []
-    for tempCount in liMark:
-        newData.append(Data[tempCount])
-        newCId.append(CId[tempCount])
-
-    return newData, newCId
+    #liMark = range(len(Data))
+    #shuffle(liMark)
+    #flagCursor = 0
+    #newData = []
+    #newCId = []
+    #for tempCount in liMark:
+    #    newData.append(Data[tempCount])
+    #    newCId.append(CId[tempCount])
+    
+    newData, newCId, newPositions = shuffling(Data, CId, Positions)
+    
+    return newData, newCId, newPositions
 
 
 # write to .mat data format
-def writeToMAT(trainList, testList, datasetName, train_ratio, neighbors):
-    DataTr, CIdTr = prepareMatList(trainList)
-    DataTe, CIdTe = prepareMatList(testList)
+def writeToMAT(trainList, testList,trainPositions, testPositions, datasetName, train_ratio, neighbors):
+    DataTr, CIdTr, PositionsTr = prepareMatList(trainList, trainPositions)
+    DataTe, CIdTe, PositionsTe = prepareMatList(testList, testPositions)
   
     ltime = time.localtime()
     time_stamp = str(ltime[0]) + "_" + str(ltime[1]) + "_" + str(ltime[2]) + "_" + str(ltime[3]) + "_" + str(ltime[4])
@@ -337,7 +367,7 @@ def writeToMAT(trainList, testList, datasetName, train_ratio, neighbors):
 
     realPath = folderPath + datasetName + "_" + str(neighbors) + "_" + str(train_ratio)
 
-    sio.savemat(realPath + '.mat',{'DataTr':DataTr, 'CIdTr':CIdTr, 'DataTe':DataTe, 'CIdTe':CIdTe})
+    sio.savemat(realPath + '.mat',{'DataTr':DataTr, 'CIdTr':CIdTr, 'PositionsTr':PositionsTr,  'DataTe':DataTe, 'CIdTe':CIdTe, 'PositionsTe':PositionsTe})
     return realPath, neighbors
 
 
@@ -363,15 +393,21 @@ def assembleData(list,positionList, datasetName, neighbors, learning_ratio, data
     positionMark = 0
     trainList = []
     testList = []
+    trainPositions = []
+    testPositions = []
     for mark in range(len(list)):
         trainList.append([])
         testList.append([])
+        trainPositions.append([])
+        testPositions.append([])
     print 'confirm the number of classes in this dataset is ' + str(len(list))
     trainingCount = 0
     testingCount = 0
     #for sub_list in list:
+    positionMark = 0
     print '#########################ratioing############################'
     for dataList in list:
+         positionNow = positionList[positionMark]
         #trainingNumer = ceil((len(dataList) * float(ratio) / 100.0)
         # print 'the number of samples in this class is :' + str(len(dataList))
          trainingNumber = int(ceil((len(dataList) * int(ratio)) / 100.0))
@@ -379,12 +415,14 @@ def assembleData(list,positionList, datasetName, neighbors, learning_ratio, data
         # print 'the position of training list is from  0 to ' + str(trainingNumber)  + '.' 
          trainList[positionMark].append(dataList[0:trainingNumber])
          testList[positionMark].append(dataList[trainingNumber:len(dataList)])
+         trainPositions[positionMark].append(positionNow[0:trainingNumber])
+         testPositions[positionMark].append(positionNow[trainingNumber:len(dataList)])
          trainingCount = trainingCount + trainingNumber
          print '.............................................................'
          print 'class ' + str(positionMark)
-         print 'train:' + str(trainingNumber)
+         print 'train samples\' count:' + str(trainingNumber)
          testingCount = testingCount + testingNumber
-         print 'test:' + str(testingNumber)
+         print 'test samples\' count:' + str(testingNumber)
          print str(len(dataList)) + '.'
          positionMark = positionMark + 1
     print '---------------------------------------------------------------'
@@ -406,7 +444,7 @@ def assembleData(list,positionList, datasetName, neighbors, learning_ratio, data
         writeToLMDB(trainList, datasetName, 'training')
         writeToLMDB(testList, datasetName, 'testing')
     elif data_format == 2:
-        return writeToMAT(trainList, testList, datasetName, ratio, neighbors)
+        return writeToMAT(trainList, testList, trainPositions, testPositions, datasetName, ratio, neighbors)
 
 #def assembleData(list, datasetName):
 #    print "choose the data format, enter 1 for lmdb or enter 2 for mat"
@@ -433,8 +471,8 @@ def prepare(learning_ratio, data_set, neighbors, dataset_format):
         else:
             dataList, inner_neighbors, positionList = loadData(path, neighbors)
             #for testing purpose:print positionList
-            shuffledDataList, shuffledPositionList = shuffling(dataList, positionList)
-            realPath, wrong_neighbor = assembleData(shuffledDataList,shuffledPosition, path, inner_neighbors, learning_ratio, dataset_format)
+            #shuffledDataList, shuffledPositionList = shuffling(dataList, positionList)
+            realPath, wrong_neighbor = assembleData(dataList, positionList, path, inner_neighbors, learning_ratio, dataset_format)
             #realPath = path + '_' + str(neighbors) + '_' + str(train_ratio)i
             print "the dataset is stored in " + realPath + ".mat"
             print inner_neighbors
