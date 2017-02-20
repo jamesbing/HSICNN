@@ -224,12 +224,23 @@ def loadData(path, strategy):
     return DataList, neighbors, PositionList
 
 
-def shuffling(dataList):
+def shuffling(dataList, positionList):
     print 'shuffling data...'
-    for sub_list in dataList:
-        shuffle(sub_list)
+    if len(dataList) != len(positionList):
+        print 'The length of data list and position list does not match.'
+        return 0
+    shuffleMark = range(len(dataList))
+    shuffledData = []
+    shuffledPosition = []
+    shuffle(shuffleMark)
+    for tempCount in shuffleMark:
+        shuffledData.append(dataList[tempCount])
+        shuffledPosition.append(positionList[tempCount])
+#
+#    for sub_list in dataList:
+#        shuffle(sub_list)
     print 'shuffled.'
-    return dataList
+    return shuffledData, shuffledPosition
     
 def writeToLMDB(list, name, procedure):
 
@@ -330,7 +341,7 @@ def writeToMAT(trainList, testList, datasetName, train_ratio, neighbors):
     return realPath, neighbors
 
 
-def assembleData(list, datasetName, neighbors, learning_ratio, dataset_format):
+def assembleData(list,positionList, datasetName, neighbors, learning_ratio, dataset_format):
     
     ratio = 0
     if learning_ratio == 0:
@@ -421,9 +432,9 @@ def prepare(learning_ratio, data_set, neighbors, dataset_format):
             print "you entered the wrong file folder path, please re-enter."
         else:
             dataList, inner_neighbors, positionList = loadData(path, neighbors)
-            print positionList
-            shuffledDataList = shuffling(dataList)
-            realPath, wrong_neighbor = assembleData(shuffledDataList, path, inner_neighbors, learning_ratio, dataset_format)
+            #for testing purpose:print positionList
+            shuffledDataList, shuffledPositionList = shuffling(dataList, positionList)
+            realPath, wrong_neighbor = assembleData(shuffledDataList,shuffledPosition, path, inner_neighbors, learning_ratio, dataset_format)
             #realPath = path + '_' + str(neighbors) + '_' + str(train_ratio)i
             print "the dataset is stored in " + realPath + ".mat"
             print inner_neighbors
