@@ -86,7 +86,8 @@ def loadData(path, strategy):
         indexLine = 0
         for indexLine in range(lines):
             label = Labels[indexRow,indexLine]
-            position = {'row':indexRow, 'line':indexLine}
+            #position = {'row':indexRow, 'line':indexLine}
+            position = str(indexRow) + "|" + str(indexLine)
             # testing purpose:print position
 
             #store non-zero data
@@ -221,7 +222,7 @@ def loadData(path, strategy):
     print 'data loaded.'
     print 'spectral length now is: ' + str(len((DataList[0][0])))
     print 'neighbor strategy ' + str(neighbors)
-    return DataList, neighbors, PositionList
+    return DataList, neighbors, PositionList, rows, lines
 
 
 def shuffling(dataList,ids, positionList):
@@ -469,21 +470,21 @@ def prepare(learning_ratio, data_set, neighbors, dataset_format):
         if os.path.exists(path_prefix + path) != True:
             print "you entered the wrong file folder path, please re-enter."
         else:
-            dataList, inner_neighbors, positionList = loadData(path, neighbors)
+            dataList, inner_neighbors, positionList, rows, lines = loadData(path, neighbors)
             #for testing purpose:print positionList
             #shuffledDataList, shuffledPositionList = shuffling(dataList, positionList)
             realPath, wrong_neighbor = assembleData(dataList, positionList, path, inner_neighbors, learning_ratio, dataset_format)
             #realPath = path + '_' + str(neighbors) + '_' + str(train_ratio)i
             print "the dataset is stored in " + realPath + ".mat"
             print inner_neighbors
-            return realPath, inner_neighbors
+            return realPath, inner_neighbors, rows, lines
     elif if_new == 2:
         print "enter the existing dataset path:"
         realPath = raw_input(prompt)
         #TODO后期要根据路径名去判断数据集的信息，并且赋给neighbors 变量，暂先用8固定
         neighbors = 8
         realPath = "../experiments/" + realPath + "/" +realPath
-        return realPath, neighbors
+        return realPath, neighbors, raws, lines
 
 
 if __name__ == '__main__':
