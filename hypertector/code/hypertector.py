@@ -15,7 +15,7 @@ def run_single(learning_ratio):
     prompt = '>'
     #mix_model_svm_ratio是为了以后采用组合混合模型的时候，保存一个svm在所有模型中的占比。以后根据需求进行扩充。。。TODO
     mix_model_svm_ratio = 0
-    file_name, neighbors = data_util.prepare(learning_ratio,"NONE", 0, 2)
+    file_name, neighbors, raws_size, lines_size = data_util.prepare(learning_ratio,"NONE", 0, 2)
 
     print "now constructing the network..."
     #print "enter the layers each convolutional kernel covers: "
@@ -72,7 +72,7 @@ def run_single(learning_ratio):
         print "now processing the cnn + rf joint framework..."
     #    print "enter the count of trees you want to set in Random Forest:"
     #    trees = int(raw_input(prompt))
-        cnnrf.run(file_name,trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
+        cnnrf.run(file_name,trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay, raws_size, lines_size)
     elif following_strategy == 3 != following_strategy != 5:
         #CNN+svm and CNN+RF
         
@@ -80,7 +80,7 @@ def run_single(learning_ratio):
         cnnsvm.run(file_name, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
 
         print "now processing the cnn + rf joint framework..."
-        cnnrf.run(file_name, trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
+        cnnrf.run(file_name, trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay, raws_size, lines_size)
 
     file = open(file_name + "_experiment_description.txt", 'w')
     file.write("-------------Experiment Description-------------\n")
@@ -103,7 +103,7 @@ def run_single(learning_ratio):
 def run_batch(datasetName,strategies, neurons, neuronLayersCount, maxpoolings, fullLayers, batch_size, learning, train_decay, epoches, following_strategy, trees, learning_sample_ratios, dataset_format):
     mix_model_svm_ratio = 0
     #print strategies
-    file_name, neighbors = data_util.prepare(learning_sample_ratios, datasetName, int(strategies), 2)
+    file_name, neighbors, raws_size, lines_size = data_util.prepare(learning_sample_ratios, datasetName, int(strategies), 2)
     neighbors = neighbors + 1
     print "the neighbors strategy is: " + str(neighbors)
     print "starting ..."
@@ -114,12 +114,12 @@ def run_batch(datasetName,strategies, neurons, neuronLayersCount, maxpoolings, f
         cnnsvm.run(file_name, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
     elif following_strategy == 2:
         print "now processing the cnn + rf joint framework..."
-        cnnrf.run(file_name,trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
+        cnnrf.run(file_name,trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay, raws_size, lines_size)
     elif following_strategy == 3:
         print "now processing the cnn + svm joint framework..."
         cnnsvm.run(file_name, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
         print "now processing the cnn + rf joint framework..."
-        cnnrf.run(file_name, trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
+        cnnrf.run(file_name, trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay, raws_size,lines_size)
     file = open(file_name + "_experiment_description.txt", 'w')
     file.write("-------------Experiment Description-------------\n")
     file.write("Data set:" + file_name + "#\n")
