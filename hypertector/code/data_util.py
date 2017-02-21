@@ -59,8 +59,32 @@ def loadData(path, strategy):
     print 'loading data...'
     DataSetMat = sio.loadmat(path + '/' + dataset + 'Data.mat')
     LabelsMat = sio.loadmat(path + '/' + dataset + 'Gt.mat')
-    DataSet = DataSetMat['DataSet']
-    Labels = LabelsMat['ClsID']
+    key_data_name = DataSetMat.keys()
+    key_label_name = LabelsMat.keys()
+    # in case of the disorder of the content of data, should looking for the correct menu of the data index. for example,
+    # the labels may be orginazed like['__version__', '__header__', 'ClsID', '__globals__'] rather than
+    #['ClsID', all the other contents], so the code should not just use following index to fetch useable data.
+    #DataSet = DataSetMat[key_data_name[0]]
+    #Labels = LabelsMat[key_label_name[0]]
+
+    data_key = ''
+    label_key = ''
+    for temp_key in key_data_name:
+        if temp_key != '__version__' and temp_key != '__header__' and temp_key != '__globals__':
+            data_key = temp_key
+            break
+
+
+    for temp_key in key_label_name:
+        if temp_key != '__version__' and temp_key != '__header__' and temp_key != '__globals__':
+            label_key = temp_key
+            break
+
+    DataSet = DataSetMat[data_key]
+    Labels = LabelsMat[label_key]
+
+    #DataSet = DataSetMat['DataSet']
+    #Labels = LabelsMat['ClsID']
     maxClass = np.max(Labels)
     print 'there are ' + str(maxClass) + ' classes in dataset ' + str(dataset)
     print 'the spectral bands in this dataset is ' + str(len(DataSet[0][0]))
