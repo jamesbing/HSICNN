@@ -263,7 +263,7 @@ def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_len
     #需要画两幅图：一是期望的分类结果的RGB图，二是实际的分类结果的RGB图
     #最好是定义一个函数，叫做drawRGB()
     #画出CNN + RF结果RGB图
-    analyse.drawRGBResult(filePath + "CNN_RF_Predict.jpeg", result, test_position_for_all, raws_sise, lines_size)
+    analyse.drawRGBResult(filePath + "CNN_RF_Predict", result, test_position_for_all, raws_sise, lines_size)
 
 
     cnnrftraintime = str(train_time)
@@ -309,7 +309,7 @@ def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_len
     file.write("#############################\n")
     joblib.dump(rf1,filePath + 'rf.model')
     #画出RF RGB结果图
-    analyse.drawRGBResult(filePath + "RF_Predict.jpeg", result, test_position_for_all, raws_sise, lines_size)
+    analyse.drawRGBResult(filePath + "RF_Predict", result, test_position_for_all, raws_sise, lines_size)
     
     print("#####################################################")
     print("正在CNN上进行测试\n")
@@ -331,9 +331,9 @@ def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_len
 
     file.close
     #画出CNN结果RGB图
-    analyse.drawRGBResult(filePath + "CNN_Predict.jpeg", classes, test_position_for_all, raws_sise, lines_size)
+    analyse.drawRGBResult(filePath + "CNN_Predict", classes, test_position_for_all, raws_sise, lines_size)
     #画出真正的样本RGB图
-    analyse.drawRGBResult(filePath + "Actual.jpeg", test_dataset_label, test_position_for_all, raws_sise, lines_size)
+    analyse.drawRGBResult(filePath + "Actual", test_dataset_label, test_position_for_all, raws_sise, lines_size)
 
     return {'cnnrftraintime':cnnrftraintime,'cnnrftesttime':cnnrftesttime,'cnnrfacc':cnnrfacc, 'rftraintime':rftraintime,'rftesttime':rftesttime,'rfacc':rfacc,'cnntesttime':cnntesttime,'cnnacc':cnnacc}
 
