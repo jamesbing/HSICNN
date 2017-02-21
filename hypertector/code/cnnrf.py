@@ -31,6 +31,8 @@ from sklearn import cross_validation,decomposition,metrics
 
 
 import time
+import drawRGB
+
 def getMiddleOutPut(model,inputVector,kthlayer):
     getFunc = K.function([model.layers[0].input],[model.layers[kthlayer].output])
     layer_output = getFunc(inputVector)[0]
@@ -50,6 +52,7 @@ def loadData(dataFile, typeId = -1, bShowData = False):
 
     test_data = data['DataTe']
     test_label_temp = data['CIdTe'][0,:]
+    test_position_for_all = data['PositionsTe']
 #    test_set = [test_data, test_label]
 
     valid_data = data['DataTr']
@@ -122,14 +125,14 @@ def loadData(dataFile, typeId = -1, bShowData = False):
     test_dataset_data = numpy.array(test_dataset_data)
     valid_dataset_data = numpy.array(valid_dataset_data)
 
-    return [(train_dataset_data, train_label),(valid_dataset_data,valid_label),(test_dataset_data,test_label)]
+    return [(train_dataset_data, train_label),(valid_dataset_data,valid_label),(test_dataset_data,test_label,test_position_for_all)]
 #    return rval
 
 #######################################################################################
 #currently, I wrote all the network constructing and training and testing in this file#
 #laterly, I will seperate them apart.                                                 #
 #######################################################################################
-def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay):
+def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay, raws_sise, lines_size):
     #get the train data, train label, validate data, validate label, test data, test label
     train_dataset, valid_dataset, test_dataset = loadData(filePath + ".mat")
 
@@ -208,10 +211,14 @@ def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_len
 #    print("层号5，shape：",train_data_for_rf.shape)
     train_label_for_rf = train_dataset[1]
 #    print("训练数据label的shape:",train_label_for_rf.shape)
-    
+    # the positions information for all the testing data.
+    test_position_for_all = test_dataset[2]
+
     test_data_for_rf = getMiddleOutPut(model,[test_dataset_data],5)    
     test_dataset_label = test_dataset[1].astype(numpy.int) 
     test_label_for_rf = test_dataset[1]
+    
+    #test_position_for_all = 
 
     #进行CNN+RF的综合实验
     #第一步：构造随机森林
@@ -250,6 +257,14 @@ def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_len
     file.write("The tree number in this RF is " + str(tree_counts) + "\n")
     file.write("The correct ratio of CNN-RF is " + str(score) + "\n")
     result = rf0.predict(test_data_for_rf)
+
+    #下面是画真彩图的代码
+    #现有5个变量用于画图：1：test_label_for_rf, 2: result, 3:test_position_for_all, raws_sise, lines_size
+    #需要画两幅图：一是期望的分类结果的RGB图，二是实际的分类结果的RGB图
+    #最好是定义一个函数，叫做drawRGB()
+    drawRGB.drawResult(filePath + "CNNRF_Predict.jpeg", result, test_position_for_all, raws_sise, lines_size)
+
+
     cnnrftraintime = str(train_time)
     cnnrftesttime = str(test_time)
     cnnrfacc = str(score)
@@ -313,12 +328,12 @@ def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_len
     return {'cnnrftraintime':cnnrftraintime,'cnnrftesttime':cnnrftesttime,'cnnrfacc':cnnrfacc, 'rftraintime':rftraintime,'rftesttime':rftesttime,'rfacc':rfacc,'cnntesttime':cnntesttime,'cnnacc':cnnacc}
     file.close
 
-def network(file, trees, neurons, conLayers, convolutionalLayers, max_pooling_feature_map_size, full_layers_size, batch_size, ratio, decay):
-    result =  temp_network(file, trees, number_of_con_filters = neurons,conLayers = conLayers, con_step_length = convolutionalLayers, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = full_layers_size, learning_ratio = ratio, train_decay = decay)
+def network(file, trees, neurons, conLayers, convolutionalLayers, max_pooling_feature_map_size, full_layers_size, batch_size, ratio, decay, raws_sise, lines_size):
+    result =  temp_network(file, trees, number_of_con_filters = neurons,conLayers = conLayers, con_step_length = convolutionalLayers, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = full_layers_size, learning_ratio = ratio, train_decay = decay, raws_sise = raws_sise, lines_size = lines_size)
     return result
 
 
-def run(filename, trees, neurons, conLayers, neighbors, max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay):
+def run(filename, trees, neurons, conLayers, neighbors, max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay, raws_sise, lines_size):
     cnnrftraintime1 = 0.
     cnnrftesttime1 = 0.
     cnnrfacc1 = 0.
@@ -332,7 +347,7 @@ def run(filename, trees, neurons, conLayers, neighbors, max_pooling_feature_map_
 
     file = open(filename + "_CNNRF_EXPResultTOTAL.txt",'w')
 
-    result = network(filename, trees, neurons,conLayers, neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay)
+    result = network(filename, trees, neurons,conLayers, neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay, raws_sise, lines_size)
         
     cnnrftraintime1 = cnnrftraintime1 + float(result['cnnrftraintime'])
     cnnrftesttime1 = cnnrftesttime1 + float(result['cnnrftesttime'])
