@@ -7,6 +7,8 @@ import data_util
 import cnnsvm
 import cnnrf
 import time
+import analyse
+import os
 
 from sys import argv
 
@@ -140,8 +142,8 @@ def run_batch(datasetName,strategies, neurons, neuronLayersCount, maxpoolings, f
 
 if __name__ == '__main__':
     prompt = ">"
-    print "What kind of experiments you want to run?"
-    print "#1 Run a single experiment; #2 Run a batched experiment..."
+    print "What kind of operation you want to run?"
+    print "#1 Run a single experiment; #2 Run a batched experiment; #3 analyse existing experimental results or doing further experiments on existing data"
     if_batch = int(raw_input(prompt))
     if if_batch == 1:
         run_single(0)
@@ -282,3 +284,6 @@ if __name__ == '__main__':
             resultFile.close()
             print "The results are stored in the file " + "BatchResults_" + time_stamp + ".txt"
             print "All folders contains the experiments are stored in the file " + "BatchExpsFixedCNN_" + time_stamp + ".txt"
+    elif if_batch == 3:
+        os.system('clear')
+        analyse.analyse()

@@ -4,6 +4,8 @@
 from PIL import Image
 import re
 
+prompt = ">"
+
 def drawRGBResult(fileName, labels, positions, raws, lines):
     im = Image.new("RGB", (raws, lines))
     
@@ -37,4 +39,21 @@ def drawRGBResult(fileName, labels, positions, raws, lines):
     #color_drawing_log.close()
     im.save(fileName + ".bmp", "BMP")
 
-    
+   
+def analyse():
+    print "==============================Analyse============================="
+    print "Chose analyse type:"
+    print "#1 Draw RGB classifiation pictures; #2 TODO; #3 TODO; #4 TODODO"
+    analyse_type = int(raw_input(prompt))
+    if analyse_type == 1:
+        #
+
+    elif analyse_type == 2:
+        #TODO
+
+    elif analyse_type == 3:
+        #TODO
+
+    elif analyse_type == 4:
+        #TODO
+
