@@ -1,0 +1,12 @@
+-------------Experiment Description-------------
+Data set:../experiments/Botswana_1_1_2017_2_21_14_5/Botswana_1_1#
+neighbor strategy:2#
+Convolutional Neurons:20#
+Each convolutional neuron operates 8Max Polling Kernel Size:2#
+Full Layer Neuron number:100#
+Batch size of SGD training:2#
+Training epoches of deep CNN:100#
+Learning ratio:0.002#
+Train decay:1e-06#
+Number of trees in random forest: 100#
+===============================================

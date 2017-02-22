@@ -1,0 +1,9 @@
+The network have 102input nodes in the 1st layer.
+The amount of samples in the dataset is 7413.
+The number of classification classes is 9.0.
+The size of the first convolutional layer is 102.
+The number of convolutional filters is 20,each kernel sizes 16X1.
+There are 100 nodes in the fully connect layer.
+The input to the first convolutional layer shapes 1X102X1.
+The max pooling kernel size is 2.
+The correct ratio of the trained CNN model is 0.926836200342.

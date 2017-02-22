@@ -1,0 +1,13 @@
+The input to the first convolutional layer shapes 1X102X1.
+The max pooling kernel size is 2.
+The RF train time is 4.11243605614
+The testing time is 1.64248180389
+The tree number in this RF is 100
+The correct ratio of CNN-RF is 0.954419173079
+The RF train time is 2.35935997963
+The testing time is 1.61044716835
+The correct ratio of RF only is 0.944777211718
+#############################
+The CNN only
+The testing time is 0.000608921051025
+The correct ratio of CNN only is 0.926836200342

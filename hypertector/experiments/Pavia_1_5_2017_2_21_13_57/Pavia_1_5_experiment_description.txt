@@ -1,0 +1,12 @@
+-------------Experiment Description-------------
+Data set:../experiments/Pavia_1_5_2017_2_21_13_57/Pavia_1_5#
+neighbor strategy:2#
+Convolutional Neurons:20#
+Each convolutional neuron operates 8Max Polling Kernel Size:2#
+Full Layer Neuron number:100#
+Batch size of SGD training:100#
+Training epoches of deep CNN:200#
+Learning ratio:0.0002#
+Train decay:1e-07#
+Number of trees in random forest: 100#
+===============================================
