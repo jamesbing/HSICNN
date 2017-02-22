@@ -143,7 +143,9 @@ def run_batch(datasetName,strategies, neurons, neuronLayersCount, maxpoolings, f
 if __name__ == '__main__':
     prompt = ">"
     print "What kind of operation you want to run?"
-    print "#1 Run a single experiment; #2 Run a batched experiment; #3 analyse existing experimental results or doing further experiments on existing data"
+    print "#1 Run a single experiment;" 
+    print "#2 Run a batched experiment;"
+    print "#3 analyse existing experimental results or doing further experiments on existing data"
     if_batch = int(raw_input(prompt))
     if if_batch == 1:
         run_single(0)

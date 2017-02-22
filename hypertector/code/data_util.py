@@ -238,7 +238,9 @@ def loadData(path, strategy):
                 #        data = 
 
                 DataList[label - 1].append(data)
-                PositionList[label - 1].append(position)
+                # the position string includes following informations:
+                # row | line | class number.
+                PositionList[label - 1].append(position + "|" + str(label - 1))
             indexLine = indexLine + 1
 
         indexRow = indexRow + 1

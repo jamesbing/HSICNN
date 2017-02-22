@@ -334,6 +334,7 @@ def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_len
     analyse.drawRGBResult(filePath + "CNN_Predict", classes, test_position_for_all, raws_sise, lines_size)
     #画出真正的样本RGB图
     analyse.drawRGBResult(filePath + "Actual", test_dataset_label, test_position_for_all, raws_sise, lines_size)
+    analyse.drawRGBResultCutline(filePath, destinations)
 
     return {'cnnrftraintime':cnnrftraintime,'cnnrftesttime':cnnrftesttime,'cnnrfacc':cnnrfacc, 'rftraintime':rftraintime,'rftesttime':rftesttime,'rfacc':rfacc,'cnntesttime':cnntesttime,'cnnacc':cnnacc}
 
