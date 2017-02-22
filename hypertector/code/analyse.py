@@ -20,7 +20,7 @@ def getColors():
     return colorsDict
 
 def draw_box(img, x, y, rgb):
-    for i in range(60):
+    for i in range(80):
         for j in range(20):
             img.putpixel((x + i , y + j),(int(rgb[0]), int(rgb[1]), int(rgb[2])))
 
@@ -40,14 +40,14 @@ def drawRGBResultCutline(filePath, classesNumber):
     draw = ImageDraw.Draw(cutline)
 
     classCount = 0
-    y = 0
+    y = 5
     for location in range(int(classesNumber)):
         rgb = colorsDict[classCount]
         x = 0
-        y = y + location_line
         draw.text((x + 10, y), unicode(str(classCount + 1)), outline = 'black')
         draw_box(cutline, x + 80, y, rgb)
-    
+        y = y + int(location_line)
+        classCount = classCount + 1
     cutline.save(filePath + "_cutline.bmp", "BMP")
 
 def drawRGBResult(fileName, labels, positions, raws, lines):
@@ -69,10 +69,10 @@ def drawRGBResult(fileName, labels, positions, raws, lines):
         position_pair = position_temp.split("|")
         x = int(position_pair[0])
         y = int(position_pair[1])
-        z = int(position_pair[2])
+        #z = int(position_pair[2])
         #x = position_temp['row']
         #y = position_temp['line']
-        rgb = colorsDict[z]
+        rgb = colorsDict[int(result)]
         im.putpixel((x,y),(int(rgb[0]), int(rgb[1]), int(rgb[2])))
         #log_msg = "result: " + str(result) + "position:" + str(x) + "-" + str(y) + ", rgb:" + str(rgb)
         #color_drawing_log.write(log_msg + '\r')
