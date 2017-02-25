@@ -88,7 +88,14 @@ def analyse():
     print "#1 Draw RGB classifiation pictures; #2 TODO; #3 TODO; #4 TODODO"
     analyse_type = int(raw_input(prompt))
     if analyse_type == 1:
-        print "todo"
+        print "Draw RGB Classification Picture(s) for"
+        print "#1 only one result dataset or"
+        print "#2 a batch of datasets"
+        picture_type = raw_input(prompt)
+        if picture_type == '1':
+
+        elif picture_type == '2':
+
     elif analyse_type == 2:
         print "todo"
     elif analyse_type == 3:
