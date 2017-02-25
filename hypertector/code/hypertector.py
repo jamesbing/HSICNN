@@ -140,7 +140,8 @@ def run_batch(datasetName,strategies, neurons, neuronLayersCount, maxpoolings, f
     file.close()
     return file_name
 
-if __name__ == '__main__':
+#if __name__ == '__main__':
+def predesigned_network():
     prompt = ">"
     print "What kind of operation you want to run?"
     print "#1 Run a single experiment;" 
@@ -289,3 +290,14 @@ if __name__ == '__main__':
     elif if_batch == 3:
         os.system('clear')
         analyse.analyse()
+
+if __name__ == '__main__':
+    prompt = '>'
+    print "Want to: "
+    print "#1 use the predesigned network for the CCS and CCR, or"
+    print "#2 do an experiment with a new framework"
+    work_type = raw_input(prompt)
+    if work_type == '1':
+        predesigned_network()
+    elif work_type == '2':
+        print "this part is under development, please wait..."
