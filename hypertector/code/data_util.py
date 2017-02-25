@@ -512,6 +512,5 @@ def prepare(learning_ratio, data_set, neighbors, dataset_format):
         realPath = "../experiments/" + realPath + "/" +realPath
         return realPath, neighbors, raws, lines
 
-
 if __name__ == '__main__':
     prepare(0,'PU', 8, 1)
