@@ -93,9 +93,13 @@ def analyse():
         print "#2 a batch of datasets"
         picture_type = raw_input(prompt)
         if picture_type == '1':
-
+            print "Enter the folder path that contains the experimental results:"
+            folder_path = raw_input(prompt)
+            #TODO to be accopmlised...
         elif picture_type == '2':
-
+            print "Enter the folder path that contains many different results:"
+            folder_path = raw_input(prompt)
+            #TODO  to be accomplised....
     elif analyse_type == 2:
         print "todo"
     elif analyse_type == 3:
