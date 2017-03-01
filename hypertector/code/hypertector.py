@@ -159,9 +159,8 @@ def predesigned_network(network_type):
         if run_type == 1:
             os.system('clear')
             print "============================================================================================"
-            print "Now gathering network configuration parameters for prior proposed Cube CNN...."
-            print "--------------------------------------------------------------------------------------------"
-            print "enter a sery of numbers of the ratio of training samples, end with an 'e' or 'end', if you want to use the default sequence 1,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90, enter an 'a' or 'all':"
+            print "Enter a sery of numbers of the ratio of training samples, end with an 'e' or 'end',"
+            print "if you want to use the default sequence 1,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90, enter an 'a' or 'all':"
             ratios = []
             temp_ratio = raw_input(prompt)
             if temp_ratio == 'a' or temp_ratio == 'all':
@@ -174,7 +173,7 @@ def predesigned_network(network_type):
 #def run_batch(learning_ratio):
 #            mix_model_svm_ratio = 0
 #            file_name, neighbors = data_util.prepare(learning_ratio)
-            print "now gathering the parameters of the network..."
+#            print "now gathering the parameters of the network..."
 #            neighbors = neighbors + 1
 #            print "the neighbors strategy is: " + str(neighbors)
             print "enter the dataset name:"
@@ -190,6 +189,9 @@ def predesigned_network(network_type):
                     temp_strategy_input = raw_input(prompt)
             #strategy_fixed = raw_input(prompt)
 
+            os.system('clear')
+            print "Now gathering network configuration parameters for prior proposed Cube CNN...."
+            print "--------------------------------------------------------------------------------------------"
             print "enter the number of convolutional neurons:"
             neurons = int(raw_input(prompt))
             print "enter the number of layers you want the CNN to operate convolutional operation:"
@@ -210,15 +212,26 @@ def predesigned_network(network_type):
             print "#1:train a cnn-svm joint framework;"
             print "#2:train a cnn-rf joint framework;"
             print "#3:train both cnn-svm and cnn-rf joint frameworks;"
+            #if network_type == '3':
+            #    print "#4:compare the cube cnn with the new hic framework;"
+            #    print "#5:TODO: train a mix assemble cnn-classifier model."
+            #elif network_type == '1'
             print "#4:TODO: train a mix assemble cnn-classifier model."
+            if network_type == '3':
+                print "#5: run and compare the cube cnn with the new hic framework"
             following_strategy = int(raw_input(prompt))
-            if following_strategy == 4:
+            if network_type == '1' and following_strategy == 4:
                 print "enter the ratio of svm classifier:"
                 mix_model_svm_ratio = int(row_input(prompt))
             tress = 0
             if following_strategy == 2 or following_strategy == 3:
                 print "enter the count of trees you want to set in Random Forest:"
                 trees = int(raw_input(prompt))
+            
+            #if network_type == '3' and following_strategy == 4:
+            #    print "Now gathering parameter for hic network:"
+
+            
 
             ltime = time.localtime()
             time_stamp = str(ltime[0]) + "#" + str(ltime[1]) + "#" + str(ltime[2]) + "#" + str(ltime[3]) + "#" + str(ltime[4])
@@ -265,7 +278,7 @@ def predesigned_network(network_type):
                     #elif neighbor_strategy == 1:
                     #    actual_full_layers = fullLayers / 4
 
-                    file_name = run_batch(dataset_fixed,neighbor_strategy, neurons, neuronLayersCount, maxpoolings,fullLayers, batch_size_inner, learning_ratio, train_decay_inner, epoches, following_strategy, trees, ratios[temp_mark], 2)
+                    file_name = run_batch(file_name,neighbor_strategy, neurons, neuronLayersCount, maxpoolings,fullLayers, batch_size_inner, learning_ratio, train_decay_inner, epoches, following_strategy, trees, ratios[temp_mark], 2)
                     #file_name = run_single(ratios[temp_mark])
                     file.write(file_name + "\n")
                     fileCNNRFResultsPath = file_name + "CNNRFdescription.txt"

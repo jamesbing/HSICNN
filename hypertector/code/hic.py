@@ -139,7 +139,7 @@ def loadData(dataFile, typeId = -1, bShowData = False):
 #currently, I wrote all the network constructing and training and testing in this file#
 #laterly, I will seperate them apart.                                                 #
 #######################################################################################
-def temp_network(filePath, number_of_con_filters,neuronLayers, con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay, batch_size, epoches):
+def temp_network(filePath, neuronLayers, con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay, batch_size, epoches):
     #get the train data, train label, validate data, validate label, test data, test label
     train_dataset, valid_dataset, test_dataset = loadData(filePath + ".mat")
 
@@ -165,21 +165,26 @@ def temp_network(filePath, number_of_con_filters,neuronLayers, con_step_length, 
     file.write("The amount of samples in the dataset is " + str(sample_counts) +".\n")
     file.write("The number of classification classes is " + str(destinations) +".\n")
     file.write("The size of the first convolutional layer is " + str(layer1_input_length)+".\n")
-    file.write('The number of convolutional filters is '+ str(number_of_con_filters)+ ",each kernel sizes "+ str(con_filter_length) + "X1.\n")
     file.write("There are "+str(number_of_full_layer_nodes)+" nodes in the fully connect layer.\n")
 
     print("The network have ", channel_length, "input nodes in the 1st layer.")
     print("The amount of samples in the dataset is ", sample_counts)
     print("The number of classification classes is ", destinations)
     print("The size of the first convolutional layer is ", layer1_input_length)
-    print('The number of convolutional filters is ', number_of_con_filters, ",each kernel sizes ", con_filter_length,"X1.")
     print("There are ",number_of_full_layer_nodes," nodes in the fully connect layer.")
     #########################
     #Construct the CNN model# 
     #########################
+##################################################################################################################
+    model_not_use = Sequential()
+    layer_not_in_use = Convolution2D(20,nb_row = con_filter_length, nb_col = 1,border_mode='same', subsample=(con_filter_length,1),dim_ordering='th', bias=True,input_shape=(1,layer1_input_length, 1))
+    model_not_use.add(layer_not_in_use)
+    number_of_con_filters = layer_not_in_use.output_shape[2]
+##################################################################################################################
+    file.write('The number of convolutional filters is '+ str(number_of_con_filters)+ ",each kernel sizes "+ str(con_filter_length) + "X1.\n")
     
     model = Sequential()
-    
+   
     #the first convolutional layer
     layer1 = Convolution2D(number_of_con_filters,nb_row = con_filter_length, nb_col = 1,border_mode='same', subsample=(con_filter_length,1),dim_ordering='th', bias=True,input_shape=(1,layer1_input_length, 1))
     
@@ -279,7 +284,7 @@ def temp_network(filePath, number_of_con_filters,neuronLayers, con_step_length, 
     return classes,test_dataset_label    
 
 def network(path, con_step_length, max_pooling_feature_map_size, fullLayerSize, batch_size, learning_ratio, train_decay, epoches):
-    return temp_network(path, number_of_con_filters = 20, con_step_length = con_step_length, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = fullLayerSize, learning_ratio = learning_ratio, train_decay = train_decay, batch_size = batch_size,epoches = epoches)
+    return temp_network(path, con_step_length = con_step_length, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = fullLayerSize, learning_ratio = learning_ratio, train_decay = train_decay, batch_size = batch_size,epoches = epoches)
 
 def run_sub():
     for mark in range(15,31):
@@ -287,7 +292,7 @@ def run_sub():
         file4pixel = "newKSC" + str(mark) + "N4"
 	network(file4pixel, 5, 40, 10)
 
-def run_network(datafile,neurons, neuronLayers, neighbors, maxPoolingSize, fullLayerSize, batch_size, learning_ratio, train_decay,epoches):
+def run_network(datafile, neuronLayers, neighbors, maxPoolingSize, fullLayerSize, batch_size, learning_ratio, train_decay,epoches):
         print("=============== hic structure based ===============")
         f = open(datafile +"CNNTimeCounting.txt",'wb')
         print("现在执行的数据集是" + datafile +".mat, bling bling~~")
@@ -295,7 +300,7 @@ def run_network(datafile,neurons, neuronLayers, neighbors, maxPoolingSize, fullL
         f.write('start to train.......')
         startTime = time.clock()
         f.write('start time: ' + str(startTime) + '\n')
-        temp_network(datafile, neurons, neuronLayers, neighbors, maxPoolingSize, fullLayerSize, learning_ratio, train_decay, batch_size, epoches)
+        temp_network(datafile, neuronLayers, neighbors, maxPoolingSize, fullLayerSize, learning_ratio, train_decay, batch_size, epoches)
         endTime = time.clock()
         f.write('end time: ' + str(endTime) + '\n')
         f.write('total time: ' + str(endTime - startTime))
@@ -303,4 +308,4 @@ def run_network(datafile,neurons, neuronLayers, neighbors, maxPoolingSize, fullL
         print('total time ：' + str(endTime - startTime))
 
 if __name__ == '__main__':
-    run_network("../experiments/KSC_1_10_2017_3_1_16_29/KSC_1_10", 100, 2, 1, 2, 100, 10, 0.001, 0.000001, 100)
+    run_network("../experiments/KSC_1_10_2017_3_1_16_29/KSC_1_10",5, 1, 2, 100, 1, 0.0001, 0.00000001, 500)
