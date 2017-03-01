@@ -4,16 +4,24 @@
 from __future__ import print_function
 import numpy
 import time
+#import theano
+#theano.config.device = 'gpu'
+#theano.config.floatX = 'float32'
 
 from keras.models import Sequential
 from keras.layers.core import Dense,Dropout,Activation,Flatten
 from keras.layers.convolutional import Convolution2D, MaxPooling2D, Convolution1D, MaxPooling1D, Convolution3D, MaxPooling3D
 from keras.optimizers import SGD
+#import imdb
+#from keras.processing import sequence
+#from keras.layers.Activation import tanh, softmax
+
 from keras.utils import np_utils
 
 import scipy.io as sio
 import random
 import math
+
 import scipy.io as sio
 
 ##################################################
@@ -29,6 +37,15 @@ def build_CNN_model(layers, loss, optimizer):
     
     return model
 
+##########################################################
+#This function is used to train the constructed CNN model#
+##########################################################
+#def train_model(model, x_train, y _train, x_val, y_val, batch_size,nb_epoch):
+#    model.fit(x_train, y_train, batch_size = batch_size,
+#             nb_epoch = nb_epoch, show_accuracy=True,verbose=1,
+#             validation_data=(x_val, y_val))
+
+
 ################################
 #按照数据预处理的格式，装载数据#
 ################################
@@ -37,12 +54,34 @@ def loadData(dataFile, typeId = -1, bShowData = False):
 
     train_data = data['DataTr']
     train_label_temp = data['CIdTr'][0,:]
+#    train_label = train_label[0,:]
+#    return train_data,train_label
+#    train_set = [train_data, train_label]
 
     test_data = data['DataTe']
     test_label_temp = data['CIdTe'][0,:]
+#    test_set = [test_data, test_label]
 
     valid_data = data['DataTr']
     valid_label_temp = data['CIdTr'][0,:]
+#    valid_set = [valid_data, valid_label]
+
+#    def shared_dataset(data_xy, borrow=True):
+#        data_x, data_y = data_xy
+#        shared_x = theano.shared(numpy.asarray(data_x,dtype=theano.config.floatX))
+#        shared_y = theano.shared(numpy.asarray(data_y,dtype='int32'))
+#        return shared_x, shared_y
+
+#   test_set_x, test_set_y = shared_dataset(test_set)
+#    valid_set_x, valid_set_y = shared_dataset(valid_set)
+#    train_set_x, train_set_y = shared_dataset(train_set)
+
+#   rval = [(train_set_x, train_set_y), (valid_set_x, valid_set_y), (test_set_x, test_set_y)]
+    
+
+#    train_dataset_data = train_data.tolist()
+#    test_dataset_data = test_data.tolist()
+#    valid_dataset_data = valid_data.tolist()
     
     train_label = numpy.empty(len(train_label_temp))
     valid_label = numpy.empty(len(valid_label_temp))
@@ -60,6 +99,7 @@ def loadData(dataFile, typeId = -1, bShowData = False):
         train_label[count] = int(train_label_temp[count])
         count = count + 1
     train_dataset_data = nX
+#    testTemp = numpy.array(nX[:len(nX)])
 
     valid_dataset_data = []
     nX = []
@@ -73,6 +113,7 @@ def loadData(dataFile, typeId = -1, bShowData = False):
         valid_label[count] = int(valid_label_temp[count])
         count = count + 1
     valid_dataset_data = nX
+
 
     test_dataset_data = []
     nX = []
@@ -92,9 +133,17 @@ def loadData(dataFile, typeId = -1, bShowData = False):
     valid_dataset_data = numpy.array(valid_dataset_data)
 
     return [(train_dataset_data, train_label),(valid_dataset_data,valid_label),(test_dataset_data,test_label)]
+#    return rval
 
+#######################################################################################
+#currently, I wrote all the network constructing and training and testing in this file#
+#laterly, I will seperate them apart.                                                 #
+#######################################################################################
 def temp_network(filePath, number_of_con_filters,neuronLayers, con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay, batch_size, epoches):
+    #get the train data, train label, validate data, validate label, test data, test label
     train_dataset, valid_dataset, test_dataset = loadData(filePath + ".mat")
+
+
     #the dimension of the input signal's chanel
     channel_length = train_dataset[0].shape[1]
     sample_counts = train_dataset[0].shape[0]
@@ -139,19 +188,23 @@ def temp_network(filePath, number_of_con_filters,neuronLayers, con_step_length, 
     model.add(layer1)
 
     model.add(Activation('tanh'))
+    
+    #from here on, modify the prior CCS/CCR network structure into HIC, proposed by Prof. Bai Gang on 2017/3/1.
 
+    #将第一层的卷积层输出的数据，重新看做是一张图片，然后后面再对这张由由卷积输出的矩阵拼接成的图像进行卷积操作。
+    first_feature_map_size = (layer1_input_length - con_filter_length) / con_step_length + 1
+    model.add(Reshape(first_feature_map_size,number_of_con_filters))
 
+    #这样就相当于重新将输出结果组织成了一个新的普通的图像。
+    #然后再用类似于对黑白图像的卷积方法，用一个3X3的固定大小的卷积核对其进行卷积->下采样->全连接->输出操作。
+    #暂时先将这个卷积层的卷积核数量固定为20,大小固定为9X9
+    number_of_con_filters_second = 20
+    second_kernel_size = 9
+    layer_con_2 = Convolution2D(number_of_con_filters_second, nb_row = second_kernel_size, nb_col = second_kernel_size, border_mode='valid',subsample=(1,1),dim_ordering='th',bias=True,input_shape=(1,first_feature_map_size, number_of_con_filters))
 
     #the max pooling layer after the first convolutional layer
     first_feature_map_size = (layer1_input_length - con_filter_length) / con_step_length + 1
     print ("After the convolutional operation, the length of the feature map size is: " + str(first_feature_map_size))
-
-    # the hic network starts here to modify based on prior network structure.
-
-
-
-
-
 #    max_pooling_kernel_size = int(math.ceil(first_feature_map_size / max_pooling_feature_map_size))
     max_pooling_kernel_size = int(max_pooling_feature_map_size)
     print("The max pooling kernel size is ", max_pooling_kernel_size)
@@ -227,7 +280,7 @@ def run_sub():
 	network(file4pixel, 5, 40, 10)
 
 def run_network(datafile,neurons, neuronLayers, neighbors, maxPoolingSize, fullLayerSize, batch_size, learning_ratio, train_decay,epoches):
-
+        print("=============== hic structure based ===============")
         f = open(datafile +"CNNTimeCounting.txt",'wb')
         print("现在执行的数据集是" + datafile +".mat, bling bling~~")
         f.write('------------------------------------------------------\n')
@@ -241,5 +294,5 @@ def run_network(datafile,neurons, neuronLayers, neighbors, maxPoolingSize, fullL
         f.close()
         print('total time ：' + str(endTime - startTime))
 
-def hic():
-    print ("==========based on the HIC network structure=========")
+if __name__ == '__main__':
+    run_network()

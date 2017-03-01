@@ -141,8 +141,8 @@ def run_batch(datasetName,strategies, neurons, neuronLayersCount, maxpoolings, f
     file.close()
     return file_name
 
-#if __name__ == '__main__':
-def predesigned_network_CCS_CCR():
+def predesigned_network(network_type):
+    print "running mode:" + network_type
     prompt = ">"
     print "What kind of operation you want to run?"
     print "#1 Run a single experiment;" 
@@ -291,9 +291,10 @@ def predesigned_network_CCS_CCR():
     elif if_batch == 3:
         os.system('clear')
         analyse.analyse()
-def predesigned_network_HIC():
-    print "this network structure is designed based on the image type which proposed by Prof. Baigang on 2017,3,1."
-    hic.hic()
+
+#def predesigned_network_HIC():
+#    print "this network structure is designed based on the image type which proposed by Prof. Baigang on 2017,3,1."
+    hic.run_network()
 
 if __name__ == '__main__':
     prompt = '>'
@@ -302,14 +303,27 @@ if __name__ == '__main__':
     print "#2 do an experiment with a new framework"
     work_type = raw_input(prompt)
     if work_type == '1':
+        predesigned_type = ''
         print "Want to:"
-        print "#1 Operate CCS or CCR, or"
-        print "#2 Operate HIC:"
+        print "#1 Operate CCS and CCR, or"
+        print "#2 Operate HIC, or"
+        print "#3 Operate both."
         predesigned_type = raw_input(prompt)
-        if predesigned_type == '1':
-            predesigned_network_CCS_CCR()
-        elif predesigned_type == '2':
-            predesigned_network_HIC()
+        while predesigned_type != '1' and predesigned_type != '2' and predesigned_type != '3':
+            print "Entered wrong code, reenter please..."
+            print "Want to:"
+            print "#1 Operate CCS and CCR, or"
+            print "#2 Operate HIC, or"
+            print "#3 Operate both."
+            predesigned_type = raw_input(prompt)
+        predesigned_network(predesigned_type)
+        #if predesigned_type == '1':
+        #    predesigned_network_CCS_CCR()
+        #elif predesigned_type == '2':
+        #    predesigned_network_HIC()
+        #elif predesigned_type == '3':
+        #    predesigned_network_CCS_CCR()
+        #    predesigned_network_HIC()
     elif work_type == '2':
         print "Choose the backend you want to use first, caffe, tensorflow or theano:"
         print "#1 caffe; #2 tensorflow; #3 theano"
