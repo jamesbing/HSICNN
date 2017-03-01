@@ -9,6 +9,7 @@ import cnnrf
 import time
 import analyse
 import os
+import hic
 
 from sys import argv
 
@@ -292,6 +293,7 @@ def predesigned_network_CCS_CCR():
         analyse.analyse()
 def predesigned_network_HIC():
     print "this network structure is designed based on the image type which proposed by Prof. Baigang on 2017,3,1."
+    hic.hic()
 
 if __name__ == '__main__':
     prompt = '>'
@@ -309,4 +311,6 @@ if __name__ == '__main__':
         elif predesigned_type == '2':
             predesigned_network_HIC()
     elif work_type == '2':
-        print "this part is under development, please wait..."
+        print "Choose the backend you want to use first, caffe, tensorflow or theano:"
+        print "#1 caffe; #2 tensorflow; #3 theano"
+        print "TODO"
