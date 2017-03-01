@@ -9,7 +9,7 @@ import time
 #theano.config.floatX = 'float32'
 
 from keras.models import Sequential
-from keras.layers.core import Dense,Dropout,Activation,Flatten
+from keras.layers.core import Dense,Dropout,Activation,Flatten,Reshape
 from keras.layers.convolutional import Convolution2D, MaxPooling2D, Convolution1D, MaxPooling1D, Convolution3D, MaxPooling3D
 from keras.optimizers import SGD
 #import imdb
@@ -181,35 +181,43 @@ def temp_network(filePath, number_of_con_filters,neuronLayers, con_step_length, 
     model = Sequential()
     
     #the first convolutional layer
-    layer1 = Convolution2D(number_of_con_filters,nb_row = con_filter_length, nb_col = 1,border_mode='valid', subsample=(1,1),dim_ordering='th', bias=True,input_shape=(1,layer1_input_length, 1))
+    layer1 = Convolution2D(number_of_con_filters,nb_row = con_filter_length, nb_col = 1,border_mode='same', subsample=(con_filter_length,1),dim_ordering='th', bias=True,input_shape=(1,layer1_input_length, 1))
+    
 
     print("The input to the first convolutional layer shapes", (1,layer1_input_length,1))
     file.write("The input to the first convolutional layer shapes 1X" + str(layer1_input_length) + "X1.\n"  )
     model.add(layer1)
 
     model.add(Activation('tanh'))
-    
+
+    print("the input and  output of the first convolutional layer shapes:" +str(layer1.input_shape) + "," + str(layer1.output_shape))
     #from here on, modify the prior CCS/CCR network structure into HIC, proposed by Prof. Bai Gang on 2017/3/1.
 
     #将第一层的卷积层输出的数据，重新看做是一张图片，然后后面再对这张由由卷积输出的矩阵拼接成的图像进行卷积操作。
-    first_feature_map_size = (layer1_input_length - con_filter_length) / con_step_length + 1
-    model.add(Reshape(first_feature_map_size,number_of_con_filters))
+    #row_of_reshape = int(math.ceil(layer1_input_length / con_filter_length))
+    row_of_reshape = layer1.output_shape[2]
+    print("my defination is :" + str(row_of_reshape))
+    
+    hic_reshape_layer = Reshape((1,row_of_reshape, int(number_of_con_filters)))
+#    model.add(Reshape((row_of_reshape,int(number_of_con_filters))))
+    model.add(hic_reshape_layer)
+    print("after reshape, the image shapes:" + str(hic_reshape_layer.output_shape))
 
     #这样就相当于重新将输出结果组织成了一个新的普通的图像。
     #然后再用类似于对黑白图像的卷积方法，用一个3X3的固定大小的卷积核对其进行卷积->下采样->全连接->输出操作。
     #暂时先将这个卷积层的卷积核数量固定为20,大小固定为9X9
     number_of_con_filters_second = 20
     second_kernel_size = 9
-    layer_con_2 = Convolution2D(number_of_con_filters_second, nb_row = second_kernel_size, nb_col = second_kernel_size, border_mode='valid',subsample=(1,1),dim_ordering='th',bias=True,input_shape=(1,first_feature_map_size, number_of_con_filters))
-
+    layer_con_2 = Convolution2D(number_of_con_filters_second, nb_row = second_kernel_size, nb_col = second_kernel_size, border_mode='same',subsample=(second_kernel_size,second_kernel_size),dim_ordering='th',bias=True)
+    model.add(layer_con_2)
     #the max pooling layer after the first convolutional layer
-    first_feature_map_size = (layer1_input_length - con_filter_length) / con_step_length + 1
-    print ("After the convolutional operation, the length of the feature map size is: " + str(first_feature_map_size))
+    #first_feature_map_size = (layer1_input_length - con_filter_length) / con_step_length + 1
+    #print ("After the convolutional operation, the length of the feature map size is: " + str(first_feature_map_size))
 #    max_pooling_kernel_size = int(math.ceil(first_feature_map_size / max_pooling_feature_map_size))
     max_pooling_kernel_size = int(max_pooling_feature_map_size)
     print("The max pooling kernel size is ", max_pooling_kernel_size)
     file.write("The max pooling kernel size is " + str(max_pooling_kernel_size) +".\n")
-    layer2 = MaxPooling2D(pool_size = (max_pooling_kernel_size,1), strides=(max_pooling_kernel_size,1), border_mode='valid',dim_ordering='th')
+    layer2 = MaxPooling2D(pool_size = (max_pooling_kernel_size,max_pooling_kernel_size), strides=(max_pooling_kernel_size,max_pooling_kernel_size), border_mode='valid',dim_ordering='th')
     model.add(layer2)
 
     #Flatten the variables outputed from maxpooling layer
@@ -295,4 +303,4 @@ def run_network(datafile,neurons, neuronLayers, neighbors, maxPoolingSize, fullL
         print('total time ：' + str(endTime - startTime))
 
 if __name__ == '__main__':
-    run_network()
+    run_network("../experiments/KSC_1_10_2017_3_1_16_29/KSC_1_10", 100, 2, 1, 2, 100, 10, 0.001, 0.000001, 100)

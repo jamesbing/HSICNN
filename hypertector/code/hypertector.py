@@ -157,6 +157,10 @@ def predesigned_network(network_type):
         print "#1: fixed CNN, different ratio; #2:..."
         run_type = int(raw_input(prompt))
         if run_type == 1:
+            os.system('clear')
+            print "============================================================================================"
+            print "Now gathering network configuration parameters for prior proposed Cube CNN...."
+            print "--------------------------------------------------------------------------------------------"
             print "enter a sery of numbers of the ratio of training samples, end with an 'e' or 'end', if you want to use the default sequence 1,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90, enter an 'a' or 'all':"
             ratios = []
             temp_ratio = raw_input(prompt)
@@ -296,7 +300,6 @@ def predesigned_network(network_type):
 
 #def predesigned_network_HIC():
 #    print "this network structure is designed based on the image type which proposed by Prof. Baigang on 2017,3,1."
-    hic.run_network()
 
 if __name__ == '__main__':
     prompt = '>'
@@ -309,7 +312,7 @@ if __name__ == '__main__':
         print "Want to:"
         print "#1 Operate CCS and CCR, or"
         print "#2 Operate HIC, or"
-        print "#3 Operate both."
+        print "#3 Operate both and compare them."
         predesigned_type = raw_input(prompt)
         while predesigned_type != '1' and predesigned_type != '2' and predesigned_type != '3':
             print "Entered wrong code, reenter please..."
