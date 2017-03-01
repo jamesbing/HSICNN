@@ -141,7 +141,7 @@ def run_batch(datasetName,strategies, neurons, neuronLayersCount, maxpoolings, f
     return file_name
 
 #if __name__ == '__main__':
-def predesigned_network():
+def predesigned_network_CCS_CCR():
     prompt = ">"
     print "What kind of operation you want to run?"
     print "#1 Run a single experiment;" 
@@ -290,14 +290,23 @@ def predesigned_network():
     elif if_batch == 3:
         os.system('clear')
         analyse.analyse()
+def predesigned_network_HIC():
+    print "this network structure is designed based on the image type which proposed by Prof. Baigang on 2017,3,1."
 
 if __name__ == '__main__':
     prompt = '>'
     print "Want to: "
-    print "#1 use the predesigned network for the CCS and CCR, or"
+    print "#1 use the predesigned network, or"
     print "#2 do an experiment with a new framework"
     work_type = raw_input(prompt)
     if work_type == '1':
-        predesigned_network()
+        print "Want to:"
+        print "#1 Operate CCS or CCR, or"
+        print "#2 Operate HIC:"
+        predesigned_type = raw_input(prompt)
+        if predesigned_type == '1':
+            predesigned_network_CCS_CCR()
+        elif predesigned_type == '2':
+            predesigned_network_HIC()
     elif work_type == '2':
         print "this part is under development, please wait..."
