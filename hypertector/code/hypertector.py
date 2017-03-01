@@ -13,7 +13,7 @@ import hic
 
 from sys import argv
 
-def run_single(learning_ratio):
+def run_single(learning_ratio, network_type):
 
     prompt = '>'
     #mix_model_svm_ratio是为了以后采用组合混合模型的时候，保存一个svm在所有模型中的占比。以后根据需求进行扩充。。。TODO
@@ -62,8 +62,10 @@ def run_single(learning_ratio):
         trees = int(raw_input(prompt))
 
     print "starting ..."
-    HSICNN.run_network(file_name, neurons,neuronLayersCount, neighbors, maxpoolings, fullLayers,batch_size, learning, train_decay, epoches)
-
+    if network_type == '1':
+        HSICNN.run_network(file_name, neurons,neuronLayersCount, neighbors, maxpoolings, fullLayers,batch_size, learning, train_decay, epoches)
+    elif network_type == '2':
+        hic.run_network(file_name, neurons,neuronLayersCount, neighbors, maxpoolings, fullLayers,batch_size, learning, train_decay, epoches)
     print "the training of the network have done."
 
     if following_strategy == 1 and following_strategy != 5:
@@ -150,7 +152,7 @@ def predesigned_network(network_type):
     print "#3 analyse existing experimental results or doing further experiments on existing data"
     if_batch = int(raw_input(prompt))
     if if_batch == 1:
-        run_single(0)
+        run_single(0, network_type)
     elif if_batch == 2:
         print "#1: fixed CNN, different ratio; #2:..."
         run_type = int(raw_input(prompt))
