@@ -316,6 +316,13 @@ def predesigned_network(network_type):
 
 if __name__ == '__main__':
     prompt = '>'
+    
+    #TODO choose the deep learning framework or backend.
+    print "==========NK-Hyperspector Hyperspectral Image Analysis And Experimental Tool=========="
+    print "Choose The Backend or deep learning framework:"
+    print "#1. Caffe  #2. Tensorflow  #3. Theano  #4. Both of them and compare."
+    backend_type = raw_input(prompt)
+
     print "Want to: "
     print "#1 use the predesigned network, or"
     print "#2 do an experiment with a new framework"
