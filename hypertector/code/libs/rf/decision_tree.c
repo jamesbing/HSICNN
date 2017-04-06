@@ -9,7 +9,7 @@
 #include<malloc.h>
 #include<string.h>
 #include<math.h>
-
+#include<stdlib.h>
 //define the bool type
 typedef enum {false = 0, true = 1} bool;
 
@@ -19,9 +19,12 @@ typedef enum {false = 0, true = 1} bool;
 #define Len 20
 
 //define the structure of a node in decision tree
+//split_attribute:表示该节点用于划分数据的特征
+//is_leaf_node:用于说明本节点是否为叶子节点
+//class_id:用于记录结点中样本的类别，主要是用在是叶子节点用于分类时
 struct TreeNode{
-    int position;
-    bool if_leaf_node;
+    int split_attribute;
+    bool is_leaf_node;
     int class_id;
     struct TreeNode* child[Max_Attributes];
 };
@@ -35,7 +38,16 @@ struct TreeNode{
 
  }
 
+/*
+ *取得某个数据集中，属于哪个类别的样本数目最多
+ */
+ int get_most_class(D)
+ {
+     int class = 0;
 
+
+     return class;
+ }
 
 /*
  *构造决策树
@@ -52,16 +64,35 @@ struct TreeNode{
  struct TreeNode* BuildTree(int D, int A[], int threshold)
  {
      struct TreeNode *T;
+     T = (struct TreeNode *)malloc(sizeof(struct TreeNode));
     
-     //判断D中的所有实例是否属于同一类C，若是，则置T为但节点数，并将C作为该节点的类，返回T
+     //判断D中的所有实例是否属于同一类C，若是，则置T为单节点树，并将C作为该节点的类，返回T
     if (same_class())
-     //
+     {
+         T->is_leaf_node = true;
+         //TODO：这儿应该是将类别取出赋给class_id，但是由于数据格式不确定，暂时先空着
+         T->class_id = D[0]; 
+         return T;
+         
+     }
+    //判断特征集是否为空，若特征集为空，则将T置为单节点树，并将D中包含样本数量最多的类C作为该节点的类，返回T
+    if (sizeof(A) == 0)
+     {
+         T->is_leaf_node = true;
+         T->class_id = get_most_class(D);
+         return T;
+     }
 
-
+    //上述两条判断都不成立，则进行数据集的分裂
+    //挑选数据集中用于划分节点的属性
+    T->
+     
      return T;
  }
 
 int main()
 {
+    //读取输入训练数据集
+    
     printf("Construct decision tree...\n");
 }
