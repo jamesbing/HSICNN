@@ -124,8 +124,9 @@ float *get_all_values(float A[], int chosen_attribute, struct sample D[])
        return T;
     }else{
         printf("取得划分依据，并依据该特征：%d所有的值对数据集进行重新划分....\n",chosen_attribute);
-        //拿到chosen_attribute所有可能的取值，放到all_values_in_attribute[]中暂存
+        //拿到chosen_attribute所有可能的取值，放到all_values_in_attribute[]中暂存，并排序
         float all_values_in_attribute[] = get_all_values(A, chosen_attribute, D);
+        //将
 
         
     }
