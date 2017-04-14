@@ -278,8 +278,8 @@ def predesigned_network(network_type):
                     #elif neighbor_strategy == 1:
                     #    actual_full_layers = fullLayers / 4
 
-                    file_name = run_batch(file_name,neighbor_strategy, neurons, neuronLayersCount, maxpoolings,fullLayers, batch_size_inner, learning_ratio, train_decay_inner, epoches, following_strategy, trees, ratios[temp_mark], 2)
-                    #file_name = run_single(ratios[temp_mark])
+                    file_name = run_batch(dataset_fixed,neighbor_strategy, neurons, neuronLayersCount, maxpoolings,fullLayers, batch_size_inner, learning_ratio, train_decay_inner, epoches, following_strategy, trees, ratios[temp_mark], 2)
+                    #file_name = run_single(ratitemp_mark])
                     file.write(file_name + "\n")
                     fileCNNRFResultsPath = file_name + "CNNRFdescription.txt"
                     if following_strategy == 3:
