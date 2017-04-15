@@ -169,7 +169,8 @@ def predesigned_network(network_type):
                 while temp_ratio != 'e' and temp_ratio != 'end':
                     ratios.append(int(temp_ratio))
                     temp_ratio = raw_input(prompt)
-            ratios = temp_ratio
+            #ratios = temp_ratio
+            print ratios
 #def run_batch(learning_ratio):
 #            mix_model_svm_ratio = 0
 #            file_name, neighbors = data_util.prepare(learning_ratio)
