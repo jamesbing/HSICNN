@@ -218,7 +218,8 @@ def temp_network(filePath, number_of_con_filters,neuronLayers, con_step_length, 
     model.add(layer5)
 
     #the optimizer
-    sgd = SGD(lr = learning_ratio, decay = train_decay, momentum = 0.6, nesterov=True)
+#    sgd = SGD(lr = learning_ratio, decay = train_decay, momentum = 0.6, nesterov=True)
+    sgd = SGD(lr = learning_ratio, decay = train_decay, momentum = 0.9, nesterov=True)
 
     model.compile(optimizer=sgd, loss='categorical_crossentropy',metrics=['accuracy'])
 
