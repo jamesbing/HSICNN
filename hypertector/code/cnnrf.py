@@ -372,21 +372,21 @@ def run(filename, trees, neurons, conLayers, neighbors, max_pooling_feature_map_
 
     file.write("---------------------详细结果-----------------------\n")
 
-    file.write(str(cnnrftraintime1) + "\n")
+    file.write("CCR训练耗时：" + str(cnnrftraintime1) + "\n")
 
-    file.write(str(cnnrftesttime1) + "\n")
+    file.write("CCR测试耗时：" + str(cnnrftesttime1) + "\n")
 
-    file.write(str(cnnrfacc1) + "\n")
+    file.write("CCR测试精度：" + str(cnnrfacc1) + "\n")
 
-    file.write(str(rftraintime1) + "\n")
+    file.write("RF训练耗时：" + str(rftraintime1) + "\n")
 
-    file.write(str(rftesttime1) + "\n")
+    file.write("RF测试耗时：" + str(rftesttime1) + "\n")
 
-    file.write(str(rfacc1) + "\n")
+    file.write("RF测试精度：" + str(rfacc1) + "\n")
 
-    file.write(str(cnntesttime1) + "\n")
+    file.write("CNN测试耗时：" + str(cnntesttime1) + "\n")
 
-    file.write(str(cnnacc1) + "\n")
+    file.write("CNN测试精度：" + str(cnnacc1) + "\n")
 
     file.close
 
