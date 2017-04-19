@@ -248,6 +248,11 @@ def loadData(path, strategy):
     print 'data loaded.'
     print 'spectral length now is: ' + str(len((DataList[0][0])))
     print 'neighbor strategy ' + str(neighbors)
+    #DataList 用于存放数据和类别的二维List
+    #neighbors 近邻策略
+    #PositionList 用于存储位置信息的向量
+    #rows 高光谱图像行数
+    #lines 高光谱图像列数
     return DataList, neighbors, PositionList, rows, lines
 
 
