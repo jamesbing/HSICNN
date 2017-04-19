@@ -90,11 +90,16 @@ def loadData(path, strategy):
     print 'the spectral bands in this dataset is ' + str(len(DataSet[0][0]))
     
     #define many lists which number equals to maxClass,put it in a list
+    #return shuffledDataList, neighbors, shuffledPositionList, rows, lines
     DataList = []
     PositionList = []
+    shuffledDataList = []
+    shuffledPositionList = []
     for mark in range(maxClass):
         DataList.append([])
         PositionList.append([])
+        shuffledDataList.append([])
+        shuffledPositionList.append([])
 
     #newDataset = np.array((Dataset.shape[0]))
 #    newLabels = np.array()
@@ -253,8 +258,57 @@ def loadData(path, strategy):
     #PositionList 用于存储位置信息的向量
     #rows 高光谱图像行数
     #lines 高光谱图像列数
-    return DataList, neighbors, PositionList, rows, lines
+    #进行shuffle  TODO后期将shuffle抽取出来，删掉之前的几个重复的shuffle，统一成一些函数。
 
+    #shuffledDataList = []
+    #shuffledPositionList = []
+   
+    shuffledDataList = DataList
+    shuffledPositionList = PositionList
+    print 'call data shuffling function...'
+    
+    for shuffleMarkCount in range(len(DataList)):
+
+        tempDataList, tempPositionList = shuffling_tow_list(DataList[shuffleMarkCount], PositionList[shuffleMarkCount])
+        print len(tempDataList)
+        print len(tempPositionList)
+        shuffledDataList[shuffleMarkCount] = tempDataList
+        shuffledPositionList[shuffleMarkCount] = tempPositionList
+    
+    #print len(shuffledDataList)
+
+    return shuffledDataList, neighbors, shuffledPositionList, rows, lines
+
+def shuffling_tow_list(dataList, PositionList):
+#    print PositionList[0]
+    print 'shuffling data...'
+#    shuffledA = []
+#    shuffledB = []
+#    for mark in range():
+#        DataList.append([])
+#        PositionList.append([])
+
+    #if(len(listA) == len(positionList) != True):
+    #    print 'The length of two lists does not match.'
+    #    return 0
+    listA = dataList
+    listB = PositionList
+    matched_length = len(listA)
+    shuffleMark = range(matched_length)
+    shuffledA = listA
+    shuffledB = listB
+    #print shuffleMark
+    reloadMark = 0
+    shuffle(shuffleMark)
+    for tempCount in shuffleMark:
+        #print len(listB[tempCount])
+        shuffledA[reloadMark] = (listA[tempCount])
+        shuffledB[reloadMark] = (listB[tempCount])
+        reloadMark = reloadMark + 1
+
+    print 'shuffled.'
+#    print len(shuffledA)
+    return shuffledA, shuffledB
 
 def shuffling(dataList,ids, positionList):
     print 'shuffling data...'
@@ -368,17 +422,6 @@ def prepareMatList(list, positions):
             for actual_Position in sub_sub_positions:
             #    print str(len(actual_Positions))
                 Positions.append(actual_Position)
-
-
-    # shuffle
-    #liMark = range(len(Data))
-    #shuffle(liMark)
-    #flagCursor = 0
-    #newData = []
-    #newCId = []
-    #for tempCount in liMark:
-    #    newData.append(Data[tempCount])
-    #    newCId.append(CId[tempCount])
     
     newData, newCId, newPositions = shuffling(Data, CId, Positions)
     
@@ -504,6 +547,8 @@ def prepare(learning_ratio, data_set, neighbors, dataset_format):
             dataList, inner_neighbors, positionList, rows, lines = loadData(path, neighbors)
             #for testing purpose:print positionList
             #shuffledDataList, shuffledPositionList = shuffling(dataList, positionList)
+            print len(dataList[0])
+            print len(positionList[0])
             realPath, wrong_neighbor = assembleData(dataList, positionList, path, inner_neighbors, learning_ratio, dataset_format)
             #realPath = path + '_' + str(neighbors) + '_' + str(train_ratio)i
             print "the dataset is stored in " + realPath + ".mat"
@@ -518,4 +563,4 @@ def prepare(learning_ratio, data_set, neighbors, dataset_format):
         return realPath, neighbors, raws, lines
 
 if __name__ == '__main__':
-    prepare(0,'PU', 8, 1)
+    prepare(0,'KSC', 8, 2)
