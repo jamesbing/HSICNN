@@ -368,17 +368,27 @@ def complete_experiments():
     else:
         #读取目录下所有的文件或者文件夹
         dirList = []
+        perform_dir_list = ''
+        complete_type = ''
         for temp_content in os.listdir(true_file_path):
-            if os.path.isdir(temp_content):
+            if os.path.isdir(os.path.join(true_file_path,temp_content)):
+                print "目录" + temp_content
                 dirList.append(temp_content)
-#        dirList = os.listdir(true_file_path)
+
+        #判断是多组实验还是一个实验的逻辑
         if len(dirList) > 0:
-            print "Multiple experiments selected, folders:"
-            print dirList
+            complete_type = 'multiple'
+            perform_dir_list = dirList
+
         else:
-            print "One experiment selected, folder:"
-            print true_file_path
-        
+            complete_type = 'one'
+            perform_dir_list = true_file_path
+        complete_implement(complete_type, perform_dir_list)
+
+def complete_implement(type, dir):
+    print "Type:" + type + ", as follows:"
+    for temp in dir:
+        print temp
     
 
 if __name__ == "__main__":
