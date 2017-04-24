@@ -315,11 +315,12 @@ def predesigned_network(network_type):
 #def predesigned_network_HIC():
 #    print "this network structure is designed based on the image type which proposed by Prof. Baigang on 2017,3,1."
 
-if __name__ == '__main__':
+def new_experiments():
     prompt = '>'
     
     #TODO choose the deep learning framework or backend.
-    print "==========NK-Hyperspector Hyperspectral Image Analysis And Experimental Tool=========="
+    
+
     print "Choose The Backend or deep learning framework:"
     print "#1. Caffe  #2. Tensorflow  #3. Theano  #4. Both of them and compare."
     backend_type = raw_input(prompt)
@@ -354,3 +355,22 @@ if __name__ == '__main__':
         print "Choose the backend you want to use first, caffe, tensorflow or theano:"
         print "#1 caffe; #2 tensorflow; #3 theano"
         print "TODO"
+
+def complete_experiments():
+    folder_prompt = ">../experiments/"
+    print "Select the experiments folder, if want to perform multi experiments, put their data as sub folders in the selected folder."
+    file_path = raw_input(folder_prompt)
+    
+
+if __name__ == "__main__":
+    prompt = ">"
+    os.system('clear')
+    print "==========NK-Hyperspector Hyperspectral Image Analysis And Experimental Tool=========="
+    print "Want to: "
+    print "#1:Complete experiments on existing data;"
+    print "#2:Do new experiments from scratch."
+    if_new = raw_input(prompt)
+    if if_new == '1':
+        complete_experiments()
+    elif if_new == '2':
+        new_experiments()
