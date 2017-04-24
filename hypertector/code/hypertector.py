@@ -130,7 +130,7 @@ def run_batch(datasetName,strategies, neurons, neuronLayersCount, maxpoolings, f
     file.write("Data set:" + file_name + "#\n")
     file.write("neighbor strategy:" + str(neighbors) + "#\n")
     file.write("Convolutional Neurons:" + str(neurons) + "#\n")
-    file.write("Each Convolutional Neuron operate " + str(neuronLayersCount))
+    file.write("Each Convolutional Neuron operate " + str(neuronLayersCount) + '#\n')
     file.write("Max Polling Kernel Size:" + str(maxpoolings) + "#\n")
     file.write("Full Layer Neuron number:" + str(fullLayers) + "#\n")
     file.write("Batch size of SGD training:" + str(batch_size) + "#\n")
