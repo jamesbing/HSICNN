@@ -390,6 +390,18 @@ def complete_implement(type, dir):
     for temp in dir:
         print temp
     
+    #选择类型
+    #1 已有CNN模型，进行CNN+RF的实验
+    #2 已有CNN模型，进行CNN+SVM的实验
+    #3 对CNN进行训练微调
+    #4 没有RGB图像，补充RGB图像
+    #5 其他暂时没想到的实验
+
+    if type == 'one':
+        #执行一个逻辑
+
+    else:
+        #执行一组的逻辑
 
 if __name__ == "__main__":
     prompt = ">"
