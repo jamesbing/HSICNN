@@ -13,6 +13,8 @@ import hic
 
 from sys import argv
 
+experiment_path_prefix = '../experiments/'
+
 def run_single(learning_ratio, network_type):
 
     prompt = '>'
@@ -360,6 +362,23 @@ def complete_experiments():
     folder_prompt = ">../experiments/"
     print "Select the experiments folder, if want to perform multi experiments, put their data as sub folders in the selected folder."
     file_path = raw_input(folder_prompt)
+    true_file_path = experiment_path_prefix + file_path
+    if os.path.exists(true_file_path) != True:
+        print "Folder path \"" + true_file_path + "\" does not exist. Program termanited."
+    else:
+        #读取目录下所有的文件或者文件夹
+        dirList = []
+        for temp_content in os.listdir(true_file_path):
+            if os.path.isdir(temp_content):
+                dirList.append(temp_content)
+#        dirList = os.listdir(true_file_path)
+        if len(dirList) > 0:
+            print "Multiple experiments selected, folders:"
+            print dirList
+        else:
+            print "One experiment selected, folder:"
+            print true_file_path
+        
     
 
 if __name__ == "__main__":
