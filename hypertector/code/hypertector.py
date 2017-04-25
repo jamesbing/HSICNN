@@ -399,8 +399,10 @@ def complete_implement(type, dir):
 
     if type == 'one':
         #执行一个逻辑
+        print ""
 
     else:
+        print ""
         #执行一组的逻辑
 
 if __name__ == "__main__":
