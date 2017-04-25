@@ -373,7 +373,7 @@ def complete_experiments():
         for temp_content in os.listdir(true_file_path):
             if os.path.isdir(os.path.join(true_file_path,temp_content)):
                 print "目录" + temp_content
-                dirList.append(temp_content)
+                dirList.append(os.path.join(true_file_path,temp_content))
 
         #判断是多组实验还是一个实验的逻辑
         if len(dirList) > 0:
@@ -385,25 +385,36 @@ def complete_experiments():
             perform_dir_list = true_file_path
         complete_implement(complete_type, perform_dir_list)
 
+def complete_operate(operate_type, folder_path):
+    print "Processing " + folder_path
+
 def complete_implement(type, dir):
+    prompt = '>'
     print "Type:" + type + ", as follows:"
     for temp in dir:
         print temp
-    
+    print "Choose operate type:"
+    print "1: CNN+RF based on trained CNN model;"
+    print "2: CNN+SVM based on trained CNN model;"
+    print "3: Fine tune trained CNN network;"
+    print "4: Draw RGB graphs;"
+    print "5: TODO..."
     #选择类型
     #1 已有CNN模型，进行CNN+RF的实验
     #2 已有CNN模型，进行CNN+SVM的实验
     #3 对CNN进行训练微调
     #4 没有RGB图像，补充RGB图像
     #5 其他暂时没想到的实验
-
+    operate_type = raw_input(prompt)
+    
     if type == 'one':
         #执行一个逻辑
-        print ""
+        complete_operate(operate_type, dir)
 
     else:
-        print ""
         #执行一组的逻辑
+        for folder in dir:
+            complete_operate(operate_type, folder)
 
 if __name__ == "__main__":
     prompt = ">"
