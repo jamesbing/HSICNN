@@ -10,10 +10,12 @@ import time
 import analyse
 import os
 import hic
+import scipy.io as sio
 
 from sys import argv
 
 experiment_path_prefix = '../experiments/'
+data_prefix = '../data/'
 
 def run_single(learning_ratio, network_type):
 
@@ -79,7 +81,7 @@ def run_single(learning_ratio, network_type):
         print "now processing the cnn + rf joint framework..."
     #    print "enter the count of trees you want to set in Random Forest:"
     #    trees = int(raw_input(prompt))
-        cnnrf.run(file_name,trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay, raws_size, lines_size)
+        cnnrf.run(file_name,trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, raws_size, lines_size)
     elif following_strategy == 3 != following_strategy != 5:
         #CNN+svm and CNN+RF
         
@@ -87,7 +89,7 @@ def run_single(learning_ratio, network_type):
         cnnsvm.run(file_name, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
 
         print "now processing the cnn + rf joint framework..."
-        cnnrf.run(file_name, trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay, raws_size, lines_size)
+        cnnrf.run(file_name, trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, raws_size, lines_size)
 
     file = open(file_name + "_experiment_description.txt", 'w')
     file.write("-------------Experiment Description-------------\n")
@@ -121,12 +123,12 @@ def run_batch(datasetName,strategies, neurons, neuronLayersCount, maxpoolings, f
         cnnsvm.run(file_name, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
     elif following_strategy == 2:
         print "now processing the cnn + rf joint framework..."
-        cnnrf.run(file_name,trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay, raws_size, lines_size)
+        cnnrf.run(file_name,trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, raws_size, lines_size)
     elif following_strategy == 3:
         print "now processing the cnn + svm joint framework..."
         cnnsvm.run(file_name, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
         print "now processing the cnn + rf joint framework..."
-        cnnrf.run(file_name, trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay, raws_size,lines_size)
+        cnnrf.run(file_name, trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, raws_size,lines_size)
     file = open(file_name + "_experiment_description.txt", 'w')
     file.write("-------------Experiment Description-------------\n")
     file.write("Data set:" + file_name + "#\n")
@@ -385,8 +387,94 @@ def complete_experiments():
             perform_dir_list = true_file_path
         complete_implement(complete_type, perform_dir_list)
 
-def complete_operate(operate_type, folder_path):
-    print "Processing " + folder_path
+def complete_operate(operate_type, folder_path, trees):
+    #TODO 添加增强健壮性的代码
+    if os.path.isdir(folder_path):
+        
+        print "Processing " + folder_path
+        #首先根据目录名字拿到数据集的文件名
+        file_name_split = folder_path.split('/')
+        file_or_folder_name = file_name_split[len(file_name_split) - 1]
+        dataset_name_sub = file_or_folder_name.split('_')
+        dataset_name = dataset_name_sub[0] + '_' + dataset_name_sub[1] + '_' + dataset_name_sub[2]
+        
+        #搜寻该文件夹中的网络配置文件
+        #TODO:统一的网络配置文件格式
+        #查询已有框架自动恢复网络结构的方式？？？
+        #TODO:与下面的else配套
+        neurons = 0
+        neuronLayersCount = 0
+        neighbors = int(dataset_name_sub[1]) + 1
+        maxpoolings = 0
+        fullLayers = 0
+        raws = 0
+        lines = 0
+        batch_size = 100
+        ratio = 0.001
+        decay = 0.00001
+
+        if os.path.exists(folder_path + '/networkconf.txt'):
+            print "后续加上统一的网络配置文件记录之后就从这里面读取网络参数。"
+        else:
+            #TODO:下面代码是暂时的，而且这代码仅适用于CCS和CCR的工作，因此最终还是要靠networkconf.txt,以后改成没有这个配置文件就不让运行。
+            print "网络参数配置文件不存在，请手动输入："
+            print "Enter convolutional neurons in this network:"
+            neurons = int(raw_input(prompt))
+            print "Enter layers each convolutional neuron operates:"
+            neuronLayersCount = int(raw_input(prompt))
+            print "Enter maxpooling kernel size:"
+            maxpoolings = int(raw_input(prompt))
+            print "Enter fully layer neurons count:"
+            fullLayers = int(raw_input(prompt))
+
+            #rows lines 暂时先去数据集中找，以后这些也应该作为参数保存起来，直接load即可。
+            LabelsMat = sio.loadmat(data_prefix + dataset_name_sub[0] + '/' + dataset_name_sub[0] + 'Gt.mat')
+            key_label_name = LabelsMat.keys()
+            label_key = ''
+            for temp_key in key_label_name:
+                if temp_key != '__version__' and temp_key != '__header__' and temp_key != '__globals__':
+                    label_key = temp_key
+                    break
+            Labels = LabelsMat[label_key]
+            raws = int(len(Labels))
+            lines = int(len(Labels[0]))
+
+        if operate_type == '1':
+            print 'CNN+RF base on trained CNN model.'
+            if len(trees.split('-')) > 0:
+                small_tree_number = trees.split('-')[0]
+                big_tree_number = trees.split('-')[1]
+                exp_trees = range(int(small_tree_number),int(big_tree_number) + 1)
+                cnnrf_acc_list = []
+                rf_acc_list = []
+                for trees_number in exp_trees:
+                    cnnrf_acc, rf_acc = cnnrf.run(folder_path + "/" + dataset_name,trees_number, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, raws, lines,test_cnn = -1)
+                                       # cnnrf.run(file_name,trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, raws_size, lines_size)
+                    cnnrf_acc_list.append(cnnrf_acc)
+                    rf_acc_list.append(rf_acc)
+                sio.savemat(folder_path + "/ALL_CNN_RF_EXP_RESULT.mat",{'cnnrf':cnnrf_acc_list, 'rf':rf_acc_list})
+            else:
+                    cnnrf.run(dataset_name,trees_number, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, 0, 0, 0, raws, lines)
+
+        elif operate_type == '2':
+            print 'Rebuild CNN_+ SVM model experiments...'
+            cnnsvm.run(folder_path + "/" + dataset_name, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
+
+
+        elif operate_type == '3':
+            print 'TODO'
+
+        elif operate_type == '4':
+            print 'TODO'
+
+        elif operate_type == '5':
+            print 'TODO'
+
+        else:
+            print 'Not under selection list, skip it.'
+    else:
+        print "not a folder, skipt it."
+
 
 def complete_implement(type, dir):
     prompt = '>'
@@ -406,15 +494,20 @@ def complete_implement(type, dir):
     #4 没有RGB图像，补充RGB图像
     #5 其他暂时没想到的实验
     operate_type = raw_input(prompt)
-    
+
+    trees = ''
+    if operate_type == '1':
+        print "Enter the number of trees you want to set in RF, if you want it to be a series trees, use - to express it, for example: if you want to do a series trees experiments among 1 to 20, enter 1-20. no space or other char between numbers."
+        trees = raw_input(prompt) 
+
     if type == 'one':
         #执行一个逻辑
-        complete_operate(operate_type, dir)
+        complete_operate(operate_type = operate_type, folder_path = dir, trees = trees)
 
     else:
         #执行一组的逻辑
         for folder in dir:
-            complete_operate(operate_type, folder)
+            complete_operate(operate_type = operate_type, folder_path = folder, trees = trees)
 
 if __name__ == "__main__":
     prompt = ">"

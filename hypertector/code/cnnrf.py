@@ -132,11 +132,11 @@ def loadData(dataFile, typeId = -1, bShowData = False):
 #currently, I wrote all the network constructing and training and testing in this file#
 #laterly, I will seperate them apart.                                                 #
 #######################################################################################
-def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, learning_ratio, train_decay, raws_sise, lines_size):
+def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_length, max_pooling_feature_map_size, number_of_full_layer_nodes, raws_sise, lines_size, test_cnn):
     #get the train data, train label, validate data, validate label, test data, test label
     train_dataset, valid_dataset, test_dataset = loadData(filePath + ".mat")
 
-    file = open(filePath + "CNNRFdescription.txt",'w')
+    file = open(filePath + "_trees_" + str(trees) +"_CNNRFdescription.txt",'w')
 
 #    file.write("The network have " + str(channel_length) + "input nodes in the 1st layer.\n")
 #    file.write("The amount of samples in the dataset is " + str(sample_counts) +".\n")
@@ -192,9 +192,9 @@ def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_len
     model.add(layer5)
 
     #the optimizer
-    sgd = SGD(lr = learning_ratio, decay = train_decay, momentum = 0.6, nesterov=True)
+    #sgd = SGD(lr = learning_ratio, decay = train_decay, momentum = 0.6, nesterov=True)
 
-    model.compile(optimizer=sgd, loss='categorical_crossentropy',metrics=['accuracy'])
+    #model.compile(optimizer=sgd, loss='categorical_crossentropy',metrics=['accuracy'])
     
     train_dataset_data = train_dataset[0].reshape(train_dataset[0].shape[0],1,train_dataset[0].shape[1],1)
  #   train_dataset_label = np_utils.to_categorical(train_dataset[1])
@@ -269,7 +269,7 @@ def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_len
     cnnrftraintime = str(train_time)
     cnnrftesttime = str(test_time)
     cnnrfacc = str(score)
-    sio.savemat(filePath + "CNNRFResult.mat",{'predict':result,'actual':test_label_for_rf})
+    sio.savemat(filePath + "_trees_" + str(trees) +"_CNNRFResult.mat",{'predict':result,'actual':test_label_for_rf})
 #    file.write("#############################\n")
     joblib.dump(rf0,filePath + 'cnnrf.model')
 		
@@ -311,39 +311,43 @@ def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_len
     #画出RF RGB结果图
     analyse.drawRGBResult(filePath + "RF_Predict", result, test_position_for_all, raws_sise, lines_size)
     
-    print("#####################################################")
-    print("正在CNN上进行测试\n")
+    cnntesttime = 0
+    cnnacc = 0
+    if test_cnn != -1:
+        print("#####################################################")
+        print("正在CNN上进行测试\n")
 
-    classes = model.predict_classes(test_dataset_data)
-    start_time = time.time()
-    test_accuracy = numpy.mean(numpy.equal(test_dataset_label,classes))
-    end_time = time.time()
-    print("同一个测试集，在CNN上的正确率为：",test_accuracy)
-    print("测试用时：%f" % (end_time - start_time))
+        classes = model.predict_classes(test_dataset_data)
+        start_time = time.time()
+        test_accuracy = numpy.mean(numpy.equal(test_dataset_label,classes))
+        end_time = time.time()
+        print("同一个测试集，在CNN上的正确率为：",test_accuracy)
+        print("测试用时：%f" % (end_time - start_time))
 #    file.write("#############################\n")
-    file.write("The CNN only\n")
-    file.write("The testing time is " + str(end_time - start_time) + "\n")
-    file.write("The correct ratio of CNN only is " + str(test_accuracy) + "\n")
-    sio.savemat(filePath + "CNNOnlyResult.mat",{'predict':classes,'actual':test_dataset_label})
+        file.write("The CNN only\n")
+        file.write("The testing time is " + str(end_time - start_time) + "\n")
+        file.write("The correct ratio of CNN only is " + str(test_accuracy) + "\n")
+        sio.savemat(filePath + "CNNOnlyResult.mat",{'predict':classes,'actual':test_dataset_label})
 #    file.write("############################\n")
-    cnntesttime = str(end_time - start_time)
-    cnnacc = str(test_accuracy)
+        cnntesttime = str(end_time - start_time)
+        cnnacc = str(test_accuracy)
 
-    file.close
+        file.close
     #画出CNN结果RGB图
-    analyse.drawRGBResult(filePath + "CNN_Predict", classes, test_position_for_all, raws_sise, lines_size)
+        analyse.drawRGBResult(filePath + "CNN_Predict", classes, test_position_for_all, raws_sise, lines_size)
     #画出真正的样本RGB图
-    analyse.drawRGBResult(filePath + "Actual", test_dataset_label, test_position_for_all, raws_sise, lines_size)
-    analyse.drawRGBResultCutline(filePath, destinations)
+        analyse.drawRGBResult(filePath + "Actual", test_dataset_label, test_position_for_all, raws_sise, lines_size)
+        analyse.drawRGBResultCutline(filePath, destinations)
 
-    return {'cnnrftraintime':cnnrftraintime,'cnnrftesttime':cnnrftesttime,'cnnrfacc':cnnrfacc, 'rftraintime':rftraintime,'rftesttime':rftesttime,'rfacc':rfacc,'cnntesttime':cnntesttime,'cnnacc':cnnacc}
+    return {'cnnrftraintime':cnnrftraintime,'cnnrftesttime':cnnrftesttime,'cnnrfacc':cnnrfacc, 'rftraintime':rftraintime,'rftesttime':rftesttime,'rfacc':rfacc,'cnntesttime':str(cnntesttime),'cnnacc':str(cnnacc)}
 
-def network(file, trees, neurons, conLayers, convolutionalLayers, max_pooling_feature_map_size, full_layers_size, batch_size, ratio, decay, raws_sise, lines_size):
-    result =  temp_network(file, trees, number_of_con_filters = neurons,conLayers = conLayers, con_step_length = convolutionalLayers, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = full_layers_size, learning_ratio = ratio, train_decay = decay, raws_sise = raws_sise, lines_size = lines_size)
+def network(file, trees, neurons, conLayers, convolutionalLayers, max_pooling_feature_map_size, full_layers_size, raws_sise, lines_size,test_cnn):
+    result =  temp_network(file, trees, number_of_con_filters = neurons,conLayers = conLayers, con_step_length = convolutionalLayers, max_pooling_feature_map_size = max_pooling_feature_map_size, number_of_full_layer_nodes = full_layers_size, raws_sise = raws_sise, lines_size = lines_size,test_cnn = test_cnn)
     return result
 
 
-def run(filename, trees, neurons, conLayers, neighbors, max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay, raws_sise, lines_size):
+def run(filename, trees, neurons, conLayers, neighbors, max_pooling_feature_map_size,full_layers_size, raws_sise, lines_size, test_cnn):
+
     cnnrftraintime1 = 0.
     cnnrftesttime1 = 0.
     cnnrfacc1 = 0.
@@ -355,9 +359,9 @@ def run(filename, trees, neurons, conLayers, neighbors, max_pooling_feature_map_
     
 
 
-    file = open(filename + "_CNNRF_EXPResultTOTAL.txt",'w')
+    file = open(filename + "_trees_" + str(trees)  +"_CNNRF_EXPResultTOTAL.txt",'w')
 
-    result = network(filename, trees, neurons,conLayers, neighbors,max_pooling_feature_map_size,full_layers_size,batch_size,ratio,decay, raws_sise, lines_size)
+    result = network(filename, trees, neurons,conLayers, neighbors,max_pooling_feature_map_size,full_layers_size,raws_sise, lines_size,test_cnn)
         
     cnnrftraintime1 = cnnrftraintime1 + float(result['cnnrftraintime'])
     cnnrftesttime1 = cnnrftesttime1 + float(result['cnnrftesttime'])
@@ -389,4 +393,6 @@ def run(filename, trees, neurons, conLayers, neighbors, max_pooling_feature_map_
     file.write("CNN测试精度：" + str(cnnacc1) + "\n")
 
     file.close
+    
+    return str(cnnrfacc1), str(rfacc1)
 
