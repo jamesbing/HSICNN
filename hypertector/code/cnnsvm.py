@@ -23,6 +23,9 @@ import math
 from keras import backend as K
 from sklearn.externals import joblib
 from sklearn import cross_validation,decomposition,svm
+from sklearn.decomposition import PCA
+#这是库是标准化原始数据的作用
+from sklearn.preprocessing import StandardScaler
 
 import time
 def getMiddleOutPut(model,inputVector,kthlayer):
@@ -212,17 +215,21 @@ def temp_network(filePath, number_of_con_filters,conLayers, con_step_length, max
     kernel_2 = 'rbf'
 
 #	用rbf核
-    clf1 = svm.SVC(C=1.0, kernel = kernel_2,  gamma='auto', probability=True,
+    clf1 = svm.SVC(C=0.82, kernel = kernel_2,  gamma='auto', probability=True,
              tol = 0.00000000000001, max_iter = -1)
     
-#    clf2 = svm.SVC(C=1.0, kernel = kernel_2,  gamma='auto', probability=True,
+    clf2 = svm.SVC(C=0.82, kernel = kernel_2,  gamma='auto', probability=True, 
+             tol = 0.0000000000001, max_iter = -1)
+
+    clf2 = svm.SVC(C=2.0, kernel = kernel_2,  gamma='auto', probability=True, 
+             tol = 0.0000000000001, max_iter = -1)
 #             tol = 0.00000000000001, max_iter = -1)\
-    clf2 = svm.SVC(decision_function_shape='ovo')
+    #clf2 = svm.SVC(decision_function_shape='ovo')
     #用linear
-    clf3 = svm.SVC(C=0.8, kernel = kernel_2,  gamma='auto', probability=True,
-             tol = 0.00001, max_iter = -1)    
-    clf4 = svm.SVC(C=0.8, kernel = kernel_2,  gamma='auto', probability=True,
-             tol = 0.00001, max_iter = -1)
+    #clf3 = svm.SVC(C=0.8, kernel = kernel_2,  gamma='auto', probability=True,
+    #         tol = 0.00001, max_iter = -1)    
+    #clf4 = svm.SVC(C=0.8, kernel = kernel_2,  gamma='auto', probability=True,
+    #         tol = 0.00001, max_iter = -1)
 
     print("#####################################################")
     print("在CNN-SVM-RBF上的结果：")
@@ -268,13 +275,31 @@ def temp_network(filePath, number_of_con_filters,conLayers, con_step_length, max
     print("开始训练")
 
     start_time= time.time()
-    clf2.fit(train_dataset[0], train_dataset[1])
+
+    #将特征进行缩放以及归一化等预处理以便达到更好的效果，否则分类精度只有17%左右
+    sc = StandardScaler()
+    #估算每个特征的平均值和标准差
+    sc.fit(train_dataset[0])
+    sc_train_dataset = sc.transform(train_dataset[0])
+    sc_test_dataset = sc.transform(test_dataset[0])
+
+
+    #经过PCA
+    #经过PCA后，得到的维度与CNN全连接层的维度相同
+    #pca = PCA(n_components = 100)
+
+    #pca_train_dataset = pca.fit_transform(sc_train_dataset)
+    #pca_test_dataset = pca.fit_transform(sc_test_dataset)
+    pca_train_dataset = sc_train_dataset
+    pca_test_dataset = sc_test_dataset
+
+    clf2.fit(pca_train_dataset, train_dataset[1])
     end_time = time.time()
     train_time = end_time - start_time
     print("训练用时:",train_time)
 
     start_time = time.time()
-    print("在测试集上的平均正确率为",clf2.score(test_dataset[0],test_dataset[1]))
+    print("在测试集上的平均正确率为",clf2.score(pca_test_dataset,test_dataset[1]))
     end_time = time.time()
     test_time = end_time - start_time
     print("测试用时：%f" % test_time)
@@ -283,11 +308,11 @@ def temp_network(filePath, number_of_con_filters,conLayers, con_step_length, max
     file.write("The SVM only use kernel " + kernel_2 + "\n")
     file.write("The SVM train time is " + str(train_time) +"\n")
     file.write("The testing time is " + str(test_time) + "\n")
-    file.write("The correct ratio of CNN-SVM is " + str(clf2.score(test_dataset[0],test_dataset[1])) + "\n")
-    result = clf2.predict(test_dataset[0])
+    file.write("The correct ratio of CNN-SVM is " + str(clf2.score(pca_test_dataset,test_dataset[1])) + "\n")
+    result = clf2.predict(pca_test_dataset)
     svmtraintime = str(train_time)
     svmtesttime = str(test_time)
-    svmacc = str(clf2.score(test_dataset[0],test_dataset[1]))
+    svmacc = str(clf2.score(pca_test_dataset,test_dataset[1]))
     sio.savemat(filePath + "SVMonlyResult.mat",{'predict':result,'actual':test_dataset[1]})
 #    file.write("#########################################################################################################\n")
     joblib.dump(clf2,filePath + 'svmrbf.model')
