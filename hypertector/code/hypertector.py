@@ -387,7 +387,8 @@ def complete_experiments():
             perform_dir_list = true_file_path
         complete_implement(complete_type, perform_dir_list)
 
-def complete_operate(operate_type, folder_path, trees):
+#complete_operate(operate_type = operate_type, folder_path = folder, trees = trees, neurons = neurons, neuronLayersCount = neuronLayersCount, maxpoolings = maxpoolings, fullLayers = fullLayers)
+def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCount,maxpoolings, fullLayers):
     #TODO 添加增强健壮性的代码
     if os.path.isdir(folder_path):
         
@@ -402,30 +403,32 @@ def complete_operate(operate_type, folder_path, trees):
         #TODO:统一的网络配置文件格式
         #查询已有框架自动恢复网络结构的方式？？？
         #TODO:与下面的else配套
-        neurons = 0
-        neuronLayersCount = 0
+        #neurons = 0
+        #neuronLayersCount = 0
         neighbors = int(dataset_name_sub[1]) + 1
-        maxpoolings = 0
-        fullLayers = 0
+        #maxpoolings = 0
+        #fullLayers = 0
         raws = 0
         lines = 0
         batch_size = 100
         ratio = 0.001
         decay = 0.00001
 
+        #这一块业务逻辑需要与调用该端代码的逻辑进行整合
         if os.path.exists(folder_path + '/networkconf.txt'):
             print "后续加上统一的网络配置文件记录之后就从这里面读取网络参数。"
         else:
             #TODO:下面代码是暂时的，而且这代码仅适用于CCS和CCR的工作，因此最终还是要靠networkconf.txt,以后改成没有这个配置文件就不让运行。
-            print "网络参数配置文件不存在，请手动输入："
-            print "Enter convolutional neurons in this network:"
-            neurons = int(raw_input(prompt))
-            print "Enter layers each convolutional neuron operates:"
-            neuronLayersCount = int(raw_input(prompt))
-            print "Enter maxpooling kernel size:"
-            maxpoolings = int(raw_input(prompt))
-            print "Enter fully layer neurons count:"
-            fullLayers = int(raw_input(prompt))
+        #    print "网络参数配置文件不存在，请手动输入："
+        #    print "Enter convolutional neurons in this network:"
+         
+        #    neurons = int(raw_input(prompt))
+        #    print "Enter layers each convolutional neuron operates:"
+        #    neuronLayersCount = int(raw_input(prompt))
+        #    print "Enter maxpooling kernel size:"
+        #    maxpoolings = int(raw_input(prompt))
+        #    print "Enter fully layer neurons count:"
+        #    fullLayers = int(raw_input(prompt))
 
             #rows lines 暂时先去数据集中找，以后这些也应该作为参数保存起来，直接load即可。
             LabelsMat = sio.loadmat(data_prefix + dataset_name_sub[0] + '/' + dataset_name_sub[0] + 'Gt.mat')
@@ -458,8 +461,7 @@ def complete_operate(operate_type, folder_path, trees):
 
         elif operate_type == '2':
             print 'Rebuild CNN_+ SVM model experiments...'
-            cnnsvm.run(folder_path + "/" + dataset_name, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
-
+            cnnsvm.run(folder_path + "/" + dataset_name, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, 1, 1, 1)
 
         elif operate_type == '3':
             print 'TODO'
@@ -502,12 +504,23 @@ def complete_implement(type, dir):
 
     if type == 'one':
         #执行一个逻辑
-        complete_operate(operate_type = operate_type, folder_path = dir, trees = trees)
+        complete_operate(operate_type = operate_type, folder_path = dir, trees = trees, neurons = neurons, neuronLayersCount = neuronLayersCount, maxpoolings = maxpoolings, fullLayers = fullLayers)
 
     else:
         #执行一组的逻辑
+
+        print "网络参数配置文件不存在，请手动输入："
+        print "Enter convolutional neurons in this network:"
+        neurons = int(raw_input(prompt))
+        print "Enter layers each convolutional neuron operates:"
+        neuronLayersCount = int(raw_input(prompt))
+        print "Enter maxpooling kernel size:"
+        maxpoolings = int(raw_input(prompt))
+        print "Enter fully layer neurons count:"
+        fullLayers = int(raw_input(prompt))
+
         for folder in dir:
-            complete_operate(operate_type = operate_type, folder_path = folder, trees = trees)
+            complete_operate(operate_type = operate_type, folder_path = folder, trees = trees, neurons = neurons, neuronLayersCount = neuronLayersCount, maxpoolings = maxpoolings, fullLayers = fullLayers)
 
 if __name__ == "__main__":
     prompt = ">"
