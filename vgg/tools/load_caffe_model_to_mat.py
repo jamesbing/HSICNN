@@ -26,7 +26,7 @@ def load(experiment_number):
     conv6_b = net.params['conv6'][1].data
 
     #net = caffe.Net('/home/para/gitstore/HSICNN/vgg/train_test.prototxt','/home/para/gitstore/HSICNN/vgg/experiment_results/' + str(experiment_number) + '/_iter_5000.caffemodel',caffe.TEST)
-    sio.savemat('/home/para/gitstore/HSICNN/vgg/experiment_results/' + str(experiment_number) + '/parameters.mat', {'conv1_w':conv1_w,'conv1_b':conv1_b,'conv2_w':conv2_w,'conv2_b':conv2_b,'conv3_w':conv3_w,'conv3_b':conv3_b,'conv4_w':conv4_w,'conv4_b':conv4_b,'conv5_w':conv5_w,'conv5_b':conv5_b,'conv6_w':conv6_w,'conv6_b':conv6_b})
+    sio.savemat('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '_parameters.mat', {'conv1_w':conv1_w,'conv1_b':conv1_b,'conv2_w':conv2_w,'conv2_b':conv2_b,'conv3_w':conv3_w,'conv3_b':conv3_b,'conv4_w':conv4_w,'conv4_b':conv4_b,'conv5_w':conv5_w,'conv5_b':conv5_b,'conv6_w':conv6_w,'conv6_b':conv6_b})
 if __name__ == '__main__':
     experiment_number = 1
     load(experiment_number)
