@@ -20,6 +20,6 @@ display: 100
 max_iter: 10000
 # snapshot intermediate results
 snapshot: 5000
-snapshot_prefix: "/home/para/gitstore/HSICNN/vgg/experiment_results/4/"
+snapshot_prefix: "/home/para/gitstore/HSICNN/vgg/experiment_results/38/"
 # solver mode: CPU or GPU
 solver_mode: GPU
