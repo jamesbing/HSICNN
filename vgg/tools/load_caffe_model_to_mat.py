@@ -27,53 +27,53 @@ def load(experiment_number):
     conv6_w = net.params['conv6'][0].data
     conv6_b = net.params['conv6'][1].data
 
-    print conv1_w
-        
-    os.mkdir('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/')
-    
-    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv1_w.csv', 'wb') as f:
-        writer = csv.writer(f)
-        writer.writerows(conv1_w)
-    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv1_b.csv', 'wb') as f:
-        writer = csv.writer(f)
-        writer.writerows(conv1_b)
+#    print conv1_w
+#        
+#    os.mkdir('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/')
+#    
+#    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv1_w.csv', 'wb') as f:
+#        writer = csv.writer(f)
+#        writer.writerows(conv1_w)
+#    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv1_b.csv', 'wb') as f:
+#        writer = csv.writer(f)
+#        writer.writerows(conv1_b)
 
-    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv2_w.csv', 'wb') as f:
-        writer = csv.writer(f)
-        writer.writerows(conv2_w)
-    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv2_b.csv', 'wb') as f:
-        writer = csv.writer(f)
-        writer.writerows(conv2_b)
-
-
-    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv3_w.csv', 'wb') as f:
-        writer = csv.writer(f)
-        writer.writerows(conv3_w)
-    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv3_b.csv', 'wb') as f:
-        writer = csv.writer(f)
-        writer.writerows(conv3_b)
+#    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv2_w.csv', 'wb') as f:
+#        writer = csv.writer(f)
+#        writer.writerows(conv2_w)
+#    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv2_b.csv', 'wb') as f:
+#        writer = csv.writer(f)
+#        writer.writerows(conv2_b)
 
 
-    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv4_w.csv', 'wb') as f:
-        writer = csv.writer(f)
-        writer.writerows(conv4_w)
-    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv4_b.csv', 'wb') as f:
-        writer = csv.writer(f)
-        writer.writerows(conv4_b)
+#    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv3_w.csv', 'wb') as f:
+#        writer = csv.writer(f)
+#        writer.writerows(conv3_w)
+#    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv3_b.csv', 'wb') as f:
+#        writer = csv.writer(f)
+#        writer.writerows(conv3_b)
 
-    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv5_w.csv', 'wb') as f:
-        writer = csv.writer(f)
-        writer.writerows(conv5_w)
-    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv5_b.csv', 'wb') as f:
-        writer = csv.writer(f)
-        writer.writerows(conv5_b)
 
-    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv6_w.csv', 'wb') as f:
-        writer = csv.writer(f)
-        writer.writerows(conv6_w)
-    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv6_b.csv', 'wb') as f:
-        writer = csv.writer(f)
-        writer.writerows(conv6_b)
+#    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv4_w.csv', 'wb') as f:
+#        writer = csv.writer(f)
+#        writer.writerows(conv4_w)
+#    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv4_b.csv', 'wb') as f:
+#        writer = csv.writer(f)
+#        writer.writerows(conv4_b)
+
+#    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv5_w.csv', 'wb') as f:
+#        writer = csv.writer(f)
+#        writer.writerows(conv5_w)
+#    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv5_b.csv', 'wb') as f:
+#        writer = csv.writer(f)
+#        writer.writerows(conv5_b)
+
+#    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv6_w.csv', 'wb') as f:
+#        writer = csv.writer(f)
+#        writer.writerows(conv6_w)
+#    with open('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '/conv6_b.csv', 'wb') as f:
+#        writer = csv.writer(f)
+#        writer.writerows(conv6_b)
     #net = caffe.Net('/home/para/gitstore/HSICNN/vgg/train_test.prototxt','/home/para/gitstore/HSICNN/vgg/experiment_results/' + str(experiment_number) + '/_iter_5000.caffemodel',caffe.TEST)
     sio.savemat('/home/para/gitstore/HSICNN/vgg/parameters/' + str(experiment_number) + '_parameters.mat', {'conv1_w':conv1_w,'conv1_b':conv1_b,'conv2_w':conv2_w,'conv2_b':conv2_b,'conv3_w':conv3_w,'conv3_b':conv3_b,'conv4_w':conv4_w,'conv4_b':conv4_b,'conv5_w':conv5_w,'conv5_b':conv5_b,'conv6_w':conv6_w,'conv6_b':conv6_b})
 if __name__ == '__main__':
