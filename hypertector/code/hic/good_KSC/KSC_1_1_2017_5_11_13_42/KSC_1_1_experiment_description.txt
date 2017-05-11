@@ -1,0 +1,11 @@
+-------------Experiment Description-------------
+Data set:../experiments/KSC_1_1_2017_5_11_13_42/KSC_1_1#
+neighbor strategy:2#
+Convolutional Neurons:22#
+Each convolutional neuron operates 8Max Polling Kernel Size:2#
+Full Layer Neuron number:100#
+Batch size of SGD training:1#
+Training epoches of deep CNN:500#
+Learning ratio:2.668e-05#
+Train decay:2e-08#
+===============================================
