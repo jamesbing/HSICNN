@@ -310,4 +310,4 @@ def run_network(datafile, neuronLayers, neighbors, maxPoolingSize, fullLayerSize
         print('total time ：' + str(endTime - startTime))
 
 if __name__ == '__main__':
-    run_network("KSC_1_1_2017_5_11_13_42/KSC_1_1", 20, 1, 2, 160, 1, 0.00002668, 0.0000001, 500)
+    run_network("KSC_1_1_2017_5_11_13_42/KSC_1_1", 20, 1, 2, 170, 1, 0.00002668, 0.0000001, 500)
