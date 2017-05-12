@@ -525,7 +525,7 @@ def complete_implement(type, dir):
 if __name__ == "__main__":
     prompt = ">"
     os.system('clear')
-    print "==========NK-Hyperspector Hyperspectral Image Analysis And Experimental Tool=========="
+    print "=======NK-Hypertector Hyperspectral Image Analysis And Experimental Tool======="
     print "Want to: "
     print "#1:Complete experiments on existing data;"
     print "#2:Do new experiments from scratch."
