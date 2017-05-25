@@ -136,7 +136,8 @@ def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_len
     #get the train data, train label, validate data, validate label, test data, test label
     train_dataset, valid_dataset, test_dataset = loadData(filePath + ".mat")
 
-    file = open(filePath + "_trees_" + str(trees) +"_CNNRFdescription.txt",'w')
+    #file = open(filePath + "_trees_" + str(trees) +"_CNNRFdescription.txt",'w')
+    file = open(filePath + "_CNNRFdescription.txt",'w')
 
 #    file.write("The network have " + str(channel_length) + "input nodes in the 1st layer.\n")
 #    file.write("The amount of samples in the dataset is " + str(sample_counts) +".\n")
@@ -184,7 +185,7 @@ def temp_network(filePath, trees, number_of_con_filters,conLayers,  con_step_len
     model.add(Activation('tanh'))
 
     #the activation layer which will output the final classification result
-    layer4 = Dense(destinations + 1,activation = 'tanh', bias=True)
+    layer4 = Dense(int(destinations) + 1,activation = 'tanh', bias=True)
 #    layer4 = Activation('tanh')
     model.add(layer4)
 
@@ -359,8 +360,19 @@ def run(filename, trees, neurons, conLayers, neighbors, max_pooling_feature_map_
     
 
 
-    file = open(filename + "_trees_" + str(trees)  +"_CNNRF_EXPResultTOTAL.txt",'w')
-
+    #file = open(filename + "_trees_" + str(trees)  +"_CNNRF_EXPResultTOTAL.txt",'w')
+    file = open(filename + "_CNNRF_EXPResultTOTAL.txt",'w')
+    print(filename)
+    print(trees)
+    print(neurons)
+    print(conLayers)
+    print(neighbors)
+    print(max_pooling_feature_map_size)
+    print(full_layers_size)
+    print(raws_sise)
+    print(lines_size)
+    print(test_cnn)
+    
     result = network(filename, trees, neurons,conLayers, neighbors,max_pooling_feature_map_size,full_layers_size,raws_sise, lines_size,test_cnn)
         
     cnnrftraintime1 = cnnrftraintime1 + float(result['cnnrftraintime'])

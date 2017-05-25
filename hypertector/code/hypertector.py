@@ -109,43 +109,44 @@ def run_single(learning_ratio, network_type):
     file.close()
     return file_name
 
-def run_batch(datasetName,strategies, neurons, neuronLayersCount, maxpoolings, fullLayers, batch_size, learning, train_decay, epoches, following_strategy, trees, learning_sample_ratios, dataset_format):
-    mix_model_svm_ratio = 0
-    #print strategies
-    file_name, neighbors, raws_size, lines_size = data_util.prepare(learning_sample_ratios, datasetName, int(strategies), 2)
-    neighbors = neighbors + 1
-    print "the neighbors strategy is: " + str(neighbors)
-    print "starting ..."
-    HSICNN.run_network(file_name, neurons,neuronLayersCount, neighbors, maxpoolings, fullLayers,batch_size, learning, train_decay, epoches)
-    print "the training of the network have done."
-    if following_strategy == 1:
-        print "now processing the cnn + svm joint framework..."
-        cnnsvm.run(file_name, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
-    elif following_strategy == 2:
-        print "now processing the cnn + rf joint framework..."
-        cnnrf.run(file_name,trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, raws_size, lines_size)
-    elif following_strategy == 3:
-        print "now processing the cnn + svm joint framework..."
-        cnnsvm.run(file_name, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
-        print "now processing the cnn + rf joint framework..."
-        cnnrf.run(file_name, trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, raws_size,lines_size)
-    file = open(file_name + "_experiment_description.txt", 'w')
-    file.write("-------------Experiment Description-------------\n")
-    file.write("Data set:" + file_name + "#\n")
-    file.write("neighbor strategy:" + str(neighbors) + "#\n")
-    file.write("Convolutional Neurons:" + str(neurons) + "#\n")
-    file.write("Each Convolutional Neuron operate " + str(neuronLayersCount) + '#\n')
-    file.write("Max Polling Kernel Size:" + str(maxpoolings) + "#\n")
-    file.write("Full Layer Neuron number:" + str(fullLayers) + "#\n")
-    file.write("Batch size of SGD training:" + str(batch_size) + "#\n")
-    file.write("Training epoches of deep CNN:" + str(epoches) + "#\n")
-    file.write("Learning ratio:" + str(learning) + "#\n")
-    file.write("Train decay:" + str(train_decay) +"#\n")
-    if following_strategy == 2 or following_strategy == 3:
-        file.write("Number of trees in random forest: " + str(trees) + "#\n")
-    file.write("===============================================\n")
-    file.close()
-    return file_name
+def run_batch(datasetName,strategies, neurons, neuronLayersCount, maxpoolings, fullLayers, batch_size, learning, train_decay, epoches, following_strategy, trees, learning_sample_ratios, dataset_format, experiment_times):
+    for time_counts in range(experiment_times):
+        mix_model_svm_ratio = 0
+        #print strategies
+        file_name, neighbors, raws_size, lines_size = data_util.prepare(learning_sample_ratios, datasetName, int(strategies), 2)
+        neighbors = neighbors + 1
+        print "the neighbors strategy is: " + str(neighbors)
+        print "starting ..."
+        HSICNN.run_network(file_name, neurons,neuronLayersCount, neighbors, maxpoolings, fullLayers,batch_size, learning, train_decay, epoches)
+        print "the training of the network have done."
+        if following_strategy == 1:
+            print "now processing the cnn + svm joint framework..."
+            cnnsvm.run(file_name, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
+        elif following_strategy == 2:
+            print "now processing the cnn + rf joint framework..."
+            cnnrf.run(file_name,trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, raws_size, lines_size)
+        elif following_strategy == 3:
+            print "now processing the cnn + svm joint framework..."
+            cnnsvm.run(file_name, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, batch_size, learning, train_decay)
+            print "now processing the cnn + rf joint framework..."
+            cnnrf.run(file_name, trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, raws_size,lines_size,-1)
+        file = open(file_name + "_experiment_description.txt", 'w')
+        file.write("-------------Experiment Description-------------\n")
+        file.write("Data set:" + file_name + "#\n")
+        file.write("neighbor strategy:" + str(neighbors) + "#\n")
+        file.write("Convolutional Neurons:" + str(neurons) + "#\n")
+        file.write("Each Convolutional Neuron operate " + str(neuronLayersCount) + '#\n')
+        file.write("Max Polling Kernel Size:" + str(maxpoolings) + "#\n")
+        file.write("Full Layer Neuron number:" + str(fullLayers) + "#\n")
+        file.write("Batch size of SGD training:" + str(batch_size) + "#\n")
+        file.write("Training epoches of deep CNN:" + str(epoches) + "#\n")
+        file.write("Learning ratio:" + str(learning) + "#\n")
+        file.write("Train decay:" + str(train_decay) +"#\n")
+        if following_strategy == 2 or following_strategy == 3:
+            file.write("Number of trees in random forest: " + str(trees) + "#\n")
+        file.write("===============================================\n")
+        file.close()
+        return file_name
 
 def predesigned_network(network_type):
     print "running mode:" + network_type
@@ -237,6 +238,8 @@ def predesigned_network(network_type):
             #    print "Now gathering parameter for hic network:"
 
             
+            print "How many individual experiments want to take?"
+            experiment_times =  raw_input(prompt)
 
             ltime = time.localtime()
             time_stamp = str(ltime[0]) + "#" + str(ltime[1]) + "#" + str(ltime[2]) + "#" + str(ltime[3]) + "#" + str(ltime[4])
@@ -282,11 +285,11 @@ def predesigned_network(network_type):
                     #    actual_full_layers = fullLayers / 2
                     #elif neighbor_strategy == 1:
                     #    actual_full_layers = fullLayers / 4
-
-                    file_name = run_batch(dataset_fixed,neighbor_strategy, neurons, neuronLayersCount, maxpoolings,fullLayers, batch_size_inner, learning_ratio, train_decay_inner, epoches, following_strategy, trees, ratios[temp_mark], 2)
+#                    for time_counts in range(int(experiment_times)):
+                    file_name = run_batch(dataset_fixed,neighbor_strategy, neurons, neuronLayersCount, maxpoolings,fullLayers, batch_size_inner, learning_ratio, train_decay_inner, epoches, following_strategy, trees, ratios[temp_mark], 2, int(experiment_times))
                     #file_name = run_single(ratitemp_mark])
                     file.write(file_name + "\n")
-                    fileCNNRFResultsPath = file_name + "CNNRFdescription.txt"
+                    fileCNNRFResultsPath = file_name + "_CNNRFdescription.txt"
                     if following_strategy == 3:
                         fileCNNSVMResultsPath = file_name + "CNNSVMdescription.txt"
                     resultFile.write("=========================================================\n")
@@ -308,7 +311,7 @@ def predesigned_network(network_type):
                         inputFileRF.close()
                         inputFileSVM.close()
                     resultFile.write("##################################################\n")
-            file.close()
+                #file.close()
             resultFile.close()
             print "The results are stored in the file " + "BatchResults_" + time_stamp + ".txt"
             print "All folders contains the experiments are stored in the file " + "BatchExpsFixedCNN_" + time_stamp + ".txt"
@@ -451,7 +454,8 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
                 cnnrf_acc_list = []
                 rf_acc_list = []
                 for trees_number in exp_trees:
-                    cnnrf_acc, rf_acc = cnnrf.run(folder_path + "/" + dataset_name,trees_number, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, raws, lines,test_cnn = -1)
+                    print "Tree Number:" + str(trees_number)
+                    cnnrf_acc, rf_acc = cnnrf.run(folder_path + "/" + dataset_name,trees_number, int(neurons), int(neuronLayersCount), int(neighbors), int(maxpoolings), int(fullLayers), raws, lines,test_cnn = -1)
                                        # cnnrf.run(file_name,trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, raws_size, lines_size)
                     cnnrf_acc_list.append(cnnrf_acc)
                     rf_acc_list.append(rf_acc)
