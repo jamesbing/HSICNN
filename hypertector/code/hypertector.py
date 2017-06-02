@@ -109,8 +109,8 @@ def run_single(learning_ratio, network_type):
     file.close()
     return file_name
 
-def run_batch(datasetName,strategies, neurons, neuronLayersCount, maxpoolings, fullLayers, batch_size, learning, train_decay, epoches, following_strategy, trees, learning_sample_ratios, dataset_format, experiment_times):
-    for time_counts in range(experiment_times):
+def run_batch(datasetName,strategies, neurons, neuronLayersCount, maxpoolings, fullLayers, batch_size, learning, train_decay, epoches, following_strategy, trees, learning_sample_ratios, dataset_format):
+    #for time_counts in range(experiment_times):
         mix_model_svm_ratio = 0
         #print strategies
         file_name, neighbors, raws_size, lines_size = data_util.prepare(learning_sample_ratios, datasetName, int(strategies), 2)
@@ -240,81 +240,83 @@ def predesigned_network(network_type):
             
             print "How many individual experiments want to take?"
             experiment_times =  raw_input(prompt)
+        
+            for time_counts in range(int(experiment_times)):
 
-            ltime = time.localtime()
-            time_stamp = str(ltime[0]) + "#" + str(ltime[1]) + "#" + str(ltime[2]) + "#" + str(ltime[3]) + "#" + str(ltime[4])
+                ltime = time.localtime()
+                time_stamp = str(ltime[0]) + "#" + str(ltime[1]) + "#" + str(ltime[2]) + "#" + str(ltime[3]) + "#" + str(ltime[4])
 
-            file = open("../experiments/BatchExpsFixedCNN_" + time_stamp + ".txt", 'w')
-            resultFile = open("../experiments/BatchResults_" + time_stamp + ".txt", 'w')
-            file.write("======== Experimental Folders ==========\n")
-            resultFile.write("=============== Batch Exprimental Results ===============\n")
-            resultFile.write("=========================================================\n")
-            
-            #strategiesList = []
-            #if str(strategy_fixed) == 'a' or strategy_fixed == 'all':
-            #    strategiesList = [1,4,8]
-            #else:
-            #    strategiesList = [int(strategy_fixed)]
-            # 
-            strategiesList = temp_strategies_list
-            for neighbor_strategy_mark in range(len(strategiesList)):
-                neighbor_strategy = strategiesList[neighbor_strategy_mark]
-                print "now is running on strategy " + str(neighbor_strategy)
-                file.write("~~~~~~~~~~~~~~~ Neighbors Strategies:" + str(neighbor_strategy) +" ~~~~~~~~~~~~~~~\n")
-                for temp_mark in range(len(ratios)):
-                    learning_ratio = 0
-                    train_decay_inner = 0
-                    batch_size_inner = 0
-                    if ratios[temp_mark] < 10:
-                        learning_ratio = learning / 10
-                        train_decay_inner = train_decay / 10
-                        batch_size_inner = batch_size / 10
-                    #elif ratios[temp_mark] < 5:
-                    #    learning_ratio = learning / 100
-                    #    train_decay_inner = train_decay / 100
-                    #    batch_size_inner = batch_size / 100
-                    else:
-                        learning_ratio = learning
-                        train_decay_inner = train_decay
-                        batch_size_inner = batch_size
-    
-                    #set the full layers nodes to satisfy the change of neighbors strategies.
-                    #TODO: need to check if this makes sense
-                    #actual_full_layers = 0
-                    #if neighbor_strategy == 4:
-                    #    actual_full_layers = fullLayers / 2
-                    #elif neighbor_strategy == 1:
-                    #    actual_full_layers = fullLayers / 4
-#                    for time_counts in range(int(experiment_times)):
-                    file_name = run_batch(dataset_fixed,neighbor_strategy, neurons, neuronLayersCount, maxpoolings,fullLayers, batch_size_inner, learning_ratio, train_decay_inner, epoches, following_strategy, trees, ratios[temp_mark], 2, int(experiment_times))
-                    #file_name = run_single(ratitemp_mark])
-                    file.write(file_name + "\n")
-                    fileCNNRFResultsPath = file_name + "_CNNRFdescription.txt"
-                    if following_strategy == 3:
-                        fileCNNSVMResultsPath = file_name + "CNNSVMdescription.txt"
-                    resultFile.write("=========================================================\n")
-                    resultFile.write(file_name + "\n")
-                    inputFileRF = open(fileCNNRFResultsPath, "r")
-                    if following_strategy == 3:
-                        inputFileSVM = open(fileCNNSVMResultsPath, "r")
-                    allLinesRF = inputFileRF.readlines()
-                    if following_strategy == 3:
-                        allLinesSVM = inputFileSVM.readlines()
-                    resultFile.write("CNN-RF Results:\n")
-                    for eachLine in allLinesRF:
-                        resultFile.write(eachLine)
-                    resultFile.write("-----------------------------------------\n")
-                    if following_strategy == 3:
-                        resultFile.write("CNN-SVM Results:\n")
-                        for eachLine in allLinesSVM:
+                file = open("../experiments/BatchExpsFixedCNN_" + time_stamp + ".txt", 'w')
+                resultFile = open("../experiments/BatchResults_" + time_stamp + ".txt", 'w')
+                file.write("======== Experimental Folders ==========\n")
+                resultFile.write("=============== Batch Exprimental Results ===============\n")
+                resultFile.write("=========================================================\n")
+                
+                #strategiesList = []
+                #if str(strategy_fixed) == 'a' or strategy_fixed == 'all':
+                #    strategiesList = [1,4,8]
+                #else:
+                #    strategiesList = [int(strategy_fixed)]
+                # 
+                strategiesList = temp_strategies_list
+                for neighbor_strategy_mark in range(len(strategiesList)):
+                    neighbor_strategy = strategiesList[neighbor_strategy_mark]
+                    print "now is running on strategy " + str(neighbor_strategy)
+                    file.write("~~~~~~~~~~~~~~~ Neighbors Strategies:" + str(neighbor_strategy) +" ~~~~~~~~~~~~~~~\n")
+                    for temp_mark in range(len(ratios)):
+                        learning_ratio = 0
+                        train_decay_inner = 0
+                        batch_size_inner = 0
+                        if ratios[temp_mark] < 10:
+                            learning_ratio = learning / 10
+                            train_decay_inner = train_decay / 10
+                            batch_size_inner = batch_size / 10
+                        #elif ratios[temp_mark] < 5:
+                        #    learning_ratio = learning / 100
+                        #    train_decay_inner = train_decay / 100
+                        #    batch_size_inner = batch_size / 100
+                        else:
+                            learning_ratio = learning
+                            train_decay_inner = train_decay
+                            batch_size_inner = batch_size
+        
+                        #set the full layers nodes to satisfy the change of neighbors strategies.
+                        #TODO: need to check if this makes sense
+                        #actual_full_layers = 0
+                        #if neighbor_strategy == 4:
+                        #    actual_full_layers = fullLayers / 2
+                        #elif neighbor_strategy == 1:
+                        #    actual_full_layers = fullLayers / 4
+    #                    for time_counts in range(int(experiment_times)):
+                        file_name = run_batch(dataset_fixed,neighbor_strategy, neurons, neuronLayersCount, maxpoolings,fullLayers, batch_size_inner, learning_ratio, train_decay_inner, epoches, following_strategy, trees, ratios[temp_mark], 2)
+                        #file_name = run_single(ratitemp_mark])
+                        file.write(file_name + "\n")
+                        fileCNNRFResultsPath = file_name + "_CNNRFdescription.txt"
+                        if following_strategy == 3:
+                            fileCNNSVMResultsPath = file_name + "CNNSVMdescription.txt"
+                        resultFile.write("=========================================================\n")
+                        resultFile.write(file_name + "\n")
+                        inputFileRF = open(fileCNNRFResultsPath, "r")
+                        if following_strategy == 3:
+                            inputFileSVM = open(fileCNNSVMResultsPath, "r")
+                        allLinesRF = inputFileRF.readlines()
+                        if following_strategy == 3:
+                            allLinesSVM = inputFileSVM.readlines()
+                        resultFile.write("CNN-RF Results:\n")
+                        for eachLine in allLinesRF:
                             resultFile.write(eachLine)
-                        inputFileRF.close()
-                        inputFileSVM.close()
-                    resultFile.write("##################################################\n")
-                #file.close()
-            resultFile.close()
-            print "The results are stored in the file " + "BatchResults_" + time_stamp + ".txt"
-            print "All folders contains the experiments are stored in the file " + "BatchExpsFixedCNN_" + time_stamp + ".txt"
+                        resultFile.write("-----------------------------------------\n")
+                        if following_strategy == 3:
+                            resultFile.write("CNN-SVM Results:\n")
+                            for eachLine in allLinesSVM:
+                                resultFile.write(eachLine)
+                            inputFileRF.close()
+                            inputFileSVM.close()
+                        resultFile.write("##################################################\n")
+                    #file.close()
+                resultFile.close()
+                print "The results are stored in the file " + "BatchResults_" + time_stamp + ".txt"
+                print "All folders contains the experiments are stored in the file " + "BatchExpsFixedCNN_" + time_stamp + ".txt"
     elif if_batch == 3:
         os.system('clear')
         analyse.analyse()

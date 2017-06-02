@@ -210,7 +210,7 @@ def temp_network(filePath, number_of_con_filters,neuronLayers, con_step_length, 
     model.add(Activation('tanh'))
 
     #the activation layer which will output the final classification result
-    layer4 = Dense(destinations + 1,activation = 'tanh', bias=True)
+    layer4 = Dense(int(destinations) + 1,activation = 'tanh', bias=True)
 #    layer4 = Activation('tanh')
     model.add(layer4)
 
