@@ -494,13 +494,13 @@ def complete_implement(type, dir):
     print "2: CNN+SVM based on trained CNN model;"
     print "3: Fine tune trained CNN network;"
     print "4: Draw RGB graphs;"
-    print "5: TODO..."
+    print "5: Compute OA,AA and Kappa on batched experiments."
     #选择类型
     #1 已有CNN模型，进行CNN+RF的实验
     #2 已有CNN模型，进行CNN+SVM的实验
     #3 对CNN进行训练微调
     #4 没有RGB图像，补充RGB图像
-    #5 其他暂时没想到的实验
+    #5 根据已有的实验结果计算OA、AA、Kappa系数等参数
     operate_type = raw_input(prompt)
 
     trees = ''
