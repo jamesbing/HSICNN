@@ -390,7 +390,7 @@ def complete_experiments(if_new):
         else:
             complete_type = 'one'
             perform_dir_list = true_file_path
-        complete_implement(complete_type, perform_dir_list)
+        complete_implement(if_new, complete_type, perform_dir_list)
 
 #complete_operate(operate_type = operate_type, folder_path = folder, trees = trees, neurons = neurons, neuronLayersCount = neuronLayersCount, maxpoolings = maxpoolings, fullLayers = fullLayers)
 def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCount,maxpoolings, fullLayers):
@@ -476,7 +476,8 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
             print 'TODO'
 
         elif operate_type == '5':
-            print 'TODO'
+            print 'Computing OA, AA and Kappa for ' + folder_path
+
 
         else:
             print 'Not under selection list, skip it.'
@@ -484,24 +485,29 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
         print "not a folder, skipt it."
 
 
-def complete_implement(type, dir):
+def complete_implement(if_new, type, dir):
     prompt = '>'
+    operate_type = ''
     print "Type:" + type + ", as follows:"
     for temp in dir:
         print temp
-    print "Choose operate type:"
-    print "1: CNN+RF based on trained CNN model;"
-    print "2: CNN+SVM based on trained CNN model;"
-    print "3: Fine tune trained CNN network;"
-    print "4: Draw RGB graphs;"
-    print "5: Compute OA,AA and Kappa on batched experiments."
+    if if_new != '3':
+        print "Choose operate type:"
+        print "1: CNN+RF based on trained CNN model;"
+        print "2: CNN+SVM based on trained CNN model;"
+        print "3: Fine tune trained CNN network;"
+        print "4: Draw RGB graphs;"
+        operate_type = raw_input(prompt)
+    elif if_new == '3':
+        print "Compute OA,AA and Kappa on batched experiments."
+        operate_type = '5'
     #选择类型
     #1 已有CNN模型，进行CNN+RF的实验
     #2 已有CNN模型，进行CNN+SVM的实验
     #3 对CNN进行训练微调
     #4 没有RGB图像，补充RGB图像
     #5 根据已有的实验结果计算OA、AA、Kappa系数等参数
-    operate_type = raw_input(prompt)
+    #operate_type = raw_input(prompt)
 
     trees = ''
     if operate_type == '1':
