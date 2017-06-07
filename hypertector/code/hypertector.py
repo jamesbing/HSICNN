@@ -365,7 +365,7 @@ def new_experiments():
         print "#1 caffe; #2 tensorflow; #3 theano"
         print "TODO"
 
-def complete_experiments():
+def complete_experiments(if_new):
     folder_prompt = ">../experiments/"
     print "Select the experiments folder, if want to perform multi experiments, put their data as sub folders in the selected folder."
     file_path = raw_input(folder_prompt)
@@ -535,8 +535,9 @@ if __name__ == "__main__":
     print "Want to: "
     print "#1:Complete experiments on existing data;"
     print "#2:Do new experiments from scratch."
+    print "#3:compute OA,AA and kappa etc on batched experiments results."
     if_new = raw_input(prompt)
-    if if_new == '1':
-        complete_experiments()
+    if if_new == '1' or if_new == '3':
+        complete_experiments(if_new)
     elif if_new == '2':
         new_experiments()
