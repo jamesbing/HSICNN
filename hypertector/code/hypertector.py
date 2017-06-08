@@ -497,6 +497,10 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
             #print folder_path
             #folder是一个路径集合，它包括某个目录下面所有的子实验的目录。因此可以循环着去取出
             #所有对应的结果，然后做进一步统计和计算。
+            folder_name_current = folder_path.split('_')
+            dataset_name = folder_name_current[0].split('/')[3]
+            strategy_current = folder_name_current[1]
+            training_ratio_current = folder_name_current[2]
 
 
         else:
