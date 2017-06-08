@@ -11,6 +11,8 @@ import analyse
 import os
 import hic
 import scipy.io as sio
+import ConfigParser
+import string,sys
 
 from sys import argv
 
@@ -390,14 +392,15 @@ def complete_experiments(if_new):
         else:
             complete_type = 'one'
             perform_dir_list = true_file_path
-        complete_implement(if_new, complete_type, perform_dir_list)
+        complete_implement(if_new, complete_type, perform_dir_list, true_file_path)
 
 #complete_operate(operate_type = operate_type, folder_path = folder, trees = trees, neurons = neurons, neuronLayersCount = neuronLayersCount, maxpoolings = maxpoolings, fullLayers = fullLayers)
 def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCount,maxpoolings, fullLayers):
     #TODO 添加增强健壮性的代码
     if os.path.isdir(folder_path):
-        
-        print "Processing " + folder_path
+       
+        if(operate_type != '5'):
+            print "Processing " + folder_path
         #首先根据目录名字拿到数据集的文件名
         file_name_split = folder_path.split('/')
         file_or_folder_name = file_name_split[len(file_name_split) - 1]
@@ -420,13 +423,18 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
         decay = 0.00001
 
         #这一块业务逻辑需要与调用该端代码的逻辑进行整合
-        if os.path.exists(folder_path + '/networkconf.txt'):
-            print "后续加上统一的网络配置文件记录之后就从这里面读取网络参数。"
-        else:
+ #       print folder_path+'/network.conf'
+        #if os.path.exists(folder_path + '/network.conf'):
+ #           print "TODO"
+ #           print "Fetching configurations in the network.conf file...."
+ #           cf = ConfigParser.ConfigParser()
+ #           cf.read(folder_path + '/network.conf')
+ #           data_set_name_in_configure = cf.get("cnn","dataset")
+ #           print "data set is " + data_set_name_in_configure
+        #elif:
             #TODO:下面代码是暂时的，而且这代码仅适用于CCS和CCR的工作，因此最终还是要靠networkconf.txt,以后改成没有这个配置文件就不让运行。
         #    print "网络参数配置文件不存在，请手动输入："
-        #    print "Enter convolutional neurons in this network:"
-         
+        #    print "Enter convolutional neurons in this network:" 
         #    neurons = int(raw_input(prompt))
         #    print "Enter layers each convolutional neuron operates:"
         #    neuronLayersCount = int(raw_input(prompt))
@@ -434,18 +442,17 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
         #    maxpoolings = int(raw_input(prompt))
         #    print "Enter fully layer neurons count:"
         #    fullLayers = int(raw_input(prompt))
-
             #rows lines 暂时先去数据集中找，以后这些也应该作为参数保存起来，直接load即可。
-            LabelsMat = sio.loadmat(data_prefix + dataset_name_sub[0] + '/' + dataset_name_sub[0] + 'Gt.mat')
-            key_label_name = LabelsMat.keys()
-            label_key = ''
-            for temp_key in key_label_name:
-                if temp_key != '__version__' and temp_key != '__header__' and temp_key != '__globals__':
-                    label_key = temp_key
-                    break
-            Labels = LabelsMat[label_key]
-            raws = int(len(Labels))
-            lines = int(len(Labels[0]))
+        LabelsMat = sio.loadmat(data_prefix + dataset_name_sub[0] + '/' + dataset_name_sub[0] + 'Gt.mat')
+        key_label_name = LabelsMat.keys()
+        label_key = ''
+        for temp_key in key_label_name:
+            if temp_key != '__version__' and temp_key != '__header__' and temp_key != '__globals__':
+                label_key = temp_key
+                break
+        Labels = LabelsMat[label_key]
+        raws = int(len(Labels))
+        lines = int(len(Labels[0]))
 
         if operate_type == '1':
             print 'CNN+RF base on trained CNN model.'
@@ -476,7 +483,10 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
             print 'TODO'
 
         elif operate_type == '5':
-            print 'Computing OA, AA and Kappa for ' + folder_path
+            #print 'Computing OA, AA and Kappa for ' + folder_path
+            train_ratio = 0
+            neighbor_strategy = 0
+            #../experiments/KSC/KSC_4_20_2017_6_3_12_23
 
 
         else:
@@ -485,7 +495,7 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
         print "not a folder, skipt it."
 
 
-def complete_implement(if_new, type, dir):
+def complete_implement(if_new, type, dir, true_folder_path):
     prompt = '>'
     operate_type = ''
     print "Type:" + type + ", as follows:"
@@ -520,16 +530,35 @@ def complete_implement(if_new, type, dir):
 
     else:
         #执行一组的逻辑
+        neurons = ""
+        neuronLayersCount = ""
+        maxpoolings = ""
+        fullLayers = ""
 
-        print "网络参数配置文件不存在，请手动输入："
-        print "Enter convolutional neurons in this network:"
-        neurons = int(raw_input(prompt))
-        print "Enter layers each convolutional neuron operates:"
-        neuronLayersCount = int(raw_input(prompt))
-        print "Enter maxpooling kernel size:"
-        maxpoolings = int(raw_input(prompt))
-        print "Enter fully layer neurons count:"
-        fullLayers = int(raw_input(prompt))
+        if os.path.exists(true_folder_path + '/network.conf'):
+            print "Fetching configurations in the network.conf file...."
+            cf = ConfigParser.ConfigParser()
+            cf.read(true_folder_path + '/network.conf')
+            data_set_name_in_configure = cf.get("cnn","dataset")
+            print "data set is " + data_set_name_in_configure
+            neurons = cf.get("cnn", "conv_neuron_count")
+            neuronLayersCount = cf.get("cnn", "conv_layer_count")
+            maxpoolings = cf.get("cnn", "maxpooling_size")
+            fullLayers = cf.get("cnn", "fully_layers_count")
+            print "the number of convolutional neurons is " + neurons
+            print "the number of layers of each convolutional neuron operates is " + neuronLayersCount
+            print "the number of numbers of each maxpooling kernel operates is  " + maxpoolings
+            print "the number of neurons in full layer is " + fullLayers
+        else:
+            print "网络参数配置文件不存在，请手动输入："
+            print "Enter convolutional neurons in this network:"
+            neurons = int(raw_input(prompt))
+            print "Enter layers each convolutional neuron operates:"
+            neuronLayersCount = int(raw_input(prompt))
+            print "Enter maxpooling kernel size:"
+            maxpoolings = int(raw_input(prompt))
+            print "Enter fully layer neurons count:"
+            fullLayers = int(raw_input(prompt))
 
         for folder in dir:
             complete_operate(operate_type = operate_type, folder_path = folder, trees = trees, neurons = neurons, neuronLayersCount = neuronLayersCount, maxpoolings = maxpoolings, fullLayers = fullLayers)
