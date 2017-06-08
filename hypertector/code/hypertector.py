@@ -482,6 +482,7 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
         elif operate_type == '4':
             print 'TODO'
 
+        # logic to compute the OA, AA and kappa index.
         elif operate_type == '5':
             #print 'Computing OA, AA and Kappa for ' + folder_path
             train_ratio = 0
