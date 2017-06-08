@@ -486,7 +486,17 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
             #print 'Computing OA, AA and Kappa for ' + folder_path
             train_ratio = 0
             neighbor_strategy = 0
-            #../experiments/KSC/KSC_4_20_2017_6_3_12_23
+            #deperacated...下面的方式不太合理，重构
+            #../experiments/KSC/KSC_4iasi_20_2017_6_3_12_23
+            #获取不同近邻策略下不同训练比例下的分类准确率，accuracy_x_y_z表示x近邻策略下，训练样本
+            #占比为y%的情况下，z模型在测试集上的分类准确率。
+            #accuracy_1_1_cnn = 0
+            #accuracy_1_10_cnn = 0
+            #accuracy_1_20_cnn = 0
+            #accuracy_4_1_cnn = 0
+            #print folder_path
+            #folder是一个路径集合，它包括某个目录下面所有的子实验的目录。因此可以循环着去取出
+            #所有对应的结果，然后做进一步统计和计算。
 
 
         else:
