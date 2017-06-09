@@ -115,6 +115,8 @@ def run_batch(datasetName,strategies, neurons, neuronLayersCount, maxpoolings, f
     #for time_counts in range(experiment_times):
         mix_model_svm_ratio = 0
         #print strategies
+        print learning_sample_ratios
+
         file_name, neighbors, raws_size, lines_size = data_util.prepare(learning_sample_ratios, datasetName, int(strategies), 2)
         neighbors = neighbors + 1
         print "the neighbors strategy is: " + str(neighbors)
