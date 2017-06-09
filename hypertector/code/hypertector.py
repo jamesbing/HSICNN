@@ -504,7 +504,8 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
             dataset_name = folder_name_current[0].split('/')[3]
             strategy_current = folder_name_current[1]
             training_ratio_current = folder_name_current[2]
-
+            #return 'haha got ya'
+            
 
         else:
             print 'Not under selection list, skip it.'
@@ -578,7 +579,8 @@ def complete_implement(if_new, type, dir, true_folder_path):
             fullLayers = int(raw_input(prompt))
 
         for folder in dir:
-            complete_operate(operate_type = operate_type, folder_path = folder, trees = trees, neurons = neurons, neuronLayersCount = neuronLayersCount, maxpoolings = maxpoolings, fullLayers = fullLayers)
+            result = complete_operate(operate_type = operate_type, folder_path = folder, trees = trees, neurons = neurons, neuronLayersCount = neuronLayersCount, maxpoolings = maxpoolings, fullLayers = fullLayers)
+            print result
 
 if __name__ == "__main__":
     prompt = ">"
