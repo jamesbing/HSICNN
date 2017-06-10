@@ -506,6 +506,7 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
             training_ratio_current = folder_name_current[2]
             #return 'haha got ya'
             
+            
 
         else:
             print 'Not under selection list, skip it.'
