@@ -504,8 +504,15 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
             dataset_name = folder_name_current[0].split('/')[3]
             strategy_current = folder_name_current[1]
             training_ratio_current = folder_name_current[2]
-            #return 'haha got ya'
-            
+            #首先检测是否有result.mat或者result.xls文件，如果有则省事的读取，如果没有，则补上   
+            if os.path.exists(folder_path + '/result.mat') or os.path.exists(folder_path + '/result.xls'):
+                #读取这两个文件并将结果返回的逻辑
+                return "temporary result file"
+            else:
+                #重新将测试集喂到训练好的CNN、CCR、CCS、SVM、RF模型中，并记录结果
+                #结果应该包括所有的测试结果的精度，以及每个类别的分类精度
+
+
             
 
         else:
