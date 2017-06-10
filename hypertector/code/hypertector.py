@@ -504,15 +504,26 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
             dataset_name = folder_name_current[0].split('/')[3]
             strategy_current = folder_name_current[1]
             training_ratio_current = folder_name_current[2]
-            #首先检测是否有result.mat或者result.xls文件，如果有则省事的读取，如果没有，则补上   
-            if os.path.exists(folder_path + '/result.mat') or os.path.exists(folder_path + '/result.xls'):
-                #读取这两个文件并将结果返回的逻辑
-                return "temporary result file"
+            current_dataset = dataset_name + "_" + strategy_current + "_" + training_ratio_current
+            cnn_result = current_dataset + "CNNOnlyResult.mat"
+            ccr_result = current_dataset + "CNNRFResult.mat"
+            ccr_result_backup = current_dataset + "_trees_200_CNNRFResult.mat"
+            ccs_result = current_dataset + "CNNSVMResult.mat"
+            rf_result = current_dataset + "RFonlyResult.mat"
+            svm_result = current_dataset + "SVMonlyResult.mat"
+            #print current_dataset
+            #print dataset_name
+            #拿到所有结果文件，并检测在总目录下是否存在同名的结果文件，如果结果文件存在，将子实验
+            #中的结果数据拿出来，append到总目录下的同名结果文件后面，如果结果文件不存在，新建一个
+            #同名文件，并将结果写入其中。
+            whole_path = "../"
+            if os.path.exists(whole_path + cnn_result):
+
             else:
-                #重新将测试集喂到训练好的CNN、CCR、CCS、SVM、RF模型中，并记录结果
-                #结果应该包括所有的测试结果的精度，以及每个类别的分类精度
 
 
+
+#        if os.path.exists(true_folder_path + '/network.conf'):
             
 
         else:
@@ -587,8 +598,7 @@ def complete_implement(if_new, type, dir, true_folder_path):
             fullLayers = int(raw_input(prompt))
 
         for folder in dir:
-            result = complete_operate(operate_type = operate_type, folder_path = folder, trees = trees, neurons = neurons, neuronLayersCount = neuronLayersCount, maxpoolings = maxpoolings, fullLayers = fullLayers)
-            print result
+            complete_operate(operate_type = operate_type, folder_path = folder, trees = trees, neurons = neurons, neuronLayersCount = neuronLayersCount, maxpoolings = maxpoolings, fullLayers = fullLayers)
 
 if __name__ == "__main__":
     prompt = ">"
