@@ -13,6 +13,7 @@ import hic
 import scipy.io as sio
 import ConfigParser
 import string,sys
+import numpy as np
 
 from sys import argv
 
@@ -407,6 +408,8 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
         file_name_split = folder_path.split('/')
         file_or_folder_name = file_name_split[len(file_name_split) - 1]
         dataset_name_sub = file_or_folder_name.split('_')
+#TODO：添加判断目录是否为有效实验结果的代码，有时候非实验结果的文件夹会不小心混在目录中，应该予以剔除
+#        print dataset_name_sub
         dataset_name = dataset_name_sub[0] + '_' + dataset_name_sub[1] + '_' + dataset_name_sub[2]
         
         #搜寻该文件夹中的网络配置文件
@@ -415,6 +418,7 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
         #TODO:与下面的else配套
         #neurons = 0
         #neuronLayersCount = 0
+        print dataset_name_sub[1]
         neighbors = int(dataset_name_sub[1]) + 1
         #maxpoolings = 0
         #fullLayers = 0
@@ -424,27 +428,6 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
         ratio = 0.001
         decay = 0.00001
 
-        #这一块业务逻辑需要与调用该端代码的逻辑进行整合
- #       print folder_path+'/network.conf'
-        #if os.path.exists(folder_path + '/network.conf'):
- #           print "TODO"
- #           print "Fetching configurations in the network.conf file...."
- #           cf = ConfigParser.ConfigParser()
- #           cf.read(folder_path + '/network.conf')
- #           data_set_name_in_configure = cf.get("cnn","dataset")
- #           print "data set is " + data_set_name_in_configure
-        #elif:
-            #TODO:下面代码是暂时的，而且这代码仅适用于CCS和CCR的工作，因此最终还是要靠networkconf.txt,以后改成没有这个配置文件就不让运行。
-        #    print "网络参数配置文件不存在，请手动输入："
-        #    print "Enter convolutional neurons in this network:" 
-        #    neurons = int(raw_input(prompt))
-        #    print "Enter layers each convolutional neuron operates:"
-        #    neuronLayersCount = int(raw_input(prompt))
-        #    print "Enter maxpooling kernel size:"
-        #    maxpoolings = int(raw_input(prompt))
-        #    print "Enter fully layer neurons count:"
-        #    fullLayers = int(raw_input(prompt))
-            #rows lines 暂时先去数据集中找，以后这些也应该作为参数保存起来，直接load即可。
         LabelsMat = sio.loadmat(data_prefix + dataset_name_sub[0] + '/' + dataset_name_sub[0] + 'Gt.mat')
         key_label_name = LabelsMat.keys()
         label_key = ''
@@ -489,17 +472,6 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
             #print 'Computing OA, AA and Kappa for ' + folder_path
             train_ratio = 0
             neighbor_strategy = 0
-            #deperacated...下面的方式不太合理，重构
-            #../experiments/KSC/KSC_4iasi_20_2017_6_3_12_23
-            #获取不同近邻策略下不同训练比例下的分类准确率，accuracy_x_y_z表示x近邻策略下，训练样本
-            #占比为y%的情况下，z模型在测试集上的分类准确率。
-            #accuracy_1_1_cnn = 0
-            #accuracy_1_10_cnn = 0
-            #accuracy_1_20_cnn = 0
-            #accuracy_4_1_cnn = 0
-            #print folder_path
-            #folder是一个路径集合，它包括某个目录下面所有的子实验的目录。因此可以循环着去取出
-            #所有对应的结果，然后做进一步统计和计算。
             folder_name_current = folder_path.split('_')
             dataset_name = folder_name_current[0].split('/')[3]
             strategy_current = folder_name_current[1]
@@ -511,20 +483,27 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
             ccs_result = current_dataset + "CNNSVMResult.mat"
             rf_result = current_dataset + "RFonlyResult.mat"
             svm_result = current_dataset + "SVMonlyResult.mat"
-            #print current_dataset
-            #print dataset_name
-            #拿到所有结果文件，并检测在总目录下是否存在同名的结果文件，如果结果文件存在，将子实验
-            #中的结果数据拿出来，append到总目录下的同名结果文件后面，如果结果文件不存在，新建一个
-            #同名文件，并将结果写入其中。
-            whole_path = "../"
-            if os.path.exists(whole_path + cnn_result):
-
-            else:
-
-
-
-#        if os.path.exists(true_folder_path + '/network.conf'):
             
+            #检查并创建sum_up_results目录用于存放所有文件
+            sum_up_result_folder = "../experiments/" + dataset_name + "/SumResults"
+            if not os.path.exists(sum_up_result_folder):
+                os.makedirs(sum_up_result_folder)
+            
+            #开始取出结果并汇总
+            data = sio.loadmat(folder_path + "/" + cnn_result)
+            actual = data['actual'][0]
+            predict = data['predict'][0]
+            file_name = sum_up_result_folder +  "/" + cnn_result
+            if os.path.exists(file_name):
+                data_old = sio.loadmat(file_name)
+                actual_old = data_old['actual'][0]
+                predict_old = data_old['predict'][0]
+                actual_new = np.append(actual_old, actual)
+                predict_new = np.append(predict_old, predict)
+                sio.savemat(file_name,{'actual':actual_new,'predict':predict_new},appendmat=False)
+                
+            else:
+                sio.savemat(file_name,{'actual':actual, 'predict':predict})
 
         else:
             print 'Not under selection list, skip it.'
