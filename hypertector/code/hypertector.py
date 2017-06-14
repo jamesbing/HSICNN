@@ -599,24 +599,48 @@ def complete_implement(if_new, type, dir, true_folder_path):
         files = os.listdir(sum_results_folder)
 #        print files
         sum_result_txt = open(sum_results_folder + '/results.txt','w')
+        bar = Bar(total = len(files))
         for result_file in files:
+            bar.move()
+            bar.log('Now calcluating for ' + result_file + "...")
             file_whole = result_file
             file_name = result_file.split('.')[0]
             sum_result_txt.write(file_name + ":")
-            OA = cal_oa(sum_results_folder + '/SumResults/' + file_whole)
-            kappa = cal_kappa(sum_results_folder + '/SumResults/' + file_whole)
-            sum_result_txt.write("\t\tOA:" + OA + "\t\tkappa:" + kappa + "\n")
+            OA = cal_oa(sum_results_folder + '/' + file_whole)
+            kappa = cal_kappa(sum_results_folder + "/" + file_whole)
+            sum_result_txt.write("\t\tOA:" + str(OA) + "\t\tkappa:" + str(kappa) + "\n")
 
         sum_result_txt.close()
 
 def cal_oa(result_mat):
-    oa = 'oa'
-
+    data = sio.loadmat(result_mat)
+    actual = data['actual'][0]
+    predict = data['predict'][0]
+    counting_correct = 0
+    #print "Actual tags:"
+    #print actual
+    #print "Predict tags:"
+    #print predict
+    for temp_count in range(len(actual)):
+        if int(actual[temp_count]) == int(predict[temp_count]):
+            counting_correct += 1
+    oa = float(counting_correct)/len(actual)
     return oa
 
 def cal_kappa(result_mat):
-    kappa = 'kappa'
-
+    kappa = 0.0
+    pe = 0.0
+    pa = 0.0
+    data = sio.loadmat(result_mat)
+    actual = data['actual'][0]
+    predict = data['predict'][0]
+    classes = int(max(actual))
+    classify_results = []
+    for i in range(classes):
+        temp = []
+        classify_results.append(temp)
+    for j in range(len(actual)):
+        classify_results[]
     return kappa
 
 
