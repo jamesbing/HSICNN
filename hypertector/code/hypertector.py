@@ -596,7 +596,28 @@ def complete_implement(if_new, type, dir, true_folder_path):
         #遍历SumResults目录
         sum_results_folder = true_folder_path + '/SumResults'
         print "Results are saved in " + sum_results_folder + "."
+        files = os.listdir(sum_results_folder)
+#        print files
+        sum_result_txt = open(sum_results_folder + '/results.txt','w')
+        for result_file in files:
+            file_whole = result_file
+            file_name = result_file.split('.')[0]
+            sum_result_txt.write(file_name + ":")
+            OA = cal_oa(sum_results_folder + '/SumResults/' + file_whole)
+            kappa = cal_kappa(sum_results_folder + '/SumResults/' + file_whole)
+            sum_result_txt.write("\t\tOA:" + OA + "\t\tkappa:" + kappa + "\n")
 
+        sum_result_txt.close()
+
+def cal_oa(result_mat):
+    oa = 'oa'
+
+    return oa
+
+def cal_kappa(result_mat):
+    kappa = 'kappa'
+
+    return kappa
 
 
 if __name__ == "__main__":
