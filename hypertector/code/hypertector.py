@@ -15,6 +15,7 @@ import ConfigParser
 import string,sys
 import numpy as np
 from bar import Bar
+import datetime
 
 from sys import argv
 
@@ -379,14 +380,20 @@ def complete_experiments(if_new):
     if os.path.exists(true_file_path) != True:
         print "Folder path \"" + true_file_path + "\" does not exist. Program termanited."
     else:
+
+        #将原有的SumResults目录转移到SumResultsBackup目录下
+        if os.path.exists(os.path.join(true_file_path, "SumResults")):
+            os.rename(os.path.join(true_file_path, "SumResults"), os.path.join(true_file_path,"SumResultsBackup" + str(datetime.datetime.now())))
+        
         #读取目录下所有的文件或者文件夹
         dirList = []
         perform_dir_list = ''
         complete_type = ''
         for temp_content in os.listdir(true_file_path):
             if os.path.isdir(os.path.join(true_file_path,temp_content)):
-                print "目录" + temp_content
-                dirList.append(os.path.join(true_file_path,temp_content))
+                if '_' in os.path.join(true_file_path,temp_content):
+                    print "目录" + temp_content
+                    dirList.append(os.path.join(true_file_path,temp_content))
 
         #判断是多组实验还是一个实验的逻辑
         if len(dirList) > 0:
@@ -397,7 +404,7 @@ def complete_experiments(if_new):
             complete_type = 'one'
             perform_dir_list = true_file_path
         complete_implement(if_new, complete_type, perform_dir_list, true_file_path)
-
+        
 #complete_operate(operate_type = operate_type, folder_path = folder, trees = trees, neurons = neurons, neuronLayersCount = neuronLayersCount, maxpoolings = maxpoolings, fullLayers = fullLayers)
 def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCount,maxpoolings, fullLayers):
     #TODO 添加增强健壮性的代码
@@ -507,8 +514,6 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
                     else:
                         sio.savemat(file_name,{'actual':actual, 'predict':predict})
 
-
-
         else:
             print 'Not under selection list, skip it.'
     else:
@@ -554,7 +559,7 @@ def complete_implement(if_new, type, dir, true_folder_path):
         neuronLayersCount = ""
         maxpoolings = ""
         fullLayers = ""
-
+        data_set_name_in_configure = ""
         if os.path.exists(true_folder_path + '/network.conf'):
             print "Fetching configurations in the network.conf file...."
             cf = ConfigParser.ConfigParser()
@@ -586,6 +591,13 @@ def complete_implement(if_new, type, dir, true_folder_path):
             bar.move()
             bar.log('Now processing ' + folder + '...')
             complete_operate(operate_type = operate_type, folder_path = folder, trees = trees, neurons = neurons, neuronLayersCount = neuronLayersCount, maxpoolings = maxpoolings, fullLayers = fullLayers)
+        #完成后计算精度
+        print "Now calculating the average accuracy of all results..."
+        #遍历SumResults目录
+        sum_results_folder = true_folder_path + '/SumResults'
+        print "Results are saved in " + sum_results_folder + "."
+
+
 
 if __name__ == "__main__":
     prompt = ">"
