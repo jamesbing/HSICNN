@@ -14,6 +14,7 @@ import scipy.io as sio
 import ConfigParser
 import string,sys
 import numpy as np
+from bar import Bar
 
 from sys import argv
 
@@ -418,7 +419,6 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
         #TODO:与下面的else配套
         #neurons = 0
         #neuronLayersCount = 0
-        print dataset_name_sub[1]
         neighbors = int(dataset_name_sub[1]) + 1
         #maxpoolings = 0
         #fullLayers = 0
@@ -450,7 +450,7 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
                 for trees_number in exp_trees:
                     print "Tree Number:" + str(trees_number)
                     cnnrf_acc, rf_acc = cnnrf.run(folder_path + "/" + dataset_name,trees_number, int(neurons), int(neuronLayersCount), int(neighbors), int(maxpoolings), int(fullLayers), raws, lines,test_cnn = -1)
-                                       # cnnrf.run(file_name,trees, neurons, neuronLayersCount, neighbors, maxpoolings, fullLayers, raws_size, lines_size)
+                                       # cnnrf.run(file_name,trees, neurons, neuronLayersCount, /neighbors, maxpoolings, fullLayers, raws_size, lines_size)
                     cnnrf_acc_list.append(cnnrf_acc)
                     rf_acc_list.append(rf_acc)
                 sio.savemat(folder_path + "/ALL_CNN_RF_EXP_RESULT.mat",{'cnnrf':cnnrf_acc_list, 'rf':rf_acc_list})
@@ -483,27 +483,31 @@ def complete_operate(operate_type, folder_path, trees, neurons, neuronLayersCoun
             ccs_result = current_dataset + "CNNSVMResult.mat"
             rf_result = current_dataset + "RFonlyResult.mat"
             svm_result = current_dataset + "SVMonlyResult.mat"
-            
+            results_index = [cnn_result, ccr_result, ccr_result_backup, ccs_result, rf_result, svm_result] 
             #检查并创建sum_up_results目录用于存放所有文件
             sum_up_result_folder = "../experiments/" + dataset_name + "/SumResults"
             if not os.path.exists(sum_up_result_folder):
                 os.makedirs(sum_up_result_folder)
             
-            #开始取出结果并汇总
-            data = sio.loadmat(folder_path + "/" + cnn_result)
-            actual = data['actual'][0]
-            predict = data['predict'][0]
-            file_name = sum_up_result_folder +  "/" + cnn_result
-            if os.path.exists(file_name):
-                data_old = sio.loadmat(file_name)
-                actual_old = data_old['actual'][0]
-                predict_old = data_old['predict'][0]
-                actual_new = np.append(actual_old, actual)
-                predict_new = np.append(predict_old, predict)
-                sio.savemat(file_name,{'actual':actual_new,'predict':predict_new},appendmat=False)
-                
-            else:
-                sio.savemat(file_name,{'actual':actual, 'predict':predict})
+            for temp_index in results_index:
+                if os.path.exists(folder_path + "/" + temp_index): 
+                    #开始取出结果并汇总
+                    data = sio.loadmat(folder_path + "/" + temp_index)
+                    actual = data['actual'][0]
+                    predict = data['predict'][0]
+                    file_name = sum_up_result_folder +  "/" + temp_index
+                    if os.path.exists(file_name):
+                        data_old = sio.loadmat(file_name)
+                        actual_old = data_old['actual'][0]
+                        predict_old = data_old['predict'][0]
+                        actual_new = np.append(actual_old, actual)
+                        predict_new = np.append(predict_old, predict)
+                        sio.savemat(file_name,{'actual':actual_new,'predict':predict_new},appendmat=False)
+                        
+                    else:
+                        sio.savemat(file_name,{'actual':actual, 'predict':predict})
+
+
 
         else:
             print 'Not under selection list, skip it.'
@@ -576,7 +580,11 @@ def complete_implement(if_new, type, dir, true_folder_path):
             print "Enter fully layer neurons count:"
             fullLayers = int(raw_input(prompt))
 
+
+        bar = Bar(total = len(dir)) 
         for folder in dir:
+            bar.move()
+            bar.log('Now processing ' + folder + '...')
             complete_operate(operate_type = operate_type, folder_path = folder, trees = trees, neurons = neurons, neuronLayersCount = neuronLayersCount, maxpoolings = maxpoolings, fullLayers = fullLayers)
 
 if __name__ == "__main__":
