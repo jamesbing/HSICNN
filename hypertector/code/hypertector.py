@@ -635,12 +635,31 @@ def cal_kappa(result_mat):
     actual = data['actual'][0]
     predict = data['predict'][0]
     classes = int(max(actual))
-    classify_results = []
-    for i in range(classes):
-        temp = []
-        classify_results.append(temp)
-    for j in range(len(actual)):
-        classify_results[]
+    result_matrix = np.zeros((classes, classes))
+
+    for i in range(len(actual)):
+        hengzuobiao = int(actual[i] - 1)
+        zongzuobiao = int(predict[i] - 1)
+        result_matrix[hengzuobiao][zongzuobiao] = result_matrix[hengzuobiao][zongzuobiao] + 1
+
+    sum = 0.0
+    for j in range(classes):
+        pe_zong = result_matrix[0:classes,j].sum()
+        pe_heng = result_matrix[j,0:classes].sum()
+        pe = pe + pe_zong * pe_heng
+        sum = sum + pe_zong + pe_heng
+    
+    for k in range(classes):
+        pa = pa = result_matrix[k][k]
+
+    pe = (pe / sum) / sum
+    pa = pa / sum
+    
+    kappa = (pa - pe)/(1-pe)
+    
+    save_file = result_mat + ".mat"
+    sio.savemat(save_file,{'sum_result':result_matrix})
+
     return kappa
 
 
