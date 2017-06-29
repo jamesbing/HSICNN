@@ -647,12 +647,12 @@ def cal_kappa(result_mat):
         pe_zong = result_matrix[0:classes,j].sum()
         pe_heng = result_matrix[j,0:classes].sum()
         pe = pe + pe_zong * pe_heng
-        sum = sum + pe_zong + pe_heng
+    sum = result_matrix.sum()
     
     for k in range(classes):
         pa = pa + result_matrix[k][k]
 
-    pe = (pe / sum) / sum
+    pe = pe / (sum * sum)
     pa = pa / sum
     
     kappa = (pa - pe)/(1-pe)
